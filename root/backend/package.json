@@ -4,9 +4,11 @@
   "description": "Tutormi - Book your tutor today!",
   "main": "server.js",
   "scripts": {
+    "frontend-install": "npm install --prefix ../frontend",
     "start": "node server.js",
     "server": "nodemon server.js",
-    "concurrently": "concurrently"
+    "frontend": "npm start --prefix ../frontend",
+    "dev": "concurrently \"npm run server\" \"npm run frontend\""
   },
   "repository": {
     "type": "git",
