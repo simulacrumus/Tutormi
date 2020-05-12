@@ -1,11 +1,4 @@
-import React from "react";
-import styled from "styled-components";
-import { Button, Form, FormGroup, Label, Input } from "reactstrap";
-import {
-  FacebookLoginButton,
-  GoogleLoginButton,
-  LinkedInLoginButton,
-} from "react-social-login-buttons";
+import React from 'react';
 
 function App() {
   return (
