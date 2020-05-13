@@ -4,9 +4,9 @@ const {
     check,
     checkSchema,
     validationResult
-} = require('express-validator/check');
+} = require('express-validator');
 const bcrypt = require('bcryptjs');
-
+const User = require('../../models/user.model');
 
 var Schema = {
     "type": {
@@ -19,6 +19,8 @@ var Schema = {
 }
 
 // @route   POST api/users
+// @desc    Register user
+// @access  Public
 router.post('/', [
     check('name', 'Name is required!').not().isEmpty(),
     check('email', 'Please provide a valid email').isEmail(),
@@ -39,52 +41,44 @@ router.post('/', [
         name,
         email,
         password,
-        about,
-        userType
+        type
     } = req.body;
 
     try {
-
         // check if the user already ezists
-        let tutee = await Tutee.findOne({
+        let user = await User.findOne({
             email
         });
 
-        if (tutee) {
+        if (user) {
             return res.status(400).json({
-                errors: 'Username already exists'
+                errors: [{
+                    msg: 'Username already exists'
+                }]
             });
         }
 
         // create a new tutee object
-        const user = new User({
+        const newUser = new User({
             name,
             email,
             password,
-            about,
-            userType
+            type
         });
 
         // encrypt password
         const salt = await bcrypt.genSalt(10);
 
-        user.password = await bcrypt.hash(password, salt);
+        newUser.password = await bcrypt.hash(password, salt);
 
         // sae new tutee to database
-        await user.save();
-
-        newTutee
-            .save()
-            .then(tutee => {
-                res.json(tutee)
-            })
-            .catch(err => res.status(400).json(err));
-
-
-
+        await newUser.save();
+        res.send('User registered');
 
     } catch (err) {
         console.log(err.message);
         res.status(500).send('Server error!');
     }
 });
+
+module.exports = router;

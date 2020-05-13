@@ -3,12 +3,14 @@ const router = express.Router();
 const {
     check,
     validationResult
-} = require('express-validator/check');
+} = require('express-validator');
 const bcrypt = require('bcryptjs');
 
 const Tutee = require('../../models/tutee.model');
 
 // @route   GET api/tutees
+// @desc    Get current user's tutee profile
+// @access  Private
 router.get('/', (req, res) => {
     Tutee
         .find()

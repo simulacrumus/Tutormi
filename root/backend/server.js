@@ -1,29 +1,26 @@
 const express = require('express');
+const connectDB = require('./config/db');
+
+const app = express();
+
+// Connect to database
+connectDB();
+
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const tutorsRouter = require('./routes/api/tutors');
 const tuteesRouter = require('./routes/api/tutees');
-
-const app = express();
+const userRouter = require('./routes/api/users');
 
 app.use(express.json({
     extended: false
 }));
 
-const db = require('./config/keys').mongoURI;
-
-mongoose
-    .connect(db, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useUnifiedTopology: true
-    })
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.log(err));
-
 app.use('/api/tutees', tuteesRouter);
-//app.use('/api/tutors', tutorsRouter);
+app.use('/api/tutors', tutorsRouter);
+app.use('/api/users', userRouter);
+
 
 const port = process.env.PORT || 5000;
 

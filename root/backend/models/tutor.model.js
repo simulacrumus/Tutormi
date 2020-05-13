@@ -15,6 +15,12 @@ const TutorSchema = new mongoose.Schema({
             ref: 'appointment'
         }
     }],
+    followers: [{
+        tutee: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutee'
+        }
+    }],
     ratings: [{
         tutor: {
             type: mongoose.Schema.Types.ObjectId,
@@ -25,13 +31,7 @@ const TutorSchema = new mongoose.Schema({
         }
     }],
     rating: {
-        function () {
-            let totalRate = 0.0;
-            this.ratings.forEach(element => {
-                totalRate += element.rate;
-            });
-            return totalRate / this.ratings.length;
-        }
+        type: mongoose.Schema.Types.Decimal128
     },
     languages: [{
         language: {
@@ -45,8 +45,15 @@ const TutorSchema = new mongoose.Schema({
         }
     }],
     availableHours: [{
-        hour: {
-            type: Date
+        time: {
+            start: {
+                type: Date,
+                required: true
+            },
+            end: {
+                type: Date,
+                required: true
+            }
         }
     }],
     social: {
