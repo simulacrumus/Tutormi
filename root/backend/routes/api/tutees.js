@@ -1,8 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const {
+    check,
+    validationResult
+} = require('express-validator/check');
+const bcrypt = require('bcryptjs');
 
 const Tutee = require('../../models/tutee.model');
 
+// @route   GET api/tutees
 router.get('/', (req, res) => {
     Tutee
         .find()
@@ -12,22 +18,15 @@ router.get('/', (req, res) => {
         .catch(err => res.status(400).json(err));
 });
 
-router.post('/', (req, res) => {
-    const newTutee = new Tutee({
-        name: req.body.name
-    });
-    newTutee
-        .save()
-        .then(tutee => {
-            res.json(tutee)
-        })
-        .catch(err => res.status(400).json(err));
+// @route   DELETE api/tutees
+router.delete('/:id', (req, res) => {
+    Tutee.findById(req.params.id)
+        .then(tutee => tutee.remove().then(() => res.json({
+            success: true
+        })))
+        .catch(err => res.status(404).json({
+            success: false
+        }));
 });
-
-
-router.delete('/', (req, res) => {
-
-});
-
 
 module.exports = router;

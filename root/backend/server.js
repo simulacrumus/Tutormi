@@ -7,7 +7,9 @@ const tuteesRouter = require('./routes/api/tutees');
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json({
+    extended: false
+}));
 
 const db = require('./config/keys').mongoURI;
 
