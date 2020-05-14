@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const tutorsRouter = require('./routes/api/tutors');
 const tuteesRouter = require('./routes/api/tutees');
 const userRouter = require('./routes/api/users');
+const authRouter = require('./routes/api/auth');
 
 app.use(express.json({
     extended: false
@@ -20,6 +21,7 @@ app.use(express.json({
 app.use('/api/tutees', tuteesRouter);
 app.use('/api/tutors', tutorsRouter);
 app.use('/api/users', userRouter);
+app.use('/api/auth', authRouter);
 
 
 const port = process.env.PORT || 5000;
