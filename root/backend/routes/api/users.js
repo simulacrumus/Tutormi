@@ -25,7 +25,7 @@ var Schema = {
 // @access  Public
 router.post('/', [
     check('name', 'Name is required!').not().isEmpty(),
-    check('email', 'Please provide a valid email').isEmail(),
+    check('email', 'Please provide a valid email address').isEmail(),
     check('password', 'Password should be at least 8 characters').isLength({
         min: 8,
         max: 25
@@ -77,7 +77,9 @@ router.post('/', [
         await newUser.save();
 
         const payload = {
-            id: newUser.id
+            user: {
+                id: user.id
+            }
         }
 
         jwt.sign(payload, config.get('jwtSecret'), {
