@@ -5,9 +5,13 @@ const TutorSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
-    about: {
+    bio: {
         type: String,
         max: 300
+    },
+    courses: {
+        type: [String],
+        required: true
     },
     appointments: [{
         appointment: {
@@ -22,22 +26,25 @@ const TutorSchema = new mongoose.Schema({
         }
     }],
     ratings: [{
-        tutee: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'tutee'
-        },
         rate: {
-            type: mongoose.Schema.Types.Decimal128
+            tutee: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'tutee'
+            },
+            value: {
+                type: Number,
+                default: 0.0
+            }
         }
     }],
     rating: {
-        type: mongoose.Schema.Types.Decimal128
+        type: Number,
+        default: 0.0
     },
-    languages: [{
-        language: {
-            type: String
-        }
-    }],
+    languages: {
+        type: [String],
+        required: true
+    },
     blockedTutees: [{
         tutee: {
             type: mongoose.Schema.Types.ObjectId,
@@ -68,7 +75,14 @@ const TutorSchema = new mongoose.Schema({
         },
         instagram: {
             type: String
+        },
+        youtube: {
+            type: String
         }
+    },
+    location: {
+        type: String,
+        max: 30
     }
 });
 

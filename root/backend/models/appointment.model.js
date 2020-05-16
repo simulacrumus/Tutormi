@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const AppointmentSchema = new mongoose.Schema({
     tutee: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'tutee'
+        ref: 'tutor'
     },
     tutor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'tutor'
+        ref: 'tutee'
     },
     time: {
         start: {
