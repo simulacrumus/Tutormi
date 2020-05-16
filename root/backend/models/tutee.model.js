@@ -27,7 +27,7 @@ const TuteeSchema = new mongoose.Schema({
             ref: 'tutor'
         },
         rate: {
-            type: mongoose.Schema.Types.Decimal128
+            type: Number
         }
     }],
     followingTutors: [{
