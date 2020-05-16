@@ -16,7 +16,7 @@ const {
 // @access  Public
 router.get('/', auth, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(req.user.user.id).select('-password');
         res.json(user);
     } catch (err) {
         console.error(err.message);
@@ -93,7 +93,7 @@ router.post(
             );
         } catch (err) {
             console.error(err.message);
-            res.status(500).send('Server error');
+            res.status(500).send('*auth* Server error');
         }
     }
 );
