@@ -47,7 +47,7 @@ router.post('/', [
     } = req.body;
 
     try {
-        // check if the user already ezists
+        // check if the user already exists
         let user = await User.findOne({
             email
         });
@@ -73,7 +73,7 @@ router.post('/', [
 
         newUser.password = await bcrypt.hash(password, salt);
 
-        // sae new tutee to database
+        // save new tutee to database
         await newUser.save();
 
         const payload = {
@@ -93,7 +93,7 @@ router.post('/', [
 
     } catch (err) {
         console.log(err.message);
-        res.status(500).send('Server error!');
+        res.status(500).send('*users* Server error!');
     }
 });
 
