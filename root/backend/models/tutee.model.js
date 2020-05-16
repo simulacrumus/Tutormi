@@ -33,37 +33,72 @@ const TuteeSchema = new mongoose.Schema({
       },
       rate: {
         type: mongoose.Schema.Types.Decimal128,
-      },
-    },
+      }
+    }
   ],
   followingTutors: [
     {
       tutor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "tutor",
-      },
-    },
+      }
+    }
   ],
   blockedTutors: [
     {
       tutor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "tutor",
-      },
-    },
+      }
+    }
   ],
-  social: {
-    linkedin: {
-      type: String,
-    },
-    twitter: {
-      type: String,
-    },
-    facebook: {
-      type: String,
-    },
-    instagram: {
-      type: String,
+  
+    appointments: [{
+        appointment: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'appointment'
+        }
+    }],
+    languages: [{
+        language: {
+            type: String,
+            max: 20
+        }
+    }],
+    ratings: [{
+        tutor: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutor'
+        },
+        rate: {
+            type: Number
+        }
+    }],
+    followingTutors: [{
+        tutor: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutor'
+        }
+    }],
+    blockedTutors: [{
+        tutor: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutor'
+        }
+    }],
+    social: {
+        linkedin: {
+            type: String
+        },
+        twitter: {
+            type: String
+        },
+        facebook: {
+            type: String
+        },
+        instagram: {
+            type: String
+        }
     }
   }
 });
