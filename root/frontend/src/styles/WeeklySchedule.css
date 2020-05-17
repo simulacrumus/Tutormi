@@ -1,0 +1,31 @@
+table {
+    text-align: center;
+    background-color: #F5F2FB;
+    /* border-collapse:separate; 
+    border-spacing:0 2px;  */
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 0.6px solid #E1E1E1;
+    border-right: 0.6px solid #E1E1E1;
+}
+
+th {
+    font-weight: normal;
+    color: #F2F2F2;
+    /* width: 110px; */
+    border: 0.6px solid #E1E1E1;
+    background-color: #a385e0;
+}
+
+td {
+    height: 35px;
+}
+
+.time {
+    position: relative;
+    top: 20px;
+    border: 0px;
+    /* border-right: solid #D8D8D8; */
+}
