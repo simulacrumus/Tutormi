@@ -1,0 +1,38 @@
+.summarySection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    padding: 30px;
+    border-radius: 5px;
+}
+
+.profileImg {
+    object-fit: cover;
+    height: 150px;
+    width: 300px;
+    margin-bottom: 30px;
+}
+
+.textContainer {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin-bottom: 5px;
+}
+
+.socialArea {
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 15px;
+}
+
+.editContainer {
+    align-self: flex-end;
+}
+
+.editIcon:hover {
+    transform: scale(1.015);
+    transition: all .10s ease-in-out;
+}
