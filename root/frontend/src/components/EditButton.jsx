@@ -6,10 +6,11 @@ import Form from 'react-bootstrap/Form';
 import { connect } from "react-redux";
 <<<<<<< HEAD
 import {store} from '../store/configureStore.js';
+import {UPDATE_USER} from '../store/profileReducer.js';
 =======
 import {store} from '../configureStore.js';
->>>>>>> 8d43487be2fb3ac6eb896d9c872c4eb4e7c3344b
 import {UPDATE_USER} from '../reducers/profileReducer.js';
+>>>>>>> 8d43487be2fb3ac6eb896d9c872c4eb4e7c3344b
 
 function EditButton(props) {
     const [show, setShow] = React.useState(false);
