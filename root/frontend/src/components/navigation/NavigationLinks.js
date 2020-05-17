@@ -23,7 +23,7 @@ const NavigationLinks = (props) => {
 
         <li>
           <NavLink to="/components/login/SignUp.js">Sign up</NavLink>
-        </li>
+        </li> 
       </ul>
     </CSSTransition>
   );
