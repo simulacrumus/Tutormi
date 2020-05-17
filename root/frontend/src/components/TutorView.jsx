@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../styles/TutorView.css';
-import { store } from "../store.js";
+import { store } from "../configureStore.js";
 import { CHANGE_VIEWED_TUTOR } from "../reducers/profileReducer.js";
 
 export default class TutorView extends Component {

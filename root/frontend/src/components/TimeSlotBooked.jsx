@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import '../styles/TimeSlotBooked.css';
-import { store } from "../store.js";
+import { store } from "../configureStore.js";
 import { CANCEL_APPOINTMENT } from "../reducers/profileReducer.js";
 
 export default class TimeSlotBooked extends Component {

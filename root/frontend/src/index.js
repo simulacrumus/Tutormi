@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.css'; // Bootstrap styles
-import {store, persistor} from './store.js';
+import {store, persistor} from './configureStore.js';
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import TutorViewPage from "./pages/TutorViewPage.jsx";

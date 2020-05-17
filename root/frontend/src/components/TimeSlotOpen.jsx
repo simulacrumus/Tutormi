@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import '../styles/TimeSlotOpen.css';
-import { store } from "../store.js";
+import { store } from "../configureStore.js";
 import { BOOK_SLOT } from "../reducers/profileReducer.js";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';

@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { connect } from "react-redux";
-import {store} from '../store.js';
+import {store} from '../configureStore.js';
 import {UPDATE_USER} from '../reducers/profileReducer.js';
 
 function EditButton(props) {
