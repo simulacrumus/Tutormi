@@ -1,63 +1,106 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema;
-
-const TuteeSchema = new Schema({
-    // tuteeName: {
-    //     type: Object,
-    //     firstName: {
-    //         type: String,
-    //         required: true
-    //     },
-    //     lastName: {
-    //         type: String,
-    //         required: true
-    //     }
-    // },
-    // about: {
-    //     type: String
-    // },
-    // social: {
-    //     facebook: String,
-    //     twitter: String,
-    //     linkedIn: String
-    // },
-    // appointments: [{
-    //     tutorID: {
-    //         type: String,
-    //         required: true
-    //     },
-    //     timeBlock: {
-    //         startTime: {
-    //             type: Date,
-    //             default: Date.now
-    //         },
-    //         endTime: {
-    //             type: Date,
-    //             required: true
-    //         }
-    //     },
-    //     subject: {
-    //         type: String,
-    //         required: true
-    //     },
-    //     note: String
-
-    // }],
-    // languages: [{
-    //     language: String
-    // }],
-    // favoriteTutors: [{
-    //     tutorID: String
-    // }],
-    // blockedTutors: [{
-    //     _id: String
-    // }]
-    name: {
-        type: String,
-        required: true
+const TuteeSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  about: {
+    type: String,
+    max: 300,
+  },
+  location: {
+      type: String,
+      max: 25
+  },
+  appointments: [
+    {
+      appointment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "appointment",
+      },
+    },
+  ],
+  languages: {
+    type: [String],
+    max: 20,
+  },
+  ratings: [
+    {
+      tutor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "tutor",
+      },
+      rate: {
+        type: mongoose.Schema.Types.Decimal128,
+      }
     }
+  ],
+  followingTutors: [
+    {
+      tutor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "tutor",
+      }
+    }
+  ],
+  blockedTutors: [
+    {
+      tutor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "tutor",
+      }
+    }
+  ],
+  
+    appointments: [{
+        appointment: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'appointment'
+        }
+    }],
+    languages: [{
+        language: {
+            type: String,
+            max: 20
+        }
+    }],
+    ratings: [{
+        tutor: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutor'
+        },
+        rate: {
+            type: Number
+        }
+    }],
+    followingTutors: [{
+        tutor: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutor'
+        }
+    }],
+    blockedTutors: [{
+        tutor: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutor'
+        }
+    }],
+    social: {
+        linkedin: {
+            type: String
+        },
+        twitter: {
+            type: String
+        },
+        facebook: {
+            type: String
+        },
+        instagram: {
+            type: String
+        }
+    }
+  }
 });
 
-const Tutee = mongoose.model('Tutee', TuteeSchema);
-module.exports = Tutee;
+module.exports = Tutee = mongoose.model("tutee", TuteeSchema);

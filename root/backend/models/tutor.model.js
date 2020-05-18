@@ -1,85 +1,89 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
-
-const TutorSchema = new Schema({
-    tutorName: {
-        firstName: {
-            type: String,
-            required: true
-        },
-        lastName: {
-            type: String,
-            required: true
-        }
+const TutorSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
     },
-    about: {
-        type: String
+    bio: {
+        type: String,
+        max: 300
     },
-    social: {
-        type: Object,
-        facebook: String,
-        twitter: String,
-        linkedIn: String
+    courses: {
+        type: [String],
+        required: true
     },
-    rating: {
-        type: Number
-    },
-    // weeks: [{
-    //     startDate: {
-    //         type: Date,
-    //     },
-    //     week: [{
-    //         day: [{
-    //             timeSlot: {
-    //                 status: String,
-    //                 tuteeID: String,
-    //                 tutorID: String
-    //             }
-    //         }]
-    //     }]
-    // }],
     appointments: [{
-        tuteeID: {
-            type: String,
-            required: true
-        },
-        timeBlock: {
-            startTime: {
-                type: Date,
-                required: true,
-                default: Date.now
+        appointment: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'appointment'
+        }
+    }],
+    followers: [{
+        tutee: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutee'
+        }
+    }],
+    ratings: [{
+        rate: {
+            tutee: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'tutee'
             },
-            endTime: {
-                type: Date,
-                required: true
+            value: {
+                type: Number,
+                default: 0.0
             }
-        },
-        subject: {
-            type: String
-        },
-        note: {
-            type: String
-        }
-
-    }],
-    languages: [{
-        language: {
-            type: String
         }
     }],
+    rating: {
+        type: Number,
+        default: 0.0
+    },
+    languages: {
+        type: [String],
+        required: true
+    },
     blockedTutees: [{
-        _id: {
-            type: String
+        tutee: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutee'
         }
     }],
     availableHours: [{
         time: {
-            type: Date,
-            required: true
+            start: {
+                type: Date,
+                required: true
+            },
+            end: {
+                type: Date,
+                required: true
+            }
         }
-    }]
+    }],
+    social: {
+        linkedin: {
+            type: String
+        },
+        twitter: {
+            type: String
+        },
+        facebook: {
+            type: String
+        },
+        instagram: {
+            type: String
+        },
+        youtube: {
+            type: String
+        }
+    },
+    location: {
+        type: String,
+        max: 30
+    }
 });
 
-const Tutor = mongoose.model('Tutor', TutorSchema);
-module.exports = Tutor;
+module.exports = Tutor = mongoose.model('tutor', TutorSchema);
