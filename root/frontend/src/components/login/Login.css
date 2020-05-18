@@ -1,7 +1,7 @@
-p, div {
+/* p, div {
   font-family:  'Nunito', sans-serif;  
 
-}
+} */
 
 .parentLoginFormBoxContainer {
   height: 97vh;
@@ -37,7 +37,7 @@ p, div {
   color: #222;
 }
 
-form {
+ .login-form{
   width: 100%;
   display: flex;
   flex-wrap: wrap;

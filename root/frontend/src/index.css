@@ -1,18 +1,4 @@
 
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  font-family: 'Nunito', sans-serif;;
-}
-
-body {
-  margin: 0;
-  background: #4d4d4d;
-}
-
 .slide-in-left-enter {
   transform: translateX(-100%);
 }
