@@ -16,7 +16,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <MainNavigation />
-      <main>
+      <main className = "main-class-app">
         <Switch>
           <Route path="/" exact>
             <Login />

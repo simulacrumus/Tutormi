@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 //import Alert, { AlertHeading } from "react-bootstrap/Alert";
-
 import { Button } from "react-bootstrap";
 import {
   FacebookLoginButton,
@@ -10,9 +9,7 @@ import {
   TwitterLoginButton,
   LinkedInLoginButton,
 } from "react-social-login-buttons";
-
 import "./Login.css";
-//import { Link } from "react-router-dom";
 
 export default function Login() {
   //const [email, setEmail] = useState("");
@@ -107,7 +104,7 @@ export default function Login() {
     <div className="parentLoginFormBoxContainer">
       <div className="loginFormBoxContainer">
         <h1 className="welcomeSign">Sign In</h1>
-        <form>
+        <form className = "login-form">
           <div className="form-group">
             <label>Email address</label>
             <input

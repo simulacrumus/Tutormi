@@ -18,7 +18,7 @@ class Router extends Component {
 
   render() {
     return (
-      <main>
+     // <main>
         <Switch>
           <Route path='/' component={ProfilePage} exact />
           <Route path="/dashboard" component={DashboardPage} />
@@ -26,7 +26,7 @@ class Router extends Component {
           <Route path="/search" component={SearchMain} />
           <Route component={Error} /> {/* Need to make an error component later */}
         </Switch>
-      </main>
+     // </main>
     );
   }
 

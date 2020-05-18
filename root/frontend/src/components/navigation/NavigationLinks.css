@@ -1,4 +1,4 @@
-.nav-link {
+.navigation-link {
   list-style: none;
   overflow: hidden;
   margin: 0;
@@ -7,7 +7,7 @@
   height: 100%;
 }
 
-.nav-link li {
+.navigation-link li {
   margin: 1rem;
   list-style-type: none;
   margin: 0;
@@ -15,7 +15,7 @@
   display: inline;
 }
 
-.nav-link a {
+.navigation-link a {
 
   border: 1px solid transparent;
   color: #292929;
@@ -23,16 +23,16 @@
   padding: 0.5rem;
 }
 
-.nav-link a:hover,
-.nav-link a:active,
-.nav-link a.active {
+.navigation-link a:hover,
+.navigation-link a:active,
+.navigation-link a.active {
   text-decoration:none;
   background: #9b97d1;
   border-color: #292929;
   color: #292929;
 }
 
-.nav-link button {
+.navigation-link button {
   cursor: pointer;
   border: 1px solid #292929;
   color: #292929;
@@ -41,42 +41,42 @@
   font: inherit;
 }
 
- .nav-link button:focus {
+ .navigation-link button:focus {
   outline: none;
 } 
 
-.nav-link button:hover,
-.nav-link button:active {
+.navigation-link button:hover,
+.navigation-link button:active {
   background: #292929;
   color: white;
 }
 
 @media (min-width: 768px) {
-  .nav-link {
+  .navigation-link {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     
   }
 
-  .nav-link li {
+  .navigation-link li {
     margin: 0 0.5rem;
   }
 
-  .nav-link a {
+  .navigation-link a {
     color: white;
     text-decoration: none;
 
   }
 
-  .nav-link button {
+  .navigation-link button {
     border: 1px solid white;
     color: white;
     background: transparent;
   }
   
-  .nav-link button:hover,
-  .nav-link button:active {
+  .navigation-link button:hover,
+  .navigation-link button:active {
     background: #f8df00;
     color: #292929;
   }

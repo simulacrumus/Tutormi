@@ -11,7 +11,7 @@ const NavigationLinks = (props) => {
       mountOnEnter
       unmountOnExit
     >
-      <ul className="nav-link">
+      <ul className="navigation-link">
         <li>
           <NavLink to="/about">About</NavLink>
         </li>
