@@ -1,5 +1,5 @@
 import React from "react";
-import TutorProfile from "./tutorProfile";
+import TutorProfile from "./TutorProfile";
 import { Grid } from "@material-ui/core";
 
 const SearchContent = () => {

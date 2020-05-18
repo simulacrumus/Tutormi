@@ -50,15 +50,6 @@ const TutorProfile = ({ avatarSrc, title, subTitle, description, imgSrc }) => {
         >
           Profile
         </Button>
-        <Button
-          className={classes.greenColor}
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={() => alert("You Bought!!")}
-        >
-          Book
-        </Button>
       </CardActions>
     </Card>
   );
