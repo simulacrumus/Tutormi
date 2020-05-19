@@ -4,10 +4,3 @@
     justify-content: space-evenly;
     align-items: center;
 }
-
-.innerProfileContainer {
-    display: flex;
-    height: 73vh;
-}
-
-

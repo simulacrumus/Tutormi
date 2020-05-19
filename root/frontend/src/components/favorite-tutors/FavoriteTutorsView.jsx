@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import "../styles/FavoriteTutorsView.css";
+import "./FavoriteTutorsView.css";
 import { connect } from "react-redux";
-import TutorView from "../components/TutorView.jsx";
+import TutorView from "./TutorView.jsx";
 
 class FavoriteTutorsView extends Component {
 

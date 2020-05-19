@@ -12,19 +12,10 @@ export const favTutors = [
         },
         languages: ["English", "Hindi"],
         availableHours: [
-            {
-                timeBlock: {
-                    startTime: new Date(2020, 4, 16, 4),
-                    endTime: new Date(2020, 4, 16, 6)
-                }
-            },
-            {
-                timeBlock: {
-                    startTime: new Date(2020, 4, 11, 1),
-                    endTime: new Date(2020, 4, 11, 5)
-                }
-
-            }
+            { start: new Date(2020, 5, 16, 4) },
+            { start: new Date(2020, 5, 16, 5) },
+            { start: new Date(2020, 5, 16, 6) },
+            { start: new Date(2020, 5, 16, 7) },         
         ]
     },
     {
@@ -40,27 +31,10 @@ export const favTutors = [
         },
         languages: ["Hungarian"],
         availableHours: [
-            {
-                timeBlock: {
-                    startTime: new Date(2020, 4, 11, 5),
-                    endTime: new Date(2020, 4, 11, 7)
-                }
-
-            },
-            {
-                timeBlock: {
-                    startTime: new Date(2020, 4, 13, 1),
-                    endTime: new Date(2020, 4, 13, 5)
-                }
-
-            },
-            {
-                timeBlock: {
-                    startTime: new Date(2020, 4, 15, 1),
-                    endTime: new Date(2020, 4, 15, 2)
-                }
-
-            }
+                { start: new Date(2020, 5, 17, 4) },
+                { start: new Date(2020, 5, 17, 5) },
+                { start: new Date(2020, 5, 17, 6) },
+                { start: new Date(2020, 5, 17, 7) },         
         ]
     },
     {

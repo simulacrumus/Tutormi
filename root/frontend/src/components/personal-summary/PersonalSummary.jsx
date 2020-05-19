@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react';
-import '../styles/PersonalSummary.css';
+import './PersonalSummary.css';
 import { SocialIcon } from 'react-social-icons';
 import EditButton from './EditButton.jsx';
 
@@ -21,9 +21,9 @@ export default class PersonalSummary extends Component {
                     {this.createSocialArea()}
                 </div>
                 <div className="editContainer">
-                {this.props.isUser ? <EditButton className="editIcon" /> : ""}
+                    {this.props.isUser ? <EditButton className="editIcon" /> : ""}
                 </div>
-                
+
             </div>
         );
     }

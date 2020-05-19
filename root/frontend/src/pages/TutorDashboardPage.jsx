@@ -5,7 +5,7 @@ import "./DashboardPage.css";
 import { connect } from "react-redux";
 import FavoriteTutorsView from "../components/favorite-tutors/FavoriteTutorsView.jsx";
 
-class DashboardPage extends Component {
+class TutorDashboardPage extends Component {
 
     render() {
         return (
@@ -14,14 +14,12 @@ class DashboardPage extends Component {
                 <div className="dashboardContainer">
                     <div className="innerDashboardContainer">
                         <WeeklySchedule
-                            tuteeAppointments={this.props.user.appointments}
-                            tutorAppointments={this.props.viewedTutor.appointments}
-                            tutorAvailableHours={this.props.viewedTutor.availableHours}
-                            viewedTutor={this.props.viewedTutor}
+                            appointments={this.props.user.appointments}
                             tutorHours={this.props.user.availableHours} />
                     </div>
                     <div className="innerDashboardContainer">
-                        <FavoriteTutorsView />
+                        <h4>Metrics</h4>
+                        <p>Number of open hours: {this.props.user.availableHours.length}</p>
                     </div>
                 </div>
             </div>
@@ -33,9 +31,7 @@ class DashboardPage extends Component {
 function mapStateToProps(state) {
     return {
         user: state.profileReducer.user,
-        favoriteTutors: state.profileReducer.user.favoriteTutors,
-        viewedTutor: state.profileReducer.viewedTutor
     };
 }
 
-export default connect(mapStateToProps)(DashboardPage);
+export default connect(mapStateToProps)(TutorDashboardPage);

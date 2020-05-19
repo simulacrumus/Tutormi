@@ -3,6 +3,7 @@ import { favTutors } from './testData.js';
 // Initial Global State 
 const initialState = {
     user: {  // The person currently logged in (can be either a tutor or tutee)
+        type: "tutor",
         firstName: "Bob",
         lastName: "Smith",
         imgPath: "https://www.yourdictionary.com/images/definitions/lg/9816.man.jpg",
@@ -14,6 +15,7 @@ const initialState = {
             instagram: "https://www.instagram.com/random/",
             youtube: "https://www.youtube.com/user/PewDiePie/"
         },
+        courses: ["JavaScript", "Spanish"],
         languages: ["English", "French"],
         location: "Ottawa",
         favoriteTutors: favTutors,
@@ -45,8 +47,10 @@ const initialState = {
                 subject: "Java",
                 note: "Some theory before my midterm"
             }
+        ],
+        availableHours: [
+            // {start: new Date(2020, 4, 11, 6)},
         ]
-
     },
     viewedTutor: {}, // The tutor the tutee is currently viewing in detail, not applicable if the user is a tutor
     tutorSearchList: [] // List containing all the tutors currently displayed in the search list
