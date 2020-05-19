@@ -14,7 +14,7 @@ var Schema = {
     "type": {
         in: 'body',
         matches: {
-            options: [/\b(?:tutor|tutee)\b/],
+            options: [/\b(?:tutor|tutee|admin)\b/],
             errorMessage: 'User type should be either tutor or tutee'
         }
     }
