@@ -360,7 +360,7 @@ router.post('/schedule', auth, async (req, res) => {
 
         hours.forEach(hour => {
             if (!tutor.availableHours.includes(hour)) {
-                tutor.availableHours.unshift()
+                tutor.availableHours.unshift(hour)
             }
         });
 
