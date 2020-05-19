@@ -43,26 +43,26 @@ router.post(
     }
 
     const {
-      about,
+      bio,
       languages,
       location,
       linkedin,
       twitter,
       facebook,
-      instagram
+      instagram,
     } = req.body;
 
     // Build tutee profile object
     const tuteeProfileFields = {};
     tuteeProfileFields.user = req.user.user.id;
-    if (about) tuteeProfileFields.about = about;
+    if (bio) tuteeProfileFields.bio = bio;
     if (languages) {
       tuteeProfileFields.languages = languages
-        .split(',')
-        .map(languages => languages.trim());
+        .split(",")
+        .map((languages) => languages.trim());
     }
     console.log(tuteeProfileFields.languages);
-    
+
     if (location) tuteeProfileFields.location = location;
 
     //Build social object
@@ -90,7 +90,6 @@ router.post(
       profile = new Tutee(tuteeProfileFields);
       await profile.save();
       res.json(profile);
-
     } catch (err) {
       console.error(err.message);
       res.status(500).send("*tuteee profile* Server Error");
@@ -99,24 +98,56 @@ router.post(
 );
 
 // @route   GET api/tutees
-// @desc    Create or update user's tutee profile
-// @access  Private
+// @desc    Get all tutee profiles
+// @access  Public
+router.get("/", async (req, res) => {
+  try {
+    const profiles = await Tutee.find().populate("user", ["name", "email"]);
+    res.json(profiles);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("*tuteee profile* Server Error");
+  }
+});
+
+// @route   GET api/tutees/user/:user_id
+// @desc    Get tutee profile by user ID
+// @access  Public
+router.get("/user/:id", async (req, res) => {
+  try {
+    const profile = await Tutee.findOne({
+      user: req.params.id,
+    }).populate("user", ["name", "email"]);
+    if (!profile) {
+      return res.status(400).json({ msg: "Tutee not found" });
+    }
+    res.json(profile);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind == "ObjectId") {
+      return res.status(400).json({ msg: "Tutee not found" });
+    }
+    res.status(500).send("*tuteee profile* Server Error");
+  }
+});
 
 // @route   DELETE api/tutees
-router.delete("/:id", (req, res) => {
-  Tutee.findById(req.params.id)
-    .then((tutee) =>
-      tutee.remove().then(() =>
-        res.json({
-          success: true,
-        })
-      )
-    )
-    .catch((err) =>
-      res.status(404).json({
-        success: false,
-      })
-    );
+// @desc    Delete tutee profile, user & posts
+// @access  Private
+router.delete("/", auth, async (req, res) => {
+  try {
+    // @todo - remove users posts
+
+    // Remove profile
+    await Tutee.findOneAndRemove({ user: req.user.user.id });
+
+    // Remove User
+    await User.findOneAndRemove({ _id: req.user.user.id });
+    res.json({ msg: "Tutee deleted" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("*tuteee profile* Server Error");
+  }
 });
 
 module.exports = router;
