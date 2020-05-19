@@ -1,13 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Grid } from "@material-ui/core";
 import { connect } from "react-redux";
 import { addTutor } from "../store/tutorSearchList";
 import Nav from "./nav";
-import SearchContent from "./searchContent";
-import SearchRightPanel from "./searchRightPanel";
-import SearchLeftPanel from "./searchLeftPanel";
+import SearchContent from "./SearchContent";
+import SearchRightPanel from "./SearchRightPanel";
+import SearchLeftPanel from "./SearchLeftPanel";
 
 const SearchMain = ({ tutorSearchList = [], onAddTutor }) => {
+  useEffect(() => {
+    const getTutors = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/tutors");
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.log("Error!!", error);
+      }
+    };
+    getTutors();
+  }, []);
+
   return (
     <div className="App">
       <Grid container direction="column">
@@ -15,13 +28,13 @@ const SearchMain = ({ tutorSearchList = [], onAddTutor }) => {
           <Nav />
         </Grid>
         <Grid item container>
-          <Grid xs={false} sm={2}>
+          <Grid item xs={false} sm={2}>
             <SearchLeftPanel />
           </Grid>
           <Grid item xs={12} sm={8}>
             <SearchContent />
           </Grid>
-          <Grid xs={false} sm={2}>
+          <Grid item xs={false} sm={2}>
             <SearchRightPanel />
           </Grid>
         </Grid>

@@ -1,16 +1,17 @@
-import { createStore } from "redux";
-import rootReducer from "./rootReducer";
+import { createStore } from 'redux';
+import rootReducer from './rootReducer';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
-// Global State
-const initialState = {
-  user: {}, // The person currently logged in (can be either a tutor or tutee)
-  viewedTutor: {}, // The tutor the tutee is currently viewing in detail, not applicable if the user is a tutor
-  tutorSearchList: [], // List containing all the tutors currently displayed in the search list
+const persistConfig = {
+    key: 'root',
+    storage: storage,
+    stateReconciler: autoMergeLevel2 
 };
 
-const store = createStore(
-  rootReducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-); //connects our app to Redux DevTools extension
+const pReducer = persistReducer(persistConfig, rootReducer);
 
-export default store;
+export const store = createStore(pReducer,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+export const persistor = persistStore(store);
