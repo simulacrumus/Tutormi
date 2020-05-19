@@ -18,7 +18,7 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-            user: req.user.id
+            user: req.user.user.id
         }).populate('user', ['name', 'email', 'date']);
 
         if (!tutor) {
@@ -54,21 +54,27 @@ router.post(
         }
         const {
             bio,
+            courses,
             languages,
             linkedin,
             twitter,
             facebook,
             instagram,
             youtube,
-            location
+            location,
+            availableHours
         } = req.body;
 
         const tutorProfileFields = {
             user: req.user.user.id,
             location,
+            availableHours,
             bio,
             languages: Array.isArray(languages) ?
-                languages : languages.split(',').map((language) => language.trim())
+                languages : languages.split(',').map((language) => language.trim()),
+            courses: Array.isArray(courses) ?
+                courses : courses.split(',').map((course) => course.trim())
+
         };
 
         // Build social object and add to profileFields
@@ -109,8 +115,8 @@ router.post(
 // @access   Public
 router.get('/', async (req, res) => {
     try {
-        const profiles = await Tutor.find().populate('user', ['name', 'email']);
-        res.json(profiles);
+        const tutors = await Tutor.find().populate('user', ['name', 'email']);
+        res.json(tutors);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -128,15 +134,15 @@ router.get(
         }
     }, res) => {
         try {
-            const profile = await Tutor.findOne({
+            const tutor = await Tutor.findOne({
                 user: id
             }).populate('user', ['name', 'email']);
 
-            if (!profile) return res.status(400).json({
+            if (!tutor) return res.status(400).json({
                 msg: 'Tutor not found'
             });
 
-            return res.json(profile);
+            return res.json(tutor);
         } catch (err) {
             console.error(err.message);
             return res.status(500).json({
@@ -176,75 +182,174 @@ router.delete('/', auth, async (req, res) => {
     }
 });
 
-// @route    PUT api/tutors/appointment
-// @desc     Add appointment
-// @access   Private
-router.put(
-    '/appointment',
-    [
-        auth,
-        [
-            check('start', 'Start time is required').not().isEmpty(),
-            check('end', 'End time is required').not().isEmpty(),
-            check('subject', 'Subject is required').not().isEmpty(),
-            check('tutoremail', 'Tutor\'s email is required').not().isEmpty()
-        ]
-    ],
-    async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                errors: errors.array()
+// @route    GET api/tutors
+// @desc     Get all tutors matching search criteria
+// @access   Public
+router.get('/search', auth, async (req, res) => {
+
+    const {
+        start,
+        course,
+        language,
+        rating,
+        key
+    } = req.body;
+
+    let end = req.body.end;
+    let query = {};
+
+    let appointmentHours = new Array();
+    if (start) {
+        end = end ? end : new Date(start).setHours(new Date(start).getHours() + 1);
+        const hours = (start, end) => {
+            let startTime = new Date(start);
+            let endTime = new Date(end);
+            let hours = new Array();
+            while (startTime <= endTime) {
+                hours.push(new Date(startTime));
+                startTime.setHours(startTime.getHours() + 1);
+            }
+            return hours;
+        }
+        appointmentHours = hours(start, end);
+    }
+
+    try {
+        if (key) {
+            const users = await User.find({
+                $or: [{
+                        name: {
+                            $regex: key
+                        }
+                    },
+                    {
+                        email: {
+                            $regex: key
+                        }
+                    }
+                ]
+            }).select({
+                _id: 1
             });
+            const usersIDs = users.map(user => user._id);
+            query = {
+                $or: [{
+                    user: {
+                        $in: usersIDs
+                    }
+                }, {
+                    bio: {
+                        $regex: key
+                    }
+                }]
+            }
         }
 
-        const {
-            start,
-            end,
-            subject,
-            tutoremail,
-            note
-        } = req.body;
+        if (language) {
+            query.languages = {
+                $in: [language]
+            }
+        }
+        if (course) {
+            query.courses = {
+                $in: [course]
+            }
+        }
 
-        const time = {
-            start,
-            end
-        };
+        if (rating) {
+            query.rating = {
+                $gte: rating
+            }
+        }
 
-        const newAppointment = {
-            tutee: req.user.user.id,
-            subject,
-            time,
-            note
-        };
+        if (start) {
+            query.availableHours = {
+                $all: appointmentHours
+            }
+        }
 
+        const tutors = await Tutor.find(query).select('courses languages rating bio blockedTutees').populate('user', '-_id -password -type -date -__v -email');
+        tutors.forEach(tutor => {
+            if (tutor.blockedTutees.includes(req.user.user.id)) {
+                tutors.pop(tutor)
+            }
+        });
+
+        const currentTutee = await Tutee.findOne({
+            user: req.user.user.id
+        }).select('blockedTutees');
+
+        res.json(tutors);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route    POST api/tutors/block.:id
+// @desc     Block/Unblock tutee using their user id
+// @access   Private
+router.get(
+    '/block/:id',
+    async ({
+        params: {
+            id
+        }
+    }, res) => {
         try {
-
             const tutee = await Tutee.findOne({
-                user: req.user.user.id
+                id: id
             });
 
-            const tutorUser = await User.findOne({
-                email: tutoremail
+            if (!tutee) return res.status(400).json({
+                msg: 'Tutee not found'
             });
 
             const tutor = await Tutor.findOne({
-                user: tutorUser.id
+                user: req.user.user.id
             });
 
-            newAppointment.tutor = tutor.user;
+            if (tutee.blockedBy.includes(req.user.user.id)) {
+                const index = tutee.blockedBy.indexOf(req.user.user.id);
+                tutee.blockedBy.splice(index, 1);
+            } else {
+                tutee.blockedBy.unshift(req.user.user.id);
+            }
 
-            const newAppointment = await Appointment.save(newAppointment);
+            if (tutor.blocked.includes(tutee.user)) {
+                const index = tutor.blocked.indexOf(tutee.user);
+                tutor.blocked.splice(index, 1);
+            } else {
+                tutor.blocked.unshift(tutee.user);
+            }
 
-            tutor.appintments.unshift(newAppointment.id);
-            tutee.appintments.unshift(newAppointment.id);
+            tutee.save();
+            tutor.save();
 
-            res.json([tutor, tutee]);
+            return res.json(tutee);
         } catch (err) {
             console.error(err.message);
-            res.status(500).send('Server Error');
+            return res.status(500).json({
+                msg: 'Server error'
+            });
         }
     }
 );
+
+// @route    POST api/tutors/availibility
+// @desc     Update available hours
+// @access   Private
+router.post('/schedule', auth, async (req, res) => {
+
+    try {
+
+
+
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
 
 module.exports = router;

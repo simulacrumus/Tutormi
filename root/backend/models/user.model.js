@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['tutor', 'tutee'],
+        enum: ['tutor', 'tutee', 'admin'],
         required: true
     }
 });
