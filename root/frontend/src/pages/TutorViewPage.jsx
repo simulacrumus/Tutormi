@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import ProfileNavBar from "../components/ProfileNavBar.jsx";
-import PersonalSummary from "../components/PersonalSummary.jsx";
-import "../styles/TutorViewPage.css";
+import ProfileNavBar from "../components/logged-in-nav-bar/ProfileNavBar.jsx";
+import PersonalSummary from "../components/personal-summary/PersonalSummary.jsx";
+import "./TutorViewPage.css";
 import { connect } from "react-redux";
-import WeeklySchedule from '../components/WeeklySchedule.jsx';
+import WeeklySchedule from '../components/scheduling/WeeklySchedule.jsx';
 
 
 class TutorViewPage extends Component {
@@ -13,7 +13,7 @@ class TutorViewPage extends Component {
             <div>
                 <ProfileNavBar />
                 <div className="profilePage">
-                <div className="tutorWeekContainer">
+                    <div className="tutorWeekContainer">
                         <WeeklySchedule
                             tuteeAppointments={this.props.user.appointments}
                             tutorAppointments={this.props.viewedTutor.appointments}
@@ -23,7 +23,7 @@ class TutorViewPage extends Component {
                     <div className="tutorProfileContainer">
                         <PersonalSummary person={this.props.viewedTutor} isUser={false} />
                     </div>
-                    
+
                 </div>
             </div>
         );

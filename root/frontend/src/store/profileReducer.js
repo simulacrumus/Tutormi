@@ -1,12 +1,18 @@
 import initialState from '../initialState.js';
+import { PURGE } from 'redux-persist';
+import moment from 'moment';
 
 export const CHANGE_VIEWED_TUTOR = "CHANGE_VIEWED_TUTOR";
 export const CLEAR_VIEWED_TUTOR = "CLEAR_VIEWED_TUTOR";
 export const BOOK_SLOT = "BOOK_SLOT";
 export const UPDATE_USER = "UPDATE_USER";
 export const CANCEL_APPOINTMENT = "CANCEL_APPOINTMENT";
+export const OPEN_TIME_SLOT = "OPEN_TIME_SLOT";
+export const CANCEL_AVAILABILITY = "CANCEL_AVAILABILITY";
 
 export default function profileReducer(state = initialState, action) {
+    let copiedAvailableHours = state.user.availableHours.slice();
+    let copiedNewAppointments = state.user.appointments.slice();
     switch (action.type) {
         case CHANGE_VIEWED_TUTOR:
             return { ...state, viewedTutor: action.payload }
@@ -15,9 +21,8 @@ export default function profileReducer(state = initialState, action) {
             return { ...state, viewedTutor: {} }
 
         case BOOK_SLOT:
-            let newAppointments = state.user.appointments.slice();
-            newAppointments.push(action.payload);
-            return {...state,  user: {...state.user, appointments: newAppointments}};
+            copiedNewAppointments.push(action.payload);
+            return {...state,  user: {...state.user, appointments: copiedNewAppointments}};
 
         case UPDATE_USER:
             return {...state, user: {...state.user, 
@@ -35,12 +40,25 @@ export default function profileReducer(state = initialState, action) {
                 new Date(appointment.timeBlock.startTime).getDay() === action.payload.timeBlock.startTime.getDay() && 
                 new Date(appointment.timeBlock.startTime).getDay() === action.payload.timeBlock.startTime.getDay() && 
                 new Date(appointment.timeBlock.endTime).getHours() === action.payload.timeBlock.endTime.getHours()));
-            return{
+            return { 
                 ...state, user: {...state.user, appointments: deletedAppointments }
             }
+
+        case OPEN_TIME_SLOT:
+            copiedAvailableHours.push(action.payload);
+            return { 
+                ...state, user: {...state.user, availableHours: copiedAvailableHours }
+            };
+
+        case CANCEL_AVAILABILITY:
+            copiedAvailableHours = copiedAvailableHours.filter( (hour) => !action.payload.some( (cancelHour) => 
+            moment(hour.start).isSame(moment(cancelHour.start))));
+            return {...state,  user: {...state.user, availableHours: copiedAvailableHours }};
+
+        case PURGE: // Clears the cache, I use this for testing purposes 
+            return initialState;
 
         default:
             return state;
     }
 }
-

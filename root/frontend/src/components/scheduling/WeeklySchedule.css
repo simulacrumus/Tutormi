@@ -6,7 +6,7 @@ table {
 }
 
 th, td {
-    padding: 10px;
+    /* padding: 10px; */
     border-bottom: 0.6px solid #E1E1E1;
     border-right: 0.6px solid #E1E1E1;
 }
@@ -28,4 +28,17 @@ td {
     top: 20px;
     border: 0px;
     /* border-right: solid #D8D8D8; */
+}
+
+.weekControlSection {
+    display: flex;
+    background-color: #a385e0;
+    color: #E1E1E1;
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+
+.weekScheduleContainer {
+    display: flex;
+    flex-direction: column;
 }
