@@ -43,7 +43,8 @@ router.get('/me', auth, async (req, res) => {
 router.post(
     '/',
     auth, [
-        check('courses', '')
+        check('courses', 'Course cannot be empty').not().isEmpty(),
+        check('languages', 'Languages cannot be empty')
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -61,14 +62,12 @@ router.post(
             facebook,
             instagram,
             youtube,
-            location,
-            availableHours
+            location
         } = req.body;
 
         const tutorProfileFields = {
             user: req.user.user.id,
             location,
-            availableHours,
             bio,
             languages: Array.isArray(languages) ?
                 languages : languages.split(',').map((language) => language.trim()),
@@ -240,6 +239,10 @@ router.get('/search', auth, async (req, res) => {
                 }, {
                     bio: {
                         $regex: key
+                    },
+                }, {
+                    location: {
+                        $regex: key
                     }
                 }]
             }
@@ -268,16 +271,16 @@ router.get('/search', auth, async (req, res) => {
             }
         }
 
-        const tutors = await Tutor.find(query).select('courses languages rating bio blockedTutees').populate('user', '-_id -password -type -date -__v -email');
-        tutors.forEach(tutor => {
-            if (tutor.blockedTutees.includes(req.user.user.id)) {
-                tutors.pop(tutor)
-            }
-        });
+        const tutors = await Tutor.find(query).select('courses languages rating bio location').populate('user', '-_id -password -type -date -__v -email');
+        // tutors.forEach(tutor => {
+        //     if (tutor.blockedTutees.includes(req.user.user.id)) {
+        //         tutors.pop(tutor)
+        //     }
+        // });
 
-        const currentTutee = await Tutee.findOne({
-            user: req.user.user.id
-        }).select('blockedTutees');
+        // const currentTutee = await Tutee.findOne({
+        //     user: req.user.user.id
+        // }).select('blockedTutees');
 
         res.json(tutors);
     } catch (err) {
@@ -341,10 +344,28 @@ router.get(
 // @access   Private
 router.post('/schedule', auth, async (req, res) => {
 
+    const {
+        hours
+    } = req.body;
+
     try {
 
+        let tutor = await Tutor.findOne({
+            user: req.user.user.id
+        });
 
+        if (!tutor) return res.status(400).json({
+            msg: 'Tutor not found or there is no tutor profile for this user'
+        });
 
+        hours.forEach(hour => {
+            if (!tutor.availableHours.includes(hour)) {
+                tutor.availableHours.unshift()
+            }
+        });
+
+        tutor.save();
+        res.json(tutor);
 
     } catch (err) {
         console.error(err.message);
