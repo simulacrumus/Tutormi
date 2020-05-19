@@ -57,12 +57,9 @@ const TutorSchema = new mongoose.Schema({
             ref: 'user'
         }
     }],
-    availableHours: [{
-        hour: {
-            type: Date,
-            required: true
-        }
-    }],
+    availableHours: {
+        type: [Date]
+    },
     social: {
         linkedin: {
             type: String
