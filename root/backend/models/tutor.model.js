@@ -14,27 +14,21 @@ const TutorSchema = new mongoose.Schema({
         required: true
     },
     appointments: [{
-        appointment: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'appointment'
-        }
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'appointment'
     }],
     followers: [{
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'user'
+    }],
+    ratings: [{
         tutee: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'user'
-        }
-    }],
-    ratings: [{
-        rate: {
-            tutee: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'user'
-            },
-            value: {
-                type: Number,
-                default: 0.0
-            }
+        },
+        value: {
+            type: Number,
+            default: 0.0
         }
     }],
     rating: {
@@ -46,16 +40,12 @@ const TutorSchema = new mongoose.Schema({
         required: true
     },
     blockedUsers: [{
-        tutor: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
-        }
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'user'
     }],
     blockedBy: [{
-        tutee: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
-        }
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'user'
     }],
     availableHours: {
         type: [Date]

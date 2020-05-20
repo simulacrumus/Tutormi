@@ -44,7 +44,7 @@ router.post(
     '/',
     auth, [
         check('courses', 'Course cannot be empty').not().isEmpty(),
-        check('languages', 'Languages cannot be empty')
+        check('languages', 'Languages cannot be empty').not().isEmpty()
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -100,7 +100,7 @@ router.post(
             }, {
                 new: true,
                 upsert: true
-            });
+            }).populate('user', ['name', 'email']);
             res.json(tutor);
         } catch (err) {
             console.error(err.message);
@@ -359,12 +359,13 @@ router.post('/schedule', auth, async (req, res) => {
         });
 
         hours.forEach(hour => {
-            if (!tutor.availableHours.includes(hour)) {
-                tutor.availableHours.unshift(hour)
-            }
+            tutor.availableHours.unshift(hour)
         });
 
-        tutor.save();
+        let uniqueHours = new Set(tutor.availableHours);
+        tutor.availableHours = uniqueHours;
+
+        await tutor.save();
         res.json(tutor);
 
     } catch (err) {
