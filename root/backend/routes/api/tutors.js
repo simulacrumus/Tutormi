@@ -134,7 +134,7 @@ router.get(
     }, res) => {
         try {
             const tutor = await Tutor.findOne({
-                user: id
+                _id: id
             }).populate('user', ['name', 'email']);
 
             if (!tutor) return res.status(400).json({
@@ -326,8 +326,8 @@ router.get(
                 tutor.blocked.unshift(tutee.user);
             }
 
-            tutee.save();
-            tutor.save();
+            tutee = await tutee.save();
+            tutor = await tutor.save();
 
             return res.json(tutee);
         } catch (err) {
