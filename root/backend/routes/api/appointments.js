@@ -173,7 +173,7 @@ router.delete('/:id', auth, async (req, res) => {
 
         // return error message if tutor of the appointment doesn't exist
         if (!tutor) {
-            res.status(500).json({
+            res.status(400).json({
                 message: "Tutor of this appointment doesn't exist anymore"
             });
         }
@@ -182,7 +182,7 @@ router.delete('/:id', auth, async (req, res) => {
 
         // return error message if tutee of the appointment doesn't exist
         if (!tutee) {
-            res.status(500).json({
+            res.status(400).json({
                 message: "Tutee of this appointment doesn't exist anymore"
             });
         }
@@ -193,7 +193,7 @@ router.delete('/:id', auth, async (req, res) => {
         // check if the user who intents to delete the appointment either tutee or tutor of the appointment or admin
         // if not, return an error message
         if (!(tutor.user === req.user.user.id || tutee.user === req.user.user.id || user.type === admin)) {
-            res.status(500).json({
+            res.status(400).json({
                 message: "Request denied! You don't have permisson to delete this appointment"
             });
         }
@@ -233,6 +233,7 @@ router.delete('/:id', auth, async (req, res) => {
             id: req.params.id
         });
 
+        //return tutee and tutor
         res.json([tutee, tutor]);
 
     } catch (err) {

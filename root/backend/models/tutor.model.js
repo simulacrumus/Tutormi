@@ -13,14 +13,14 @@ const TutorSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
-    appointments: [{
+    appointments: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'appointment'
-    }],
-    followers: [{
+    },
+    followers: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'user'
-    }],
+    },
     ratings: [{
         tutee: {
             type: mongoose.Schema.Types.ObjectId,
@@ -39,14 +39,14 @@ const TutorSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
-    blockedUsers: [{
+    blockedUsers: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'user'
-    }],
-    blockedBy: [{
+    },
+    blockedBy: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'user'
-    }],
+    },
     availableHours: {
         type: [Date]
     },
