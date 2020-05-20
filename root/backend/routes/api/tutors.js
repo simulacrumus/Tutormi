@@ -21,7 +21,7 @@ router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
             user: req.user.user.id
-        }).populate('user', ['name', 'email', 'date']);
+        }).populate('user', ['name', 'email', 'date', 'type']);
 
         if (!tutor) {
             return res.status(400).json({
@@ -102,7 +102,7 @@ router.post(
             }, {
                 new: true,
                 upsert: true
-            }).populate('user', ['name', 'email']);
+            }).populate('user', ['name', 'email', 'type']);
             res.json(tutor);
         } catch (err) {
             console.error(err.message);
@@ -116,7 +116,7 @@ router.post(
 // @access   Public
 router.get('/', async (req, res) => {
     try {
-        const tutors = await Tutor.find().populate('user', ['name', 'email']);
+        const tutors = await Tutor.find().populate('user', ['name', 'email', 'type']);
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -137,7 +137,7 @@ router.get(
         try {
             const tutor = await Tutor.findOne({
                 _id: id
-            }).populate('user', ['name', 'email']);
+            }).populate('user', ['name', 'email', 'type']);
 
             if (!tutor) return res.status(400).json({
                 msg: 'Tutor not found'
@@ -364,7 +364,7 @@ router.post('/schedule', auth, async (req, res) => {
 
         let tutor = await Tutor.findOne({
             user: req.user.user.id
-        }).populate('user', ['name', 'email']);
+        }).populate('user', ['name', 'email', 'type']);
 
         if (!tutor) return res.status(400).json({
             msg: 'Tutor not found or there is no tutor profile for this user'
