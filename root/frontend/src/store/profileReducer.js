@@ -9,11 +9,15 @@ export const UPDATE_USER = "UPDATE_USER";
 export const CANCEL_APPOINTMENT = "CANCEL_APPOINTMENT";
 export const OPEN_TIME_SLOT = "OPEN_TIME_SLOT";
 export const CANCEL_AVAILABILITY = "CANCEL_AVAILABILITY";
+export const USER_LOGGED_IN = "USER_LOGGED_IN";
 
 export default function profileReducer(state = initialState, action) {
     let copiedAvailableHours = state.user.availableHours.slice();
     let copiedNewAppointments = state.user.appointments.slice();
     switch (action.type) {
+        case USER_LOGGED_IN:
+            return {...state, user: action.payload}
+
         case CHANGE_VIEWED_TUTOR:
             return { ...state, viewedTutor: action.payload }
 
@@ -33,13 +37,13 @@ export default function profileReducer(state = initialState, action) {
                 // languages: action.payload.languages,
                 location: action.payload.location}};
 
-        case CANCEL_APPOINTMENT: // Awful way of doing it because date formats are all messed up, will clean later
-            let deletedAppointments = state.user.appointments.filter( (appointment) => 
+        case CANCEL_APPOINTMENT: // Awful way of doing it because date formats are all messed up, will clean later 
+        let deletedAppointments = state.user.appointments.filter( (appointment) => 
             !(appointment.tutorID === action.payload.tutorID && 
-                new Date(appointment.timeBlock.startTime).getHours() === action.payload.timeBlock.startTime.getHours() && 
-                new Date(appointment.timeBlock.startTime).getDay() === action.payload.timeBlock.startTime.getDay() && 
-                new Date(appointment.timeBlock.startTime).getDay() === action.payload.timeBlock.startTime.getDay() && 
-                new Date(appointment.timeBlock.endTime).getHours() === action.payload.timeBlock.endTime.getHours()));
+                new Date(appointment.time.start).getHours() === action.payload.time.start.getHours() && 
+                new Date(appointment.time.start).getDay() === action.payload.time.start.getDay() && 
+                new Date(appointment.time.start).getDay() === action.payload.time.start.getDay() && 
+                new Date(appointment.time.end).getHours() === action.payload.time.end.getHours()));
             return { 
                 ...state, user: {...state.user, appointments: deletedAppointments }
             }
@@ -52,7 +56,7 @@ export default function profileReducer(state = initialState, action) {
 
         case CANCEL_AVAILABILITY:
             copiedAvailableHours = copiedAvailableHours.filter( (hour) => !action.payload.some( (cancelHour) => 
-            moment(hour.start).isSame(moment(cancelHour.start))));
+            moment(hour).isSame(moment(cancelHour))));
             return {...state,  user: {...state.user, availableHours: copiedAvailableHours }};
 
         case PURGE: // Clears the cache, I use this for testing purposes 

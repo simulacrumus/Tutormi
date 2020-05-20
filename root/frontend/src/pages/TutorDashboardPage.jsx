@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import ProfileNavBar from "../components/logged-in-nav-bar/ProfileNavBar.jsx";
 import WeeklySchedule from "../components/scheduling/WeeklySchedule.jsx";
-import "./DashboardPage.css";
+import "./TutorDashboardPage.css";
 import { connect } from "react-redux";
 import FavoriteTutorsView from "../components/favorite-tutors/FavoriteTutorsView.jsx";
+import ScheduleMetrics from "../components/scheduling/ScheduleMetrics.jsx";
 
 class TutorDashboardPage extends Component {
 
@@ -11,15 +12,14 @@ class TutorDashboardPage extends Component {
         return (
             <div>
                 <ProfileNavBar />
-                <div className="dashboardContainer">
-                    <div className="innerDashboardContainer">
+                <div className="tutorDashboardContainer">
+                    <div className="tutorInnerDashboardContainer">
                         <WeeklySchedule
                             appointments={this.props.user.appointments}
                             tutorHours={this.props.user.availableHours} />
                     </div>
-                    <div className="innerDashboardContainer">
-                        <h4>Metrics</h4>
-                        <p>Number of open hours: {this.props.user.availableHours.length}</p>
+                    <div className="tutorInnerDashboardContainer">
+                        <ScheduleMetrics />
                     </div>
                 </div>
             </div>

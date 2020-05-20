@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import './TimeSlotOpen.css';
-import { store } from "../../store/configureStore.js";
-import { BOOK_SLOT } from "../../store/profileReducer.js";
+import { store } from "../../../store/configureStore.js";
+import { BOOK_SLOT } from "../../../store/profileReducer.js";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
@@ -23,7 +23,7 @@ export default class TimeSlotOpen extends Component {
             <Popover.Title >
                 <div className="popoverTitleContainer">
                     <div>
-                        <img className="timeIcon" src={require("../../images/time-icon.png")}></img>
+                        <img className="timeIcon" src={require("../../../images/time-icon.png")}></img>
                         {this.props.timeSlot.startTime.getHours() + ":00-" + this.props.timeSlot.endTime.getHours()}:00 PM
                     </div>
                 </div>
@@ -63,7 +63,7 @@ function MyPopover(props) {
             <Popover.Title >
                 <div className="popoverTitleContainer">
                     <div>
-                        <img className="timeIcon" src={require("../../images/time-icon.png")}></img>
+                        <img className="timeIcon" src={require("../../../images/time-icon.png")}></img>
                         {props.timeSlot.startTime.getHours() + ":00-" + props.timeSlot.endTime.getHours()}:00 PM
                     </div>
                 </div>
