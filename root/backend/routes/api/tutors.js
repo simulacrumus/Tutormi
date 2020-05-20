@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const auth = require('../../middleware/auth');
 const {
     check,
@@ -344,28 +346,30 @@ router.get(
 // @access   Private
 router.post('/schedule', auth, async (req, res) => {
 
-    const {
+    // findAndUpdate method doesn't return the updated hours even though they're saved in the database
+    let {
         hours
     } = req.body;
 
     try {
 
+        // update tutor's available hours
+        await Tutor.findOneAndUpdate({
+            user: req.user.user.id
+        }, {
+            $addToSet: {
+                availableHours: hours.map(hour => new Date(hour))
+            }
+        })
+
         let tutor = await Tutor.findOne({
             user: req.user.user.id
-        });
+        }).populate('user', ['name', 'email']);
 
         if (!tutor) return res.status(400).json({
             msg: 'Tutor not found or there is no tutor profile for this user'
         });
 
-        hours.forEach(hour => {
-            tutor.availableHours.unshift(hour)
-        });
-
-        let uniqueHours = new Set(tutor.availableHours);
-        tutor.availableHours = uniqueHours;
-
-        await tutor.save();
         res.json(tutor);
 
     } catch (err) {
