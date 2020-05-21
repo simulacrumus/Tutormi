@@ -16,12 +16,11 @@ const useStyles = makeStyles({
 const SearchLeftPanel = () => {
   const classes = useStyles();
   return (
-    <Grid container spacing={12}>
+    <Grid container spacing={10}>
       <Grid item xs={false} sm={2} />
       <Grid item xs={8}>
         <LeftPanelContent />
       </Grid>
-      <Grid item xs={false} sm={2} />
     </Grid>
   );
 };
