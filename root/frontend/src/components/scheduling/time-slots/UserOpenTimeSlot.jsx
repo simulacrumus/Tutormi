@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import './TimeSlotOpen.css';
-import { store } from "../../store/configureStore.js";
-import { BOOK_SLOT } from "../../store/profileReducer.js";
+import { store } from "../../../store/configureStore.js";
+import { BOOK_SLOT } from "../../../store/profileReducer.js";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { CANCEL_AVAILABILITY } from "../../store/profileReducer.js";
-import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions.js";
+import { CANCEL_AVAILABILITY } from "../../../store/profileReducer.js";
+import { convertTimeSlotToSingleHours } from "../../../util/scheduleFunctions.js";
 
 
 export default class UserOpenTimeSlot extends Component {
@@ -15,8 +15,8 @@ export default class UserOpenTimeSlot extends Component {
     render() {
         return (
             <OverlayTrigger trigger="click" placement="bottom" overlay={this.popover}>
-                <td rowSpan={parseInt(this.props.timeSlot.timeBlock.endTime.getHours()) - parseInt(this.props.timeSlot.timeBlock.startTime.getHours())} className="open">
-                    {this.props.timeSlot.timeBlock.startTime.getHours() + ":00-" + this.props.timeSlot.timeBlock.endTime.getHours()}:00 PM</td>
+                <td rowSpan={parseInt(this.props.timeSlot.time.end.getHours()) - parseInt(this.props.timeSlot.time.start.getHours())} className="open">
+                    {this.props.timeSlot.time.start.getHours() + ":00-" + this.props.timeSlot.time.end.getHours()}:00 PM</td>
             </OverlayTrigger>
         );
     }
@@ -26,9 +26,9 @@ export default class UserOpenTimeSlot extends Component {
             <Popover.Title >
                 <div className="popoverTitleContainer">
                     <div>
-                        <img className="timeIcon" src={require("../../images/time-icon.png")}></img>
-                        {this.props.timeSlot.timeBlock.startTime.getHours() + ":00-" + this.props.timeSlot.timeBlock.endTime.getHours()}:00 PM
-                        <img className="cancelIcon" src={require("../../images/cancel-icon.png")}
+                        <img className="timeIcon" src={require("../../../images/time-icon.png")}></img>
+                        {this.props.timeSlot.time.start.getHours() + ":00-" + this.props.timeSlot.time.end.getHours()}:00 PM
+                        <img className="cancelIcon" src={require("../../../images/cancel-icon.png")}
                             onClick={() => this.cancelAvailability()}></img>
                     </div>
                 </div>
@@ -51,8 +51,8 @@ function MyPopover(props) {
             <Popover.Title >
                 <div className="popoverTitleContainer">
                     <div>
-                        <img className="timeIcon" src={require("../../images/time-icon.png")}></img>
-                        {props.timeSlot.startTime.getHours() + ":00-" + props.timeSlot.endTime.getHours()}:00 PM
+                        <img className="timeIcon" src={require("../../../images/time-icon.png")}></img>
+                        {props.timeSlot.start.getHours() + ":00-" + props.timeSlot.end.getHours()}:00 PM
                     </div>
                 </div>
             </Popover.Title>
@@ -75,9 +75,9 @@ function bookSlot() {
         type: BOOK_SLOT,
         payload: {
             tutorID: this.props.tutor.firstName + " " + this.props.tutor.lastName,
-            timeBlock: {
-                startTime: this.props.timeSlot.startTime,
-                endTime: this.props.timeSlot.endTime
+            time: {
+                start: this.props.timeSlot.start,
+                end: this.props.timeSlot.end
             },
             subject: document.getElementById("coursesSelect").value,
             note: document.getElementById("notesInput").value

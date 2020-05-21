@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './OpenableTimeSlot.css';
-import { store } from "../../store/configureStore.js";
-import { OPEN_TIME_SLOT } from "../../store/profileReducer.js";
+import { store } from "../../../store/configureStore.js";
+import { OPEN_TIME_SLOT } from "../../../store/profileReducer.js";
 
 export default class OpenableTimeSlot extends Component {
 
@@ -29,7 +29,7 @@ export default class OpenableTimeSlot extends Component {
         let date = new Date(this.props.date.year(), this.props.date.month(), this.props.date.date(), this.props.hour);
         store.dispatch({
             type: OPEN_TIME_SLOT,
-            payload: { start: date }
+            payload: date
         });
     }
 

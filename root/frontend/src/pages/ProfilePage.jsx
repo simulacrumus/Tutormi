@@ -8,7 +8,6 @@ import { store } from "../store/configureStore.js";
 class ProfilePage extends Component {
 
     render() {
-        console.log(store.getState());
         return (
             <div>
                 <ProfileNavBar />
@@ -22,7 +21,6 @@ class ProfilePage extends Component {
 }
 
 function mapStateToProps(state) {
-    console.log(store.getState());
     return {
         user: state.profileReducer.user,
         viewedTutor: state.profileReducer.viewedTutor

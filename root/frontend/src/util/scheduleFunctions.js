@@ -6,12 +6,12 @@ import moment from 'moment';
 // Converts available hours to the format used with booked appointments
 export function convertSingleHoursToTimeSlots(availableHours) {
     return availableHours.map((timeHour) => {
-        let date = moment(timeHour.start);
+        let date = moment(timeHour);
         return {
-            timeBlock:
+            time:
             {
-                startTime: date,
-                endTime: date.clone().add(1, "hour")
+                start: date,
+                end: date.clone().add(1, "hour")
             }
         }
     });
@@ -20,19 +20,25 @@ export function convertSingleHoursToTimeSlots(availableHours) {
 // Converts available hours to the format used with booked appointments
 export function convertTimeSlotToSingleHours(timeSlot) {
     let hours = [];
-    let startTime = moment(timeSlot.timeBlock.startTime.getTime());
-    for(let i = 0, hour = timeSlot.timeBlock.startTime.getHours(); hour < timeSlot.timeBlock.endTime.getHours(); i++, hour++ ) {
-        hours.push({ start: new Date(startTime.clone().add(i, "hour"))});
+    let start = moment(new Date(timeSlot.time.start).getTime());
+    for(let i = 0, hour = new Date(timeSlot.time.start).getHours(); hour < new Date(timeSlot.time.end).getHours(); i++, hour++ ) {
+        hours.push(new Date(start.clone().add(i, "hour")));
     }
+    return hours;
+}
+
+export function convertAppointmentsListToSingleHours(appointments) {
+    let hours = [];
+    appointments.forEach( (appointments) => hours.push(...convertTimeSlotToSingleHours(appointments)));
     return hours;
 }
 
 // Finds and returns the single point (or undefined) in a collection of slots that meet the condition of day and hour
 export function findTimeSlot(day, hour, slots) {
-    return slots.filter((slot) => this.state.weekStart.year() === slot.timeBlock.startTime.getFullYear() &&
-        this.state.weekStart.month() === slot.timeBlock.startTime.getMonth() &&
-        (this.state.weekStart.date() + day) === slot.timeBlock.startTime.getDate() &&
-        hour >= slot.timeBlock.startTime.getHours() && hour < slot.timeBlock.endTime.getHours())[0];
+    return slots.filter((slot) => this.state.weekStart.year() === slot.time.start.getFullYear() &&
+        this.state.weekStart.month() === slot.time.start.getMonth() &&
+        (this.state.weekStart.date() + day) === slot.time.start.getDate() &&
+        hour >= slot.time.start.getHours() && hour < slot.time.end.getHours())[0];
 }
 
 // Used to remove all tutor available hours that have a conflict with what the tutee has already booked. This makes sure that the conflicted
@@ -41,11 +47,11 @@ export function removeSlotConflict(tutorAvailableHours, tuteeAppointments) {
     for (let i = 0; i < tuteeAppointments.length; i++) {
         for (let j = 0; j < tutorAvailableHours.length; j++) {
             // Check if the two slots fall on the same exact date
-            if (tuteeAppointments[i].timeBlock.startTime.getFullYear() === tutorAvailableHours[j].timeBlock.startTime.getFullYear() &&
-                tuteeAppointments[i].timeBlock.startTime.getMonth() === tutorAvailableHours[j].timeBlock.startTime.getMonth() &&
-                tuteeAppointments[i].timeBlock.startTime.getDate() === tutorAvailableHours[j].timeBlock.startTime.getDate()) {
-                if (checkIfAppointmentsConflict(tuteeAppointments[i].timeBlock.startTime.getHours(), tuteeAppointments[i].timeBlock.endTime.getHours(),
-                    tutorAvailableHours[j].timeBlock.startTime.getHours(), tutorAvailableHours[j].timeBlock.endTime.getHours())) {
+            if (tuteeAppointments[i].time.start.getFullYear() === tutorAvailableHours[j].time.start.getFullYear() &&
+                tuteeAppointments[i].time.start.getMonth() === tutorAvailableHours[j].time.start.getMonth() &&
+                tuteeAppointments[i].time.start.getDate() === tutorAvailableHours[j].time.start.getDate()) {
+                if (checkIfAppointmentsConflict(tuteeAppointments[i].time.start.getHours(), tuteeAppointments[i].time.end.getHours(),
+                    tutorAvailableHours[j].time.start.getHours(), tutorAvailableHours[j].time.end.getHours())) {
                     tutorAvailableHours.splice(j, 1); // may have to adjust index
                 }
             }
@@ -58,8 +64,8 @@ export function convertDateStringsToDates(dateStrings) {
     let dates = [];
     for (let i = 0; typeof dateStrings !== "undefined" && i < dateStrings.length; i++) {
         dates[i] = {
-            ...dateStrings[i], timeBlock: {
-                startTime: new Date(dateStrings[i].timeBlock.startTime), endTime: new Date(dateStrings[i].timeBlock.endTime)
+            ...dateStrings[i], time: {
+                start: new Date(dateStrings[i].time.start), end: new Date(dateStrings[i].time.end)
             }
         };
     }
@@ -76,15 +82,27 @@ export function checkIfAppointmentsConflict(start1, end1, start2, end2) {
 }
 
 export function combineSingleSlots(openHours) {
-    openHours.sort((timeSlot1, timeSlot2) => timeSlot1.timeBlock.startTime.getTime() - timeSlot2.timeBlock.startTime.getTime());
+    openHours.sort((timeSlot1, timeSlot2) => timeSlot1.time.start.getTime() - timeSlot2.time.start.getTime());
     for (let i = 0; i < openHours.length - 1; i++) {
-        if (openHours[i].timeBlock.startTime.getFullYear() === openHours[i + 1].timeBlock.startTime.getFullYear() &&
-            openHours[i].timeBlock.startTime.getMonth() === openHours[i + 1].timeBlock.startTime.getMonth() &&
-            openHours[i].timeBlock.startTime.getDate() === openHours[i + 1].timeBlock.startTime.getDate()
-            && openHours[i].timeBlock.endTime.getHours() === openHours[i + 1].timeBlock.startTime.getHours()) {
-            openHours[i + 1].timeBlock.startTime.setHours(openHours[i].timeBlock.startTime.getHours());
+        if (openHours[i].time.start.getFullYear() === openHours[i + 1].time.start.getFullYear() &&
+            openHours[i].time.start.getMonth() === openHours[i + 1].time.start.getMonth() &&
+            openHours[i].time.start.getDate() === openHours[i + 1].time.start.getDate()
+            && openHours[i].time.end.getHours() === openHours[i + 1].time.start.getHours()) {
+            openHours[i + 1].time.start.setHours(openHours[i].time.start.getHours());
             openHours.splice(i, 1);
             i--; // Need to go back one index so we don't skip the newly joined time slot
         }
     }
+}
+
+export function calcTotalHours(hours, timePeriod) {
+    let start = moment().startOf(timePeriod);
+    let end = moment().endOf(timePeriod);
+    return hours.filter( (hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end) ).length;
+}
+
+export function calcTotalHoursPerMonth(hours, monthBack) {
+    let start = moment().clone().startOf("month").subtract(monthBack, "month").startOf("month");
+    let end = moment().clone().startOf("month").subtract(monthBack, "month").endOf("month");
+    return hours.filter( (hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end) ).length;
 }

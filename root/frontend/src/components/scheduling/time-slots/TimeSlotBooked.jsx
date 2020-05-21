@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import './TimeSlotBooked.css';
-import { store } from "../../store/configureStore.js";
-import { CANCEL_APPOINTMENT } from "../../store/profileReducer.js";
+import { store } from "../../../store/configureStore.js";
+import { CANCEL_APPOINTMENT } from "../../../store/profileReducer.js";
 
 export default class TimeSlotBooked extends Component {
 
@@ -21,10 +21,10 @@ export default class TimeSlotBooked extends Component {
             <Popover.Title >
                 <div className="popoverTitleContainer">
                     <div>
-                        <img className="timeIcon" src={require("../../images/time-icon.png")}></img>
+                        <img className="timeIcon" src={require("../../../images/time-icon.png")}></img>
                         {this.props.start.getHours() + ":00-" + this.props.end.getHours()}:00 PM
                     </div>
-                    <img className="cancelIcon" src={require("../../images/cancel-icon.png")}
+                    <img className="cancelIcon" src={require("../../../images/cancel-icon.png")}
                         onClick={() => this.cancelAppointment()}></img>
                 </div>
             </Popover.Title>
@@ -41,9 +41,9 @@ export default class TimeSlotBooked extends Component {
             type: CANCEL_APPOINTMENT,
             payload: {
                 tutorID: this.props.name,
-                timeBlock: {
-                    startTime: this.props.start,
-                    endTime: this.props.end
+                time: {
+                    start: this.props.start,
+                    end: this.props.end
                 }
             }
         });

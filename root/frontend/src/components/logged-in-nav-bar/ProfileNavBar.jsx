@@ -3,8 +3,6 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import './ProfileNavBar.css';
 import { connect } from "react-redux";
-import { PURGE } from 'redux-persist';
-import { store } from '../../store/configureStore.js';
 
 class ProfileNavBar extends Component {
 
@@ -20,11 +18,9 @@ class ProfileNavBar extends Component {
                         <Nav.Link href="/search">Search</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
-                {/* This button is only for testing and is used to clear the cache */}
-                <button onClick={() => store.dispatch({ type: PURGE, result: () => null })}>Clear Cache</button>
                 <Navbar.Collapse className="justify-content-end">
                     <Navbar.Text>
-                        Signed in as: <a href="#login">{this.props.firstName + " " + this.props.lastName}</a>
+                        Signed in as: <a href="#login">{this.props.name}</a>
                     </Navbar.Text>
                     <img src={this.props.imgPath}></img>
                 </Navbar.Collapse>
@@ -36,8 +32,7 @@ class ProfileNavBar extends Component {
 
 function mapStateToProps(state) {
     return {
-        firstName: state.profileReducer.user.firstName,
-        lastName: state.profileReducer.user.lastName,
+        name: state.profileReducer.user.user.name,
         imgPath: state.profileReducer.user.imgPath
     };
 }

@@ -32,13 +32,26 @@ td {
 
 .weekControlSection {
     display: flex;
-    background-color: #a385e0;
-    color: #E1E1E1;
-    margin-bottom: 10px;
+    background-color: #e6dff5;
+    /* color: #F5F2FB; */
+    margin-bottom: 5px;
+    font-weight: normal;
+    padding: 10px;
+    border-radius: 10px;
     font-weight: normal;
 }
+
+.weekControlSection button {}
 
 .weekScheduleContainer {
     display: flex;
     flex-direction: column;
+}
+
+.pastSlot {
+    background-color: #cacaca;
+}
+
+.weekChangeIcons:hover {
+    color: #cacaca;
 }
