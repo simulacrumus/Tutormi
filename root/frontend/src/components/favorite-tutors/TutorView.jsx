@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import '../styles/TutorView.css';
-import { store } from "../store/configureStore.js";
-import { CHANGE_VIEWED_TUTOR } from "../store/profileReducer.js";
+import './TutorView.css';
+import { store } from "../../store/configureStore.js";
+import { CHANGE_VIEWED_TUTOR } from "../../store/profileReducer.js";
 
 export default class TutorView extends Component {
 
@@ -16,7 +16,8 @@ export default class TutorView extends Component {
                 <h6>{this.props.tutor.firstName} {this.props.tutor.lastName}</h6>
                 <button className="goToProfileBtn" onClick={() => {
                     store.dispatch({ type: CHANGE_VIEWED_TUTOR, payload: this.props.tutor });
-                    setTimeout(() => window.location.href = "/viewTutor", 1);}}>View Profile</button>
+                    setTimeout(() => window.location.href = "/viewTutor", 1);
+                }}>View Profile</button>
             </div>
         );
     }

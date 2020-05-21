@@ -20,7 +20,7 @@ router.get('/', auth, async (req, res) => {
         res.json(user);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).send('*auth*Server error');
     }
 });
 
@@ -82,7 +82,7 @@ router.post(
             jwt.sign(
                 payload,
                 config.get('jwtSecret'), {
-                    expiresIn: 1800000
+                    expiresIn: 180000000
                 },
                 (err, token) => {
                     if (err) throw err;

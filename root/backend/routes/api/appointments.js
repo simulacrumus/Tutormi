@@ -74,7 +74,7 @@ router.post('/', [auth, [
 
         const appointment = Appointment(newAppointment);
 
-        appointment.save();
+        appointment = await appointment.save();
 
         if (!appointment) {
             return res.status(400).json({
@@ -84,11 +84,11 @@ router.post('/', [auth, [
 
         tutor.appointments.unshift(appointment.id);
 
-        tutor.save();
+        tutor = await tutor.save();
 
         tutee.appointments.unshift(appointment.id);
 
-        tutee.save();
+        tutee = await tutee.save();
 
         res.json([tutor, tutee]);
     } catch (err) {
@@ -138,50 +138,101 @@ router.get('/:id', auth, async (req, res) => {
 // @route   DELETE api/appintments/:id
 // @desc    Delete appointments by ID
 // @access  Public
-router.delete('/:id', auth, async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({
-            errors: errors.array()
+router.delete('/:id', auth, async ({
+    params: {
+        id
+    }
+}, res) => {
+
+    if (!id) {
+        res.status(400).json({
+            message: 'Appintment ID required to delete'
         });
     }
 
+    // function to convert appointment hours to an array
+    const hours = (appointment) => {
+        let start = new Date(appointment.time.start);
+        let end = new Date(appointment.time.end);
+        let hours = new Array();
+        while (start <= end) {
+            hours.push(new Date(start));
+            start.setHours(start.getHours() + 1);
+        }
+        return hours;
+    }
+
     try {
+        // Find appointment
+        const appointment = await Appointment.findById(id);
 
-        // find tutor of the appointmnet
-        const tutor = await Tutor.find({
-            appointment: req.params.id
+        // return arror message if appointment doesn't exist in db
+        if (!appointment) {
+            res.status(400).json({
+                message: 'No appointment found'
+            });
+        }
+
+        //find tutor of the appointment
+        const tutor = await Tutor.findById(appointment.tutor);
+
+        // return error message if tutor of the appointment doesn't exist
+        if (!tutor) {
+            res.status(400).json({
+                message: "Tutor of this appointment doesn't exist anymore"
+            });
+        }
+        //find tutee of the appointment
+        const tutee = await Tutee.findById(appointment.tutee);
+
+        // return error message if tutee of the appointment doesn't exist
+        if (!tutee) {
+            res.status(400).json({
+                message: "Tutee of this appointment doesn't exist anymore"
+            });
+        }
+
+        // get user info for admin valication
+        const user = await User.findById(req.user.user.id);
+
+        // check if the user who intents to delete the appointment either tutee or tutor of the appointment or admin
+        // if not, return an error message
+        if (!(tutor.user === req.user.user.id || tutee.user === req.user.user.id || user.type === 'admin')) {
+            res.status(400).json({
+                message: "Request denied! You don't have permisson to delete this appointment"
+            });
+        }
+
+        // add appointment hours to tutor's available hours and delete appointment id from appointments
+        await Tutor.findOneAndUpdate({
+            _id: appointment.tutor
+        }, {
+            $addToSet: {
+                availableHours: hours(appointment)
+            },
+            $pull: {
+                appointments: id
+            }
         });
 
-        // get index of the appointment in tutor appointments
-        const appintmentIndexTutor = tutor.appointments.map(item => item.appointment).indexOf(appointment.id);
-
-        // remove appointment from tutor appointments
-        tutor.appintments.splice(appintmentIndexTutor, 1);
-
-        // save tutor back
-        tutor = await tutor.save();
-
-        // find tutee of the appoitnment
-        const tutee = await Tutor.find({
-            appointment: req.params.id
+        //delete appointment id from appointments
+        await Tutee.findOneAndUpdate({
+            _id: appointment.tutee
+        }, {
+            $pull: {
+                appointments: id
+            }
         });
 
-        // get index of the ppointment in tutee appointments
-        const appintmentIndexTutee = tutee.appointments.map(item => item.appointment).indexOf(appointment.id);
-
-        // remove appointment from tutee appointments
-        tutee.appintments.splice(appintmentIndexTutee, 1);
-
-        // save tutee back
-        tutee = await tutee.save();
-
-        // delete the appointment
-        const appointment = await Appointment.deleteOne({
-            id: req.params.id
+        // delete the appointment itself
+        await Appointment.findOneAndDelete({
+            _id: id
         });
 
-        res.json(appointments);
+        //return message
+        res.json({
+            message: 'Appointment Deleted'
+        });
 
     } catch (err) {
         console.error(err.message);

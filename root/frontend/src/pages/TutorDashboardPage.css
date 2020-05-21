@@ -1,13 +1,11 @@
-.profilePageContainer {
+.tutorDashboardContainer {
     display: flex;
     height: 100vh;
     justify-content: space-evenly;
     align-items: center;
 }
 
-.innerProfileContainer {
+.tutorInnerDashboardContainer {
     display: flex;
-    height: 73vh;
+    height: 68vh;
 }
-
-

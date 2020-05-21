@@ -14,7 +14,7 @@ var Schema = {
     "type": {
         in: 'body',
         matches: {
-            options: [/\b(?:tutor|tutee)\b/],
+            options: [/\b(?:tutor|tutee|admin)\b/],
             errorMessage: 'User type should be either tutor or tutee'
         }
     }
@@ -26,6 +26,7 @@ var Schema = {
 router.post('/', [
     check('name', 'Name is required!').not().isEmpty(),
     check('email', 'Please provide a valid email address').isEmail(),
+    check('type', 'Please provide a valid user type').isEmail(),
     check('password', 'Password should be at least 8 characters').isLength({
         min: 8,
         max: 25

@@ -6,7 +6,7 @@ table {
 }
 
 th, td {
-    padding: 10px;
+    /* padding: 10px; */
     border-bottom: 0.6px solid #E1E1E1;
     border-right: 0.6px solid #E1E1E1;
 }
@@ -28,4 +28,30 @@ td {
     top: 20px;
     border: 0px;
     /* border-right: solid #D8D8D8; */
+}
+
+.weekControlSection {
+    display: flex;
+    background-color: #e6dff5;
+    /* color: #F5F2FB; */
+    margin-bottom: 5px;
+    font-weight: normal;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: normal;
+}
+
+.weekControlSection button {}
+
+.weekScheduleContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.pastSlot {
+    background-color: #cacaca;
+}
+
+.weekChangeIcons:hover {
+    color: #cacaca;
 }

@@ -1,0 +1,42 @@
+.open {
+    color: #eaeaea;
+    border: 0px;
+    border-radius: 10px;
+    background-color: #4DB6AC;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.open:hover {
+    background-color: #409c93;
+}
+
+#coursesSelect, #notesInput {
+    margin-bottom: 6px;
+}
+
+.popoverTitleContainer {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.timeIcon {
+    object-fit: cover;
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

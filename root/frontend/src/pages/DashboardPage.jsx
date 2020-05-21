@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import ProfileNavBar from "../components/ProfileNavBar.jsx";
-import WeeklySchedule from "../components/WeeklySchedule.jsx";
-import "../styles/DashboardPage.css";
+import ProfileNavBar from "../components/logged-in-nav-bar/ProfileNavBar.jsx";
+import WeeklySchedule from "../components/scheduling/WeeklySchedule.jsx";
+import "./DashboardPage.css";
 import { connect } from "react-redux";
-import FavoriteTutorsView from "../components/FavoriteTutorsView.jsx";
+import FavoriteTutorsView from "../components/favorite-tutors/FavoriteTutorsView.jsx";
 
 class DashboardPage extends Component {
 
@@ -17,7 +17,8 @@ class DashboardPage extends Component {
                             tuteeAppointments={this.props.user.appointments}
                             tutorAppointments={this.props.viewedTutor.appointments}
                             tutorAvailableHours={this.props.viewedTutor.availableHours}
-                            viewedTutor={this.props.viewedTutor} />
+                            viewedTutor={this.props.viewedTutor}
+                            tutorHours={this.props.user.availableHours} />
                     </div>
                     <div className="innerDashboardContainer">
                         <FavoriteTutorsView />

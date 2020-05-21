@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
-import '../styles/ProfileNavBar.css';
+import './ProfileNavBar.css';
 import { connect } from "react-redux";
 
 class ProfileNavBar extends Component {
@@ -20,7 +20,7 @@ class ProfileNavBar extends Component {
                 </Navbar.Collapse>
                 <Navbar.Collapse className="justify-content-end">
                     <Navbar.Text>
-                        Signed in as: <a href="#login">{this.props.firstName + " " + this.props.lastName}</a>
+                        Signed in as: <a href="#login">{this.props.name}</a>
                     </Navbar.Text>
                     <img src={this.props.imgPath}></img>
                 </Navbar.Collapse>
@@ -32,8 +32,7 @@ class ProfileNavBar extends Component {
 
 function mapStateToProps(state) {
     return {
-        firstName: state.profileReducer.user.firstName,
-        lastName: state.profileReducer.user.lastName,
+        name: state.profileReducer.user.user.name,
         imgPath: state.profileReducer.user.imgPath
     };
 }
