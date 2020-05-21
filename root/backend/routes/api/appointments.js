@@ -138,14 +138,19 @@ router.get('/:id', auth, async (req, res) => {
 // @route   DELETE api/appintments/:id
 // @desc    Delete appointments by ID
 // @access  Public
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, async ({
+    params: {
+        id
+    }
+}, res) => {
 
-    if (!req.params.id) {
+    if (!id) {
         res.status(400).json({
             message: 'Appintment ID required to delete'
         });
     }
 
+    // function to convert appointment hours to an array
     const hours = (appointment) => {
         let start = new Date(appointment.time.start);
         let end = new Date(appointment.time.end);
@@ -159,7 +164,7 @@ router.delete('/:id', auth, async (req, res) => {
 
     try {
         // Find appointment
-        const appointment = await Appointment.findById(req.params.id);
+        const appointment = await Appointment.findById(id);
 
         // return arror message if appointment doesn't exist in db
         if (!appointment) {
@@ -192,49 +197,42 @@ router.delete('/:id', auth, async (req, res) => {
 
         // check if the user who intents to delete the appointment either tutee or tutor of the appointment or admin
         // if not, return an error message
-        if (!(tutor.user === req.user.user.id || tutee.user === req.user.user.id || user.type === admin)) {
+        if (!(tutor.user === req.user.user.id || tutee.user === req.user.user.id || user.type === 'admin')) {
             res.status(400).json({
                 message: "Request denied! You don't have permisson to delete this appointment"
             });
         }
 
-        // Get the hours pf the appointment
-        const appointmentHours = hours(appointment);
-
-        // add appointment hours to tutor's available hours
-        tutor.availableHours.concat(appointmentHours);
-
-        // create an array with unique aavailable hours
-        let uniqueHours = new Set(tutor.availableHours);
-
-        //update tutor's available hours with unique hours
-        tutor.availableHours = uniqueHours;
-
-        // get index of the appointment in tutor appointments
-        const appointmentIndexTutor = tutor.appointments.indexOf(appointment.id);
-
-        // remove appointment from tutor appointments
-        tutor.appointments.splice(appointmentIndexTutor, 1);
-
-        // save tutor back
-        tutor = await tutor.save();
-
-        // get index of the ppointment in tutee appointments
-        const appointmentIndexTutee = tutee.appointments.map(item => item.appointment).indexOf(appointment.id);
-
-        // remove appointment from tutee appointments
-        tutee.appointments.splice(appointmentIndexTutee, 1);
-
-        // save tutee back
-        tutee = await tutee.save();
-
-        // delete the appointment
-        await Appointment.deleteOne({
-            id: req.params.id
+        // add appointment hours to tutor's available hours and delete appointment id from appointments
+        await Tutor.findOneAndUpdate({
+            _id: appointment.tutor
+        }, {
+            $addToSet: {
+                availableHours: hours(appointment)
+            },
+            $pull: {
+                appointments: id
+            }
         });
 
-        //return tutee and tutor
-        res.json([tutee, tutor]);
+        //delete appointment id from appointments
+        await Tutee.findOneAndUpdate({
+            _id: appointment.tutee
+        }, {
+            $pull: {
+                appointments: id
+            }
+        });
+
+        // delete the appointment itself
+        await Appointment.findOneAndDelete({
+            _id: id
+        });
+
+        //return message
+        res.json({
+            message: 'Appointment Deleted'
+        });
 
     } catch (err) {
         console.error(err.message);
