@@ -15,26 +15,34 @@ class FavoriteTutorsView extends Component {
     }
 
     displayTutors() {
-        let tutors = [];
-        let tutorRow = [];
-        for (let index = 0; index < this.props.favoriteTutors.length; index++) {
-            if (index !== 0 && index % 3 === 0) {
-                tutors.push(<div className="tutorRowContainer">{tutorRow}</div>)
-                tutorRow = [];
+        // Tutee has no favorites
+        if (typeof this.props.favoriteTutors === "undefined" || this.props.favoriteTutors.length === 0) {
+            return (<div className="tutorRowContainer">
+                <p>
+                    You don't have any tutors in your favorites list yet,
+                    try <a href="/search">searching</a> for one.
+                </p>
+            </div>);
+        } else { // If the tutee has favorites display them
+            let tutors = [];
+            let tutorRow = [];
+            for (let index = 0; index < this.props.favoriteTutors.length; index++) {
+                if (index !== 0 && index % 3 === 0) {
+                    tutors.push(<div className="tutorRowContainer">{tutorRow}</div>)
+                    tutorRow = [];
+                }
+                tutorRow[index] = <TutorView tutor={this.props.favoriteTutors[index]} />;
             }
-            tutorRow[index] = <TutorView tutor={this.props.favoriteTutors[index]} />;
+            tutors.push(<div className="tutorRowContainer">{tutorRow}</div>)
+            return tutors;
         }
-        tutors.push(<div className="tutorRowContainer">{tutorRow}</div>)
-        return tutors;
     }
 
 }
 
 function mapStateToProps(state) {
     return {
-        user: state.profileReducer.user,
         favoriteTutors: state.profileReducer.user.favoriteTutors,
-        viewedTutor: state.profileReducer.viewedTutor
     };
 }
 

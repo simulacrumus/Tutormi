@@ -34,14 +34,15 @@ td {
     display: flex;
     background-color: #e6dff5;
     /* color: #F5F2FB; */
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     font-weight: normal;
     padding: 10px;
-    border-radius: 10px;
-    font-weight: normal;
 }
 
-.weekControlSection button {}
+.weekControlSection h5 {
+    margin-left: 5px;
+    margin-right: 5px;
+}
 
 .weekScheduleContainer {
     display: flex;
@@ -53,5 +54,7 @@ td {
 }
 
 .weekChangeIcons:hover {
-    color: #cacaca;
+    background-color: #F5F2FB;
+    object-fit: cover;
+    border-radius: 50%;
 }

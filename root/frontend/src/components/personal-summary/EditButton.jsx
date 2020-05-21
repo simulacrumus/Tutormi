@@ -29,11 +29,11 @@ function EditButton(props) {
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Name</Form.Label>
-                            <Form.Control type="text" defaultValue={`${props.user.firstName} ${props.user.lastName}`} id="nameInput" />
+                            <Form.Control type="text" defaultValue={props.user.user.name} id="nameInput" />
                         </Form.Group>
                         <Form.Group >
                             <Form.Label>Bio</Form.Label>
-                            <Form.Control as="textarea" rows="3" defaultValue={props.user.about} id="bioInput" />
+                            <Form.Control as="textarea" rows="3" defaultValue={props.user.bio} id="bioInput" />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Languages</Form.Label>
@@ -57,9 +57,8 @@ function EditButton(props) {
                             {
                                 type: UPDATE_USER, payload: {
                                     imgPath: document.getElementById("imgInput").value,
-                                    firstName: document.getElementById("nameInput").value.split(" ")[0],
-                                    lastName: document.getElementById("nameInput").value.split(" ")[1],
-                                    about: document.getElementById("bioInput").value,
+                                    name: document.getElementById("nameInput").value,
+                                    bio: document.getElementById("bioInput").value,
                                     languages: document.getElementById("languageInput").value,
                                     location: document.getElementById("locationInput").value,
                                 }
