@@ -16,7 +16,11 @@ import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutli
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import { ThemeProvider } from "@material-ui/styles";
-import datePickerTheme from './datePickerTheme';
+import { createMuiTheme } from "@material-ui/core";
+import purple from "@material-ui/core/colors/purple";
+import Button from 'react-bootstrap/Button'
+
+const datePickerTheme = createMuiTheme({ palette: { primary: purple, } });
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -43,30 +47,33 @@ class WeeklySchedule extends Component {
                                 format="DD/MM/yyyy"
                                 id="date-picker-inline"
                                 value={this.state.chosenDay}
-                                onChange={(date) => { }}
-                                onAccept={(date) => this.setState({ weekStart: date.clone().startOf("week"), chosenDay: date })}
+                                onChange={(date) => {
+                                    if (date !== null && date.isValid())
+                                        this.setState({ weekStart: date.clone().startOf("week"), chosenDay: date });
+                                }}
                                 KeyboardButtonProps={{
                                     'aria-label': 'change date',
                                 }}
                             />
                         </MuiPickersUtilsProvider>
                     </ThemeProvider>
-                    <button onClick={() => {
-                        let sendDate = { hours: this.props.user.availableHours.map((data) => { return data.start }) };
-                        console.log(JSON.stringify(sendDate));
-                        fetch("/api/tutors/schedule", {
-                            method: "POST",
-                            headers: {
-                                "X-Auth-Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNWVjMzVhMmYxMTJkZmZjMDczYTFkY2IwIn0sImlhdCI6MTU4OTkzMjI5MiwiZXhwIjoxNTkxNzMyMjkyfQ.IZRn3uc-8QVMXE7fqe55v5-kPEI_oauX3LbMZElHUoo",
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(sendDate)
-                        })
-                            .then((response) => {
-                                console.log(response);
-                            });
-                    }
-                    }>Save Schedule</button>
+                    <Button variant="secondary" size="sm"
+                        onClick={() => {
+                            let sendDate = { hours: this.props.user.availableHours.map((data) => { return data.start }) };
+                            console.log(JSON.stringify(sendDate));
+                            fetch("/api/tutors/schedule", {
+                                method: "POST",
+                                headers: {
+                                    "X-Auth-Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNWVjMzVhMmYxMTJkZmZjMDczYTFkY2IwIn0sImlhdCI6MTU4OTkzMjI5MiwiZXhwIjoxNTkxNzMyMjkyfQ.IZRn3uc-8QVMXE7fqe55v5-kPEI_oauX3LbMZElHUoo",
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(sendDate)
+                            })
+                                .then((response) => {
+                                    console.log(response);
+                                });
+                        }
+                        }>Save Schedule</Button>
                 </div>
                 <table>
                     <tr>

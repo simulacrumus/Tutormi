@@ -15,7 +15,7 @@ class ProfileNavBar extends Component {
                     <Nav className="mr-auto">
                         <Nav.Link href="/">Profile</Nav.Link>
                         <Nav.Link href="/dashboard">Dashboard</Nav.Link>
-                        <Nav.Link href="/search">Search</Nav.Link>
+                        {this.props.type === "tutee" ? <Nav.Link href="/search">Search</Nav.Link> : null}
                     </Nav>
                 </Navbar.Collapse>
                 <Navbar.Collapse className="justify-content-end">
@@ -33,7 +33,8 @@ class ProfileNavBar extends Component {
 function mapStateToProps(state) {
     return {
         name: state.profileReducer.user.user.name,
-        imgPath: state.profileReducer.user.imgPath
+        imgPath: state.profileReducer.user.imgPath,
+        type: state.profileReducer.user.user.type
     };
 }
 

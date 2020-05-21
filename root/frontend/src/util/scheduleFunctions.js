@@ -101,8 +101,14 @@ export function calcTotalHours(hours, timePeriod) {
     return hours.filter( (hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end) ).length;
 }
 
-export function calcTotalHoursPerMonth(hours, monthBack) {
-    let start = moment().clone().startOf("month").subtract(monthBack, "month").startOf("month");
-    let end = moment().clone().startOf("month").subtract(monthBack, "month").endOf("month");
+export function calcTotalHoursPerMonth(hours, numberOfMonthsBack) {
+    let start = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").startOf("month");
+    let end = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").endOf("month");
     return hours.filter( (hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end) ).length;
+}
+
+export function fallOnSameDay(date1, date2){
+    return (date1.getFullYear() === date2.getFullYear() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getDate() === date2.getDate());
 }

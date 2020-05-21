@@ -1,4 +1,4 @@
-import initialState from '../initialState.js';
+import initialState from '../initialState';
 import { PURGE } from 'redux-persist';
 import moment from 'moment';
 
@@ -10,13 +10,18 @@ export const CANCEL_APPOINTMENT = "CANCEL_APPOINTMENT";
 export const OPEN_TIME_SLOT = "OPEN_TIME_SLOT";
 export const CANCEL_AVAILABILITY = "CANCEL_AVAILABILITY";
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
+export const TOKEN_ACQUIRED = "TOKEN_ACQUIRED";
 
 export default function profileReducer(state = initialState, action) {
+    console.log(state);
     let copiedAvailableHours = state.user.availableHours.slice();
     let copiedNewAppointments = state.user.appointments.slice();
     switch (action.type) {
         case USER_LOGGED_IN:
             return {...state, user: action.payload}
+
+        case TOKEN_ACQUIRED:
+            return {...state, token: action.payload}
 
         case CHANGE_VIEWED_TUTOR:
             return { ...state, viewedTutor: action.payload }
@@ -30,10 +35,9 @@ export default function profileReducer(state = initialState, action) {
 
         case UPDATE_USER:
             return {...state, user: {...state.user, 
+                user: {...state.user.user, name: action.payload.name},
                 imgPath: action.payload.imgPath,
-                firstName: action.payload.firstName,
-                lastName: action.payload.lastName,
-                about: action.payload.about,
+                bio: action.payload.bio,
                 // languages: action.payload.languages,
                 location: action.payload.location}};
 
