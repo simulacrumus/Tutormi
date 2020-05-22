@@ -5,15 +5,27 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { Avatar, IconButton, CardMedia } from "@material-ui/core";
 import { Rating } from "@material-ui/lab";
 
 const useStyles = makeStyles(() => ({
+  root: {
+    padding: "2px 4px",
+    marginTop: 5,
+    display: "flex",
+    alignItems: "center",
+    textAlign: "center",
+  },
   color: {
     background: "#2962FF",
     fontWeight: "bold",
     width: 1000,
+  },
+  typography: {
+    flexGrow: 1,
+    alignItems: "center",
   },
 }));
 
@@ -32,6 +44,7 @@ const TutorProfile = ({
   description,
   imgSrc,
   rating,
+  courses,
 }) => {
   const classes = useStyles();
   description = trimBio(description);
@@ -52,6 +65,14 @@ const TutorProfile = ({
         <Typography variant="body2" component="p">
           {description}
         </Typography>
+        <Typography variant="h6">Skills</Typography>
+        {courses.map((course) => (
+          <Paper elevation="5" className={classes.root}>
+            <Typography className={classes.typography}>
+              {course.toUpperCase()}
+            </Typography>
+          </Paper>
+        ))}
       </CardContent>
       <CardActions>
         <Button

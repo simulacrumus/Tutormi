@@ -3,13 +3,14 @@ import "./index.css";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import TutorViewPage from "./pages/TutorViewPage.jsx";
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
-import searchMain from "./components/SearchMain";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import SearchMain from "./components/SearchMain";
 import TutorDashboardPage from "./pages/TutorDashboardPage.jsx";
 import { connect } from "react-redux";
-import Login from './components/login/Login';
+import Login from "./components/login/Login";
 
 class Router extends Component {
+
     render() {
       return (
         <main>
@@ -24,12 +25,14 @@ class Router extends Component {
         </main>
       );
     }
+
   }
-  
-  function mapStateToProps(state) {
-    return {
-        user: state.profileReducer.user,
-    };
-  }
-  
-  export default connect(mapStateToProps)(Router);
+}
+
+function mapStateToProps(state) {
+  return {
+    user: state.profileReducer.user,
+  };
+}
+
+export default connect(mapStateToProps)(Router);

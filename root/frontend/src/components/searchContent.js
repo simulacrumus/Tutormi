@@ -16,6 +16,7 @@ const SearchContent = ({ tutors = [] }) => {
             imgSrc="https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/105295613/original/6d0adc56aa1cb5b422149e81c5b6a5d035cbfde4/code-in-javascript-ajax-xml-and-json-for-your-website.jpg"
             description={tutor.bio}
             rating={tutor.rating}
+            courses={tutor.courses}
           />
         </Grid>
       ))}
