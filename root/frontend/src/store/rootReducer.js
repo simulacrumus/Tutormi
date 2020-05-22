@@ -1,11 +1,11 @@
 import { combineReducers } from "redux";
 import tutorSearchListReducer from "./tutorSearchList";
-import profileReducer from './profileReducer.js';
+import userReducer from './user/userReducer.js';
 
 // All reducers must be listed here so that they can be combined and associated with the store
-export default combineReducers(
-    { profileReducer: profileReducer },
-    { tutorSearchList: tutorSearchListReducer }
+export default combineReducers({
+     profileReducer: userReducer ,
+     tutorSearchList: tutorSearchListReducer }
 );
 
 

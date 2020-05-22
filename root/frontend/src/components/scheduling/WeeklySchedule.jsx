@@ -7,7 +7,6 @@ import OpenableTimeSlot from './time-slots/OpenableTimeSlot.jsx';
 import moment from 'moment';
 import { connect } from "react-redux";
 import {
-
     convertSingleHoursToTimeSlots, findTimeSlot, removeSlotConflict, convertDateStringsToDates,
     checkIfAppointmentsConflict, combineSingleSlots
 } from "../../util/scheduleFunctions.js";
@@ -59,12 +58,12 @@ class WeeklySchedule extends Component {
                     </ThemeProvider>
                     <Button variant="secondary" size="sm"
                         onClick={() => {
-                            let sendDate = { hours: this.props.user.availableHours.map((data) => { return data.start }) };
+                            let sendDate = { hours: this.props.user.availableHours };
                             console.log(JSON.stringify(sendDate));
                             fetch("/api/tutors/schedule", {
                                 method: "POST",
                                 headers: {
-                                    "X-Auth-Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNWVjMzVhMmYxMTJkZmZjMDczYTFkY2IwIn0sImlhdCI6MTU4OTkzMjI5MiwiZXhwIjoxNTkxNzMyMjkyfQ.IZRn3uc-8QVMXE7fqe55v5-kPEI_oauX3LbMZElHUoo",
+                                    "X-Auth-Token": this.props.token,
                                     "Content-Type": "application/json"
                                 },
                                 body: JSON.stringify(sendDate)
@@ -129,7 +128,7 @@ class WeeklySchedule extends Component {
                     // Display viewed tutor available hours
                 } else if (typeof viewedTutorAvailableHourSlot !== "undefined") {
                     if (hour === viewedTutorAvailableHourSlot.time.start.getHours())
-                        row[day] = <TimeSlotOpen tutor={this.props.viewedTutor} timeSlot={viewedTutorAvailableHourSlot.time} />
+                        row[day] = <TimeSlotOpen tutor={this.props.viewedTutor} timeSlot={viewedTutorAvailableHourSlot} />
                     // Display user appointments
                 } else if (typeof userAppointmentSlot !== "undefined") {
                     if (hour === userAppointmentSlot.time.start.getHours())
@@ -147,7 +146,7 @@ class WeeklySchedule extends Component {
                     } else {
                         // Tutor's can interact with empty cells and open them, tutees cannot
                         row[day] = (this.props.user.user.type === "tutor") ?
-                            <OpenableTimeSlot date={this.state.weekStart.clone().add(day, "day")} hour={hour} /> : <td></td>;
+                            <OpenableTimeSlot date={this.state.weekStart.clone().add(day, "day").set("hour", hour)} /> : <td></td>;
                     }
                 }
             }
@@ -170,7 +169,8 @@ class WeeklySchedule extends Component {
 function mapStateToProps(state) {
     return {
         user: state.profileReducer.user,
-        viewedTutor: state.profileReducer.viewedTutor
+        viewedTutor: state.profileReducer.viewedTutor,
+        token: state.profileReducer.token
     };
 }
 

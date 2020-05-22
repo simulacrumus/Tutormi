@@ -3,7 +3,7 @@ import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import './TimeSlotBooked.css';
 import { store } from "../../../store/configureStore.js";
-import { CANCEL_APPOINTMENT } from "../../../store/profileReducer.js";
+import { APPOINTMENT_CANCELED } from "../../../store/user/userActions";
 
 export default class TimeSlotBooked extends Component {
 
@@ -38,7 +38,7 @@ export default class TimeSlotBooked extends Component {
 
     cancelAppointment() {
         store.dispatch({
-            type: CANCEL_APPOINTMENT,
+            type: APPOINTMENT_CANCELED,
             payload: {
                 tutorID: this.props.name,
                 time: {
