@@ -2,18 +2,17 @@ import React, { Component } from 'react';
 import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import './TimeSlotOpen.css';
-import { store } from "../../../store/configureStore.js";
-import { BOOK_SLOT } from "../../../store/profileReducer.js";
+import { bookAppointment } from "../../../store/user/userActions";
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import { connect } from "react-redux";
 
-export default class TimeSlotOpen extends Component {
+class TimeSlotOpen extends Component {
 
     render() {
         return (
             <OverlayTrigger trigger="click" placement="bottom" overlay={this.popover}>
-                <td rowSpan={parseInt(this.props.timeSlot.endTime.getHours()) - parseInt(this.props.timeSlot.startTime.getHours())} className="open">
-                    {this.props.timeSlot.startTime.getHours() + ":00-" + this.props.timeSlot.endTime.getHours()}:00 PM</td>
+                <td rowSpan={parseInt(this.props.timeSlot.time.end.getHours()) - parseInt(this.props.timeSlot.time.start.getHours())} className="open">
+                    {this.props.timeSlot.time.start.getHours() + ":00-" + this.props.timeSlot.time.end.getHours()}:00 PM</td>
             </OverlayTrigger>
         );
     }
@@ -24,75 +23,32 @@ export default class TimeSlotOpen extends Component {
                 <div className="popoverTitleContainer">
                     <div>
                         <img className="timeIcon" src={require("../../../images/time-icon.png")}></img>
-                        {this.props.timeSlot.startTime.getHours() + ":00-" + this.props.timeSlot.endTime.getHours()}:00 PM
+                        {this.props.timeSlot.time.start.getHours() + ":00-" + this.props.timeSlot.time.end.getHours()}:00 PM
                     </div>
                 </div>
             </Popover.Title>
             <Popover.Content>
-                {/* {`${this.props.tutor.firstName} ${this.props.tutor.lastName}`} */}
+                {`Tutor: ${this.props.tutor.name}`}
                 <Form.Label>Course</Form.Label>
                 <Form.Control size="sm" as="select" id="coursesSelect">
                     {this.props.tutor.courses.map((course) => <option value={course}>{course}</option>)}
                 </Form.Control>
                 <Form.Control size="sm" type="text" placeholder="Notes" id="notesInput" />
-                <button onClick={() => this.bookSlot()}>Book Appointment</button>
-            </Popover.Content>
-        </Popover>
-    );
-
-    bookSlot() {
-        store.dispatch({
-            type: BOOK_SLOT,
-            payload: {
-                tutorID: this.props.tutor.firstName + " " + this.props.tutor.lastName,
-                timeBlock: {
-                    startTime: this.props.timeSlot.startTime,
-                    endTime: this.props.timeSlot.endTime
-                },
-                subject: document.getElementById("coursesSelect").value,
-                note: document.getElementById("notesInput").value
-            }
-        });
-    }
-
-}
-
-function MyPopover(props) {
-    return (
-        <Popover id="popover-basic">
-            <Popover.Title >
-                <div className="popoverTitleContainer">
-                    <div>
-                        <img className="timeIcon" src={require("../../../images/time-icon.png")}></img>
-                        {props.timeSlot.startTime.getHours() + ":00-" + props.timeSlot.endTime.getHours()}:00 PM
-                    </div>
-                </div>
-            </Popover.Title>
-            <Popover.Content>
-                {/* {`${this.props.tutor.firstName} ${this.props.tutor.lastName}`} */}
-                <Form.Label>Course</Form.Label>
-                <Form.Control size="sm" as="select" id="coursesSelect">
-                    {props.tutor.courses.map((course) => <option value={course}>{course}</option>)}
-                </Form.Control>
-                <Form.Control size="sm" type="text" placeholder="Notes" id="notesInput" />
-                <button onClick={() => bookSlot()}>Book Appointment</button>
+                <button onClick={() => bookAppointment(this.props.tutor._id, this.props.timeSlot.time,
+                    document.getElementById("coursesSelect").value, document.getElementById("notesInput").value)}>
+                    Book Appointment</button>
             </Popover.Content>
         </Popover>
     );
 
 }
 
-function bookSlot() {
-    store.dispatch({
-        type: BOOK_SLOT,
-        payload: {
-            tutorID: this.props.tutor.firstName + " " + this.props.tutor.lastName,
-            timeBlock: {
-                startTime: this.props.timeSlot.startTime,
-                endTime: this.props.timeSlot.endTime
-            },
-            subject: document.getElementById("coursesSelect").value,
-            note: document.getElementById("notesInput").value
-        }
-    });
+function mapStateToProps(state) {
+    return {
+        user: state.profileReducer.user,
+        viewedTutor: state.profileReducer.viewedTutor,
+        token: state.profileReducer.token
+    };
 }
+
+export default connect(mapStateToProps)(TimeSlotOpen);

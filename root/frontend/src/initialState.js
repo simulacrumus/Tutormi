@@ -1,5 +1,5 @@
 import {store} from './store/configureStore';
-import {USER_LOGGED_IN, TOKEN_ACQUIRED} from './store/profileReducer';
+import {USER_LOGGED_IN, TOKEN_ACQUIRED} from './store/user/userActions';
      
 fetch("/api/auth", {
     method: "POST",
@@ -13,7 +13,8 @@ fetch("/api/auth", {
 })
 .then( response => response.json() )
 .then( responseToken => {
-    // store.dispatch({type: TOKEN_ACQUIRED, payload: responseToken})
+    console.log(responseToken)
+    store.dispatch({type: TOKEN_ACQUIRED, payload: responseToken.token})
     fetch("/api/tutors/me", {
         method: "GET",
         headers: {"x-auth-token": responseToken.token},
@@ -30,9 +31,7 @@ const initialState = {
         availableHours: [],
         appointments: []
     },  
-    viewedTutor: {}, // The tutor the tutee is currently viewing in detail, not applicable if the user is a tutor
-    tutorSearchList: [], // List containing all the tutors currently displayed in the search list
+    token: null // Token used to make API calls
 }
 
 export default initialState;
-

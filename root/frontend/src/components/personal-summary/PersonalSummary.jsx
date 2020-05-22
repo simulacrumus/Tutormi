@@ -13,8 +13,8 @@ export default class PersonalSummary extends Component {
                     <h3>{this.props.person.user.name}</h3>
                     <h6>{this.props.person.user.email}</h6>
                     <p>{this.props.person.bio}</p>
-                    <p>{typeof this.props.person.courses !== "undefined" ? "Course(s): " + this.props.person.courses.map((course) => ` ${course} `) : ""}<br />
-                        Language(s):{typeof this.props.person.languages !== "undefined" ? this.props.person.languages.map((language) => ` ${language} `) : ""}
+                    <p>{this.props.person.user.type === "tutor" ? "Course(s): " + this.props.person.courses.map((course) => ` ${course} `) : null}<br />
+                        Language(s):{typeof this.props.person.languages !== "undefined" ? this.props.person.languages.map((language) => ` ${language} `) : null}
                         <br />Location: {this.props.person.location}
                     </p>
                 </div>
