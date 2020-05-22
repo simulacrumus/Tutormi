@@ -11,8 +11,8 @@ from the db prior to accessing the persisted state, as such regardless of any me
 in place in the addTutor reducer, errors will arise, since addTutor is currently always executed
 prior to accessing the information stored in the local storage. Will fix this next update, for now 
 its fine */
-const SearchMain = ({ onAddTutor }) => {
-  useEffect(() => {
+const SearchMain = () => {
+  /*useEffect(() => {
     const getTutors = async () => {
       try {
         const response = await fetch("/api/tutors");
@@ -24,7 +24,7 @@ const SearchMain = ({ onAddTutor }) => {
       }
     };
     getTutors();
-  }, []);
+  }, []);*/
 
   return (
     <div className="App">
@@ -45,7 +45,4 @@ const SearchMain = ({ onAddTutor }) => {
   );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  onAddTutor: (tutor) => dispatch(addTutor(tutor)),
-});
-export default connect(null, mapDispatchToProps)(SearchMain);
+export default SearchMain;

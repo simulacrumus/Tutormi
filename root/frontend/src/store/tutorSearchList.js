@@ -17,8 +17,8 @@ export default function tutorSearchListReducer(state = [], action) {
             courses: action.payload.courses,
             languages: action.payload.languages,
             rating: action.payload.rating,
-            name: action.payload.user.name, //This field's no longer are present, but somehow this works
-            id: action.payload.user._id, //This field's no longer are present, but somehow this works
+            name: action.payload.user.name,
+            id: action.payload.user._id,
           },
         ];
       }
