@@ -1,22 +1,19 @@
 import React, { Component } from 'react';
 import './TutorView.css';
 import { store } from "../../store/configureStore.js";
-import { CHANGE_VIEWED_TUTOR } from "../../store/profileReducer.js";
+import { setViewedTutor } from "../../store/viewed-tutor/viewedTutorActions";
 
 export default class TutorView extends Component {
 
     render() {
         return (
-            <div tabIndex="0" className='tutorView' onClick={
-                () => {
-                    store.dispatch({ type: CHANGE_VIEWED_TUTOR, payload: this.props.tutor });
-                }}>
+            <div tabIndex="0" className='tutorView' onClick={() => setViewedTutor(this.props.tutor._id)}>
                 <img src={this.props.tutor.imgPath} />
 
                 <h6>{this.props.tutor.firstName} {this.props.tutor.lastName}</h6>
                 <button className="goToProfileBtn" onClick={() => {
-                    store.dispatch({ type: CHANGE_VIEWED_TUTOR, payload: this.props.tutor });
-                    setTimeout(() => window.location.href = "/viewTutor", 1);
+                    setViewedTutor(this.props.tutor._id)
+                        .then(() => window.location.href = "/viewTutor"); // Change page only after tutor is set
                 }}>View Profile</button>
             </div>
         );

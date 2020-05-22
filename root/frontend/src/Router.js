@@ -14,7 +14,7 @@ class Router extends Component {
       return (
         <main>
           <Switch>
-            <Route path='/' component={Login} exact />
+            <Route path='/' component={ProfilePage} exact />
             <Route path='/profile' component={ProfilePage} exact />
             <Route path="/dashboard" render={() => ( this.props.user.user.type === "tutee" ? <DashboardPage /> : <TutorDashboardPage />) }  />
             <Route path="/viewTutor" component={TutorViewPage} />
