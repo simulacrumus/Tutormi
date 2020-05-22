@@ -7,5 +7,3 @@ export default combineReducers({
      profileReducer: userReducer ,
      tutorSearchList: tutorSearchListReducer }
 );
-
-

@@ -1,19 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid } from "@material-ui/core";
 import { connect } from "react-redux";
 import { addTutor } from "../store/tutorSearchList";
-import Nav from "./nav";
+import Nav from "./Nav";
 import SearchContent from "./SearchContent";
-import SearchRightPanel from "./SearchRightPanel";
 import SearchLeftPanel from "./SearchLeftPanel";
 
-const SearchMain = ({ tutorSearchList = [], onAddTutor }) => {
+/*Currently there is a bug, due to the local storage. This component loads all the tutors
+from the db prior to accessing the persisted state, as such regardless of any measures put 
+in place in the addTutor reducer, errors will arise, since addTutor is currently always executed
+prior to accessing the information stored in the local storage. Will fix this next update, for now 
+its fine */
+const SearchMain = ({ onAddTutor }) => {
   useEffect(() => {
     const getTutors = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/tutors");
+        const response = await fetch("/api/tutors");
         const data = await response.json();
-        console.log(data);
+        data.map((tutor) => onAddTutor(tutor));
+        console.log("Passed data!!");
       } catch (error) {
         console.log("Error!!", error);
       }
@@ -28,14 +33,11 @@ const SearchMain = ({ tutorSearchList = [], onAddTutor }) => {
           <Nav />
         </Grid>
         <Grid item container>
-          <Grid item xs={false} sm={2}>
+          <Grid item xs={false} sm={3}>
             <SearchLeftPanel />
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} sm={9}>
             <SearchContent />
-          </Grid>
-          <Grid item xs={false} sm={2}>
-            <SearchRightPanel />
           </Grid>
         </Grid>
       </Grid>
@@ -43,10 +45,7 @@ const SearchMain = ({ tutorSearchList = [], onAddTutor }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  tutorSearchList: state.tutorSearchList,
-});
 const mapDispatchToProps = (dispatch) => ({
-  onAddTutor: () => dispatch(addTutor({ name: "Test", subject: "Math" })),
+  onAddTutor: (tutor) => dispatch(addTutor(tutor)),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(SearchMain);
+export default connect(null, mapDispatchToProps)(SearchMain);

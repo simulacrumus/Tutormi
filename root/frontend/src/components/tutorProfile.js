@@ -7,32 +7,45 @@ import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Avatar, IconButton, CardMedia } from "@material-ui/core";
-import FavoriteSharpIcon from "@material-ui/icons/FavoriteSharp";
+import { Rating } from "@material-ui/lab";
 
 const useStyles = makeStyles(() => ({
-  blueColor: {
-    background: `linear-gradient(45.34deg, #EA52F8 5.66%, #0066FF 94.35%)`,
+  color: {
+    background: "#2962FF",
     fontWeight: "bold",
-  },
-  greenColor: {
-    background: "linear-gradient(45deg, #119DA4, #04B46D ,  #FBF33C)",
-    fontWeight: "bold",
+    width: 1000,
   },
 }));
 
-const TutorProfile = ({ avatarSrc, title, subTitle, description, imgSrc }) => {
+const trimBio = (description) => {
+  const bio =
+    description.length > 100
+      ? description.substring(0, 100) + "..."
+      : description;
+  return bio;
+};
+
+const TutorProfile = ({
+  id,
+  avatarSrc,
+  title,
+  description,
+  imgSrc,
+  rating,
+}) => {
   const classes = useStyles();
+  description = trimBio(description);
+
   return (
     <Card raised>
       <CardHeader
         avatar={<Avatar src={avatarSrc} />}
         action={
           <IconButton aria-label="settings">
-            <FavoriteSharpIcon color="secondary" />
+            <Rating name="read-only" value={rating} readOnly />
           </IconButton>
         }
         title={title}
-        subheader={subTitle}
       />
       <CardMedia style={{ height: "150px" }} image={imgSrc} />
       <CardContent>
@@ -42,11 +55,11 @@ const TutorProfile = ({ avatarSrc, title, subTitle, description, imgSrc }) => {
       </CardContent>
       <CardActions>
         <Button
-          className={classes.blueColor}
+          className={classes.color}
           variant="contained"
           color="primary"
-          size="small"
-          onClick={() => alert("PROFILE!!")}
+          size="medium"
+          onClick={() => alert(`ID!!: ${id}`)}
         >
           Profile
         </Button>

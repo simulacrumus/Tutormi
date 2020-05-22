@@ -295,7 +295,7 @@ router.get('/search', auth, async (req, res) => {
 // @desc     Block/Unblock tutee using their user id
 // @access   Private
 router.get(
-    '/block/:id',
+    '/block/:id', auth,
     async ({
         params: {
             id
@@ -352,22 +352,21 @@ router.post('/schedule', auth, async (req, res) => {
     } = req.body;
 
     try {
-
         // update tutor's available hours
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            $addToSet: {
+            $set: {
                 availableHours: hours.map(hour => new Date(hour))
             }
-        })
+        });
 
         let tutor = await Tutor.findOne({
             user: req.user.user.id
         }).populate('user', ['name', 'email', 'type']);
 
         if (!tutor) return res.status(400).json({
-            msg: 'Tutor not found or there is no tutor profile for this user'
+            message: 'Tutor not found or there is no tutor profile for this user'
         });
 
         res.json(tutor);
