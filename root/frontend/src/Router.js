@@ -38,7 +38,8 @@ class Router extends Component {
                 )
             }
           />
-          <Route path="*" render={() => <h1>404 Page Not Found!</h1>} />
+          <Route path ="/login" component={Login} exact />
+          <Route path="*" render={() => <h1>404 Page Not Found!</h1>} />{" "}
           {/* Need to make an error component later */}
         </Switch>
       </main>

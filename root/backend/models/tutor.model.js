@@ -21,6 +21,12 @@ const TutorSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'user'
     },
+    profilePic: {
+        type: String
+    },
+    coverPic: {
+        type: String
+    },
     ratings: [{
         tutee: {
             type: mongoose.Schema.Types.ObjectId,

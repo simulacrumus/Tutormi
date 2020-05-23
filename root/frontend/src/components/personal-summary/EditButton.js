@@ -14,12 +14,12 @@ import TwitterIcon from '@material-ui/icons/Twitter';
 import YouTubeIcon from '@material-ui/icons/YouTube';
 
 function EditButton(props) {
-
   const [show, setShow] = React.useState(false);
   const [courses, setCourses] = React.useState(props.user.courses);
   const [languages, setLanguages] = React.useState(props.user.languages);
 
   const handleClose = () => setShow(false);
+
   const handleShow = () => {
     // The modal needs to always have the most up to date courses and languages on show
     setCourses(props.user.courses);
@@ -62,7 +62,6 @@ function EditButton(props) {
               <input type="submit" />
               <img id="myPreview" src="https://cdn4.iconfinder.com/data/icons/meBaze-Freebies/512/preview.png"></img>
             </form>
-
             <Form.Label>Email address</Form.Label>
             <Form.Control type="email" defaultValue={props.user.user.email} />
             <Form.Group>
@@ -161,6 +160,7 @@ function mapStateToProps(state) {
   return {
     user: state.userReducer.user,
     token: state.userReducer.token
+
   };
 }
 

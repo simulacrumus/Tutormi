@@ -17,7 +17,8 @@
 .loginFormBoxContainer {
   display: flex;
   flex-direction: column;
-  width: 380px;
+  align-items: center;
+  width: 440px;
   max-width: 80%;
   min-width: 100px;
   min-height: 400px;
@@ -39,9 +40,9 @@
 
  .login-form{
   width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  margin:auto 0;
+  text-align: center;
+ 
 }
 
 
