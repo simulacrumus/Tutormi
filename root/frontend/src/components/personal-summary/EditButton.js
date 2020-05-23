@@ -39,29 +39,32 @@ function EditButton(props) {
           <Form>
             <Form.Label>Profile Picture</Form.Label>
 
-            <form action="/api/tutors/profile-pic" method="POST" enctype="multipart/form-data" onSubmit={
-              (e) => {
-                e.preventDefault();
-                let imageFile = document.getElementById("imageFileUpload").files[0];
-                let formData = new FormData();
-                formData.append("image", imageFile);
-                console.log(props.token);
+            <div className="imageUploadContainer">
+              <input type="file" id="imageFileUpload" accept="image/*" onChange={
+                e => {
+                  let imageFile = document.getElementById("imageFileUpload").files[0];
+                  document.getElementById("myPreview").src = URL.createObjectURL(imageFile);
+                }
+              } />
+              <button onClick={
+                (e) => {
+                  e.preventDefault();
+                  let imageFile = document.getElementById("imageFileUpload").files[0];
+                  let formData = new FormData();
+                  formData.append("image", imageFile);
 
-                document.getElementById("myPreview").src = URL.createObjectURL(imageFile);
+                  fetch("/api/tutors/profile-pic", {
+                    method: 'POST',
+                    headers: { "x-auth-token": props.token },
+                    body: formData,
+                  }).then(response => {
+                    console.log(response)
+                  });
 
-                fetch("/api/tutors/profile-pic", {
-                  method: 'POST',
-                  headers: { "x-auth-token": props.token },
-                  body: formData,
-                }).then(response => {
-                  console.log(response)
-                });
-              }
-            }>
-              <input type="file" id="imageFileUpload" accept="image/*" />
-              <input type="submit" />
-              <img id="myPreview" src="https://cdn4.iconfinder.com/data/icons/meBaze-Freebies/512/preview.png"></img>
-            </form>
+                }}>Save</button>
+              <img id="myPreview"></img>
+            </div>
+
             <Form.Label>Email address</Form.Label>
             <Form.Control type="email" defaultValue={props.user.user.email} />
             <Form.Group>
