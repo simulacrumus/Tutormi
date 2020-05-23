@@ -1,60 +1,61 @@
 table {
-    text-align: center;
-    background-color: #F5F2FB;
-    /* border-collapse:separate; 
+  text-align: center;
+  background-color: #f5f2fb;
+  /* border-collapse:separate; 
     border-spacing:0 2px;  */
 }
 
-th, td {
-    /* padding: 10px; */
-    border-bottom: 0.6px solid #E1E1E1;
-    border-right: 0.6px solid #E1E1E1;
+th,
+td {
+  /* padding: 10px; */
+  border-bottom: 0.6px solid #e1e1e1;
+  border-right: 0.6px solid #e1e1e1;
 }
 
 th {
-    font-weight: normal;
-    color: #F2F2F2;
-    /* width: 110px; */
-    border: 0.6px solid #E1E1E1;
-    background-color: #a385e0;
+  font-weight: normal;
+  color: #f2f2f2;
+  /* width: 110px; */
+  border: 0.6px solid #e1e1e1;
+  background-color: #a385e0;
 }
 
 td {
-    height: 35px;
+  height: 35px;
 }
 
 .time {
-    position: relative;
-    top: 20px;
-    border: 0px;
-    /* border-right: solid #D8D8D8; */
+  position: relative;
+  top: 20px;
+  border: 0px;
+  /* border-right: solid #D8D8D8; */
 }
 
 .weekControlSection {
-    display: flex;
-    background-color: #e6dff5;
-    /* color: #F5F2FB; */
-    margin-bottom: 3px;
-    font-weight: normal;
-    padding: 10px;
+  display: flex;
+  background-color: #e6dff5;
+  /* color: #F5F2FB; */
+  margin-bottom: 3px;
+  font-weight: normal;
+  padding: 10px;
 }
 
 .weekControlSection h5 {
-    margin-left: 5px;
-    margin-right: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .weekScheduleContainer {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .pastSlot {
-    background-color: #cacaca;
+  background-color: #cacaca;
 }
 
 .weekChangeIcons:hover {
-    background-color: #F5F2FB;
-    object-fit: cover;
-    border-radius: 50%;
+  background-color: #f5f2fb;
+  object-fit: cover;
+  border-radius: 50%;
 }

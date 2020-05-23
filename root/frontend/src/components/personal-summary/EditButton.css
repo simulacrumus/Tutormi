@@ -1,26 +1,26 @@
 .editIcon {
-    height: 30px;
+  height: 30px;
 }
 
 .removableBoxHolder {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .editFormAddIcon {
-    color: #9277C9;
+  color: #9277c9;
 }
 
 .editFormAddIcon:hover {
-    color: #826AB3;
+  color: #826ab3;
 }
 
 .myAddInputRow {
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
 .editFormSocialIcon {
-    color: #9277C9;
+  color: #9277c9;
 }

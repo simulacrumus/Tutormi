@@ -26,7 +26,7 @@
 .tutorView:hover {
   box-shadow: 0 8px 6px -6px #999999;
   transform: scale(1.03);
-  transition: all .15s ease-in-out;
+  transition: all 0.15s ease-in-out;
 }
 
 .tutorView:focus {
@@ -35,4 +35,3 @@
   outline-width: 0;
   border: solid 1px #999999;
 }
-
