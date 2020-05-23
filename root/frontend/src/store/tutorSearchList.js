@@ -2,6 +2,7 @@ import { createAction } from "@reduxjs/toolkit";
 
 //Actions
 export const addTutor = createAction("ADD_TUTOR");
+export const deleteTutor = createAction("CLEAR_TUTORS");
 
 //Reducer
 export default function tutorSearchListReducer(state = [], action) {
@@ -18,10 +19,13 @@ export default function tutorSearchListReducer(state = [], action) {
             languages: action.payload.languages,
             rating: action.payload.rating,
             name: action.payload.user.name,
-            id: action.payload.user._id,
+            id: action.payload._id,
           },
         ];
       }
+
+    case deleteTutor.type:
+      return state.filter((tutor) => tutor === action.payload.tutor);
 
     default:
       return state;

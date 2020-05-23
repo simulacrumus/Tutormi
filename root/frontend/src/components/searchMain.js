@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Grid } from "@material-ui/core";
-import { connect } from "react-redux";
-import { addTutor } from "../store/tutorSearchList";
 import Nav from "./Nav";
 import SearchContent from "./SearchContent";
 import SearchLeftPanel from "./SearchLeftPanel";
@@ -12,20 +10,6 @@ in place in the addTutor reducer, errors will arise, since addTutor is currently
 prior to accessing the information stored in the local storage. Will fix this next update, for now 
 its fine */
 const SearchMain = () => {
-  /*useEffect(() => {
-    const getTutors = async () => {
-      try {
-        const response = await fetch("/api/tutors");
-        const data = await response.json();
-        data.map((tutor) => onAddTutor(tutor));
-        console.log("Passed data!!");
-      } catch (error) {
-        console.log("Error!!", error);
-      }
-    };
-    getTutors();
-  }, []);*/
-
   return (
     <div className="App">
       <Grid container direction="column">
