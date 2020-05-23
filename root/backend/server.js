@@ -1,9 +1,12 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const connectDB = require('./config/db');
 const app = express();
 
 // Connect to database
 connectDB();
+
+app.use(express.static('./public'));
 
 const tutorsRouter = require('./routes/api/tutors');
 const tuteesRouter = require('./routes/api/tutees');

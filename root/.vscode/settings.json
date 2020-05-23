@@ -1,0 +1,7 @@
+{
+    "prettier.printWidth": 120,
+    "eslint.format.enable": true,
+    "cSpell.words": [
+        "persistor"
+    ]
+}

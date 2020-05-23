@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import "./index.css";
-import ProfilePage from "./pages/ProfilePage.jsx";
-import DashboardPage from "./pages/DashboardPage.jsx";
-import TutorViewPage from "./pages/TutorViewPage.jsx";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import ProfilePage from "./pages/ProfilePage.js";
+import DashboardPage from "./pages/DashboardPage.js";
+import TutorViewPage from "./pages/TutorViewPage.js";
+import { Route, Switch, Redirect } from "react-router-dom";
 import SearchMain from "./components/SearchMain";
-import TutorDashboardPage from "./pages/TutorDashboardPage.jsx";
+import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import { connect } from "react-redux";
 import Login from "./components/login/Login";
 
@@ -14,16 +14,17 @@ class Router extends Component {
     return (
       <main>
         <Switch>
-          <Route path="/" component={SearchMain} exact />
+          <Route path="/" component={ProfilePage} exact />
           <Route path="/profile" component={ProfilePage} exact />
+          <Route path="/login" component={Login} exact />
           <Route
             path="/dashboard"
             render={() =>
               this.props.user.user.type === "tutee" ? (
                 <DashboardPage />
               ) : (
-                <TutorDashboardPage />
-              )
+                  <TutorDashboardPage />
+                )
             }
           />
           <Route path="/viewTutor" component={TutorViewPage} />
@@ -31,12 +32,13 @@ class Router extends Component {
             path="/search"
             render={() =>
               this.props.user.user.type === "tutee" ? (
-                <searchMain />
+                <SearchMain />
               ) : (
-                <Redirect to="/dashboard" />
-              )
+                  <Redirect to="/dashboard" />
+                )
             }
           />
+          <Route path ="/login" component={Login} exact />
           <Route path="*" render={() => <h1>404 Page Not Found!</h1>} />{" "}
           {/* Need to make an error component later */}
         </Switch>
@@ -47,7 +49,7 @@ class Router extends Component {
 
 function mapStateToProps(state) {
   return {
-    user: state.profileReducer.user,
+    user: state.userReducer.user,
   };
 }
 
