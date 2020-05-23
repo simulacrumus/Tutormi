@@ -24,6 +24,10 @@ const AppointmentSchema = new mongoose.Schema({
     },
     note: {
         type: String
+    },
+    date: {
+        type: Date,
+        default: Date.nowx
     }
 });
 
