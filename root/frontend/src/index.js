@@ -6,18 +6,16 @@ import { store, persistor } from "./store/configureStore";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 import "bootstrap/dist/css/bootstrap.css"; // Bootstrap styles
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
-import Router from "./Router";
+import { BrowserRouter } from "react-router-dom";
+import Router from "./router";
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
-      <PersistGate loading={null} persistor={persistor}>
-        {" "}
-        {/* add loading later*/}
+    <PersistGate loading={<h1>Loading...</h1>} persistor={persistor}>
+      <BrowserRouter>
         <Router />
-      </PersistGate>
-    </BrowserRouter>
+      </BrowserRouter>
+    </PersistGate>
   </Provider>,
   document.getElementById("root")
 );

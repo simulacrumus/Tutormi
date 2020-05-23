@@ -1,11 +1,11 @@
 .tutorDashboardContainer {
-    display: flex;
-    height: 100vh;
-    justify-content: space-evenly;
-    align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
 .tutorInnerDashboardContainer {
-    display: flex;
-    height: 68vh;
+  display: flex;
+  height: 68vh;
 }

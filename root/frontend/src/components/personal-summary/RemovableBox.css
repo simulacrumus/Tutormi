@@ -1,14 +1,14 @@
 .removableBox {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px;
-    margin: 4px;
-    background-image: linear-gradient(#BEA9E9, #DACEF2);
-    border: 0.25px solid black;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  margin: 4px;
+  background-image: linear-gradient(#bea9e9, #dacef2);
+  border: 0.25px solid black;
 }
 
 .customCancelIcon:hover {
-    color: #ff3333;
+  color: #ff3333;
 }

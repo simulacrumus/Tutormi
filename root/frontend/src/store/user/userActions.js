@@ -1,4 +1,4 @@
-import {store} from '../configureStore';
+import { store } from '../configureStore';
 
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
@@ -9,6 +9,22 @@ export const AVAILABILITY_OPENED = "AVAILABILITY_OPENED";
 export const AVAILABILITY_CANCELED = "AVAILABILITY_CANCELED";
 export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
+
+export async function updateUser(updateInfo) {
+    await store.dispatch({
+        type: USER_INFO_UPDATED,
+        payload: updateInfo
+    });
+
+    fetch("/api/tutors", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": store.getState().userReducer.token
+        },
+        body: JSON.stringify(store.getState().userReducer.user)
+    }).then((response) => response.json()).then((updatedUser) => console.log(updatedUser));
+}
 
 export function openAvailabilityHour(availabilityDate) {
     store.dispatch({
@@ -39,19 +55,20 @@ export async function logInUser() { // Give this function a username and passwor
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            email:"cguiettr@examiner.com",
+            email: "cguiettr@examiner.com",
             password: "ly2Efl2C"
         })
     })
-    .then( response => response.json() )
-    .then( responseToken => {
-        store.dispatch({type: TOKEN_ACQUIRED, payload: responseToken.token})
-        fetch("/api/tutors/me", {
-            method: "GET",
-            headers: {"x-auth-token": responseToken.token},
-        })
-        .then( response => response.json() )
-        .then( user => {
-            store.dispatch({type: USER_LOGGED_IN, payload: user})} );
-    });
+        .then(response => response.json())
+        .then(responseToken => {
+            store.dispatch({ type: TOKEN_ACQUIRED, payload: responseToken.token })
+            fetch("/api/tutors/me", {
+                method: "GET",
+                headers: { "x-auth-token": responseToken.token },
+            })
+                .then(response => response.json())
+                .then(user => {
+                    store.dispatch({ type: USER_LOGGED_IN, payload: user })
+                });
+        });
 }
