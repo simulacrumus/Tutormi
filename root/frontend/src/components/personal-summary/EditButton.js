@@ -4,7 +4,6 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { connect } from "react-redux";
-import { store } from '../../store/configureStore.js';
 import { updateUser } from "../../store/user/userActions";
 import RemovableBox from './RemovableBox';
 import AddBoxIcon from '@material-ui/icons/AddBox';
@@ -14,15 +13,19 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import YouTubeIcon from '@material-ui/icons/YouTube';
 
-
 function EditButton(props) {
-  
   const [show, setShow] = React.useState(false);
   const [courses, setCourses] = React.useState(props.user.courses);
   const [languages, setLanguages] = React.useState(props.user.languages);
 
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+
+  const handleShow = () => {
+    // The modal needs to always have the most up to date courses and languages on show
+    setCourses(props.user.courses);
+    setLanguages(props.user.languages);
+    setShow(true);
+  };
 
   return (
     <>
@@ -34,10 +37,31 @@ function EditButton(props) {
 
         <Modal.Body>
           <Form>
-            <Form.Group>
-              <Form.Label>Profile Picture</Form.Label>
-              <Form.Control type="text" defaultValue={props.user.imgPath} id="imgInput" />
-            </Form.Group>
+            <Form.Label>Profile Picture</Form.Label>
+
+            <form action="/api/tutors/profile-pic" method="POST" enctype="multipart/form-data" onSubmit={
+              (e) => {
+                e.preventDefault();
+                let imageFile = document.getElementById("imageFileUpload").files[0];
+                let formData = new FormData();
+                formData.append("image", imageFile);
+                console.log(props.token);
+
+                document.getElementById("myPreview").src = URL.createObjectURL(imageFile);
+
+                fetch("/api/tutors/profile-pic", {
+                  method: 'POST',
+                  headers: { "x-auth-token": props.token },
+                  body: formData,
+                }).then(response => {
+                  console.log(response)
+                });
+              }
+            }>
+              <input type="file" id="imageFileUpload" accept="image/*" />
+              <input type="submit" />
+              <img id="myPreview" src="https://cdn4.iconfinder.com/data/icons/meBaze-Freebies/512/preview.png"></img>
+            </form>
             <Form.Label>Email address</Form.Label>
             <Form.Control type="email" defaultValue={props.user.user.email} />
             <Form.Group>
@@ -48,7 +72,6 @@ function EditButton(props) {
               <Form.Label>Bio</Form.Label>
               <Form.Control as="textarea" rows="3" defaultValue={props.user.bio} id="bioInput" />
             </Form.Group>
-
 
             <Form.Label>Courses</Form.Label>
             <div className="myAddInputRow">
@@ -105,8 +128,7 @@ function EditButton(props) {
 
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Close
-                    </Button>
+            Close</Button>
           <Button variant="success" onClick={() => {
             let editInformation = {
               imgPath: document.getElementById("imgInput").value,
@@ -123,11 +145,9 @@ function EditButton(props) {
                 youtube: document.getElementById("youtubeInput").value,
               },
             };
-            updateUser(editInformation);
+            updateUser(editInformation); // Update the server with the new user information
             handleClose();
-          }}>
-            Save Changes
-                    </Button>
+          }}>Save Changes</Button>
         </Modal.Footer>
       </Modal>
     </>
@@ -138,7 +158,9 @@ function EditButton(props) {
 
 function mapStateToProps(state) {
   return {
-    user: state.userReducer.user
+    user: state.userReducer.user,
+    token: state.userReducer.token
+
   };
 }
 

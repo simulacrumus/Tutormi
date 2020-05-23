@@ -3,7 +3,7 @@ import "./index.css";
 import ProfilePage from "./pages/ProfilePage.js";
 import DashboardPage from "./pages/DashboardPage.js";
 import TutorViewPage from "./pages/TutorViewPage.js";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import SearchMain from "./components/SearchMain";
 import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import { connect } from "react-redux";
@@ -16,6 +16,7 @@ class Router extends Component {
         <Switch>
           <Route path="/" component={ProfilePage} exact />
           <Route path="/profile" component={ProfilePage} exact />
+          <Route path="/login" component={Login} exact />
           <Route
             path="/dashboard"
             render={() =>
@@ -31,7 +32,7 @@ class Router extends Component {
             path="/search"
             render={() =>
               this.props.user.user.type === "tutee" ? (
-                <searchMain />
+                <SearchMain />
               ) : (
                   <Redirect to="/dashboard" />
                 )

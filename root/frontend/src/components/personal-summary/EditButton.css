@@ -24,3 +24,10 @@
 .editFormSocialIcon {
   color: #9277c9;
 }
+
+#myPreview {
+  object-fit: cover;
+  height: 90px;
+  width: 90px;
+  border-radius: 50%;
+}
