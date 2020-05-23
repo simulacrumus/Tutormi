@@ -260,12 +260,12 @@ router.get('/search', auth, async (req, res) => {
 
         if (language) {
             query.languages = {
-                $in: [language]
+                $in: [new RegExp(language, "g")]
             };
         }
         if (course) {
             query.courses = {
-                $in: [course]
+                $in: [new RegExp(course, "g")]
             };
         }
 
@@ -399,11 +399,10 @@ const upload = multer({
     }
 });
 
-// @route    POST api/tutors/upload/profile
+// @route    POST api/tutors/profile-pic
 // @desc     Upload or update profile picture of the tutor
 // @access   Private
 router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
-
     if (req.file == undefined) {
         res.status(400).json({
             message: 'Please provide an image file with 2MB max size'
