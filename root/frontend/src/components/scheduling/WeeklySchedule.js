@@ -28,6 +28,7 @@ const datePickerTheme = createMuiTheme({ palette: { primary: purple } });
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 class WeeklySchedule extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -38,7 +39,6 @@ class WeeklySchedule extends Component {
   }
 
   render() {
-    console.log(this.state);
     return (
       <div className="weekScheduleContainer">
         <div className="weekControlSection">

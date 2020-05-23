@@ -58,11 +58,11 @@ export function removeSlotConflict(tutorAvailableHours, tuteeAppointments) {
       // Check if the two slots fall on the same exact date
       if (
         tuteeAppointments[i].time.start.getFullYear() ===
-          tutorAvailableHours[j].time.start.getFullYear() &&
+        tutorAvailableHours[j].time.start.getFullYear() &&
         tuteeAppointments[i].time.start.getMonth() ===
-          tutorAvailableHours[j].time.start.getMonth() &&
+        tutorAvailableHours[j].time.start.getMonth() &&
         tuteeAppointments[i].time.start.getDate() ===
-          tutorAvailableHours[j].time.start.getDate()
+        tutorAvailableHours[j].time.start.getDate()
       ) {
         if (
           checkIfAppointmentsConflict(
@@ -117,13 +117,13 @@ export function combineSingleSlots(openHours) {
   for (let i = 0; i < openHours.length - 1; i++) {
     if (
       openHours[i].time.start.getFullYear() ===
-        openHours[i + 1].time.start.getFullYear() &&
+      openHours[i + 1].time.start.getFullYear() &&
       openHours[i].time.start.getMonth() ===
-        openHours[i + 1].time.start.getMonth() &&
+      openHours[i + 1].time.start.getMonth() &&
       openHours[i].time.start.getDate() ===
-        openHours[i + 1].time.start.getDate() &&
+      openHours[i + 1].time.start.getDate() &&
       openHours[i].time.end.getHours() ===
-        openHours[i + 1].time.start.getHours()
+      openHours[i + 1].time.start.getHours()
     ) {
       openHours[i + 1].time.start.setHours(openHours[i].time.start.getHours());
       openHours.splice(i, 1);
@@ -141,16 +141,8 @@ export function calcTotalHours(hours, timePeriod) {
 }
 
 export function calcTotalHoursPerMonth(hours, numberOfMonthsBack) {
-  let start = moment()
-    .clone()
-    .startOf("month")
-    .subtract(numberOfMonthsBack, "month")
-    .startOf("month");
-  let end = moment()
-    .clone()
-    .startOf("month")
-    .subtract(numberOfMonthsBack, "month")
-    .endOf("month");
+  let start = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").startOf("month");
+  let end = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").endOf("month");
   return hours.filter(
     (hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end)
   ).length;

@@ -6,6 +6,7 @@ import { store } from "../../../store/configureStore.js";
 import { APPOINTMENT_CANCELED } from "../../../store/user/userActions";
 
 export default class TimeSlotBooked extends Component {
+
   render() {
     return (
       <OverlayTrigger trigger="click" placement="bottom" overlay={this.popover}>
@@ -56,7 +57,7 @@ export default class TimeSlotBooked extends Component {
     store.dispatch({
       type: APPOINTMENT_CANCELED,
       payload: {
-        tutorID: this.props.name,
+        tutorID: this.props._id,
         time: {
           start: this.props.start,
           end: this.props.end,
