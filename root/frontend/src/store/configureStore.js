@@ -5,9 +5,10 @@ import storage from "redux-persist/lib/storage";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 
 const persistConfig = {
-  key: "root12",
+  key: "root",
   storage: storage,
   stateReconciler: autoMergeLevel2,
+  blacklist: ["tutorSearchList"] // The search list should not be saved to local storage
 };
 
 const pReducer = persistReducer(persistConfig, rootReducer);

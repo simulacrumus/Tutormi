@@ -1,7 +1,7 @@
 import { VIEWED_TUTOR_SET, VIEWED_TUTOR_CLEARED } from "./viewedTutorActions";
 
 export default function viewedTutorReducer(
-  state = { viewedTutor: null },
+  state = { viewedTutor: {} },
   action
 ) {
   switch (action.type) {

@@ -31,7 +31,7 @@ class TutorViewPage extends Component {
 function mapStateToProps(state) {
   return {
     user: state.userReducer.user,
-    viewedTutor: state.viewedTutorReducer,
+    viewedTutor: state.viewedTutorReducer.viewedTutor,
   };
 }
 
