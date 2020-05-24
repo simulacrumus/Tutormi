@@ -143,7 +143,7 @@ router.get('/user/:id', async ({
     try {
         const tutor = await Tutor.findOne({
             _id: id
-        }).populate('user', ['name', 'email', 'type']);
+        }).populate('user', ['name', 'email', 'type']).populate('appointments');
 
         if (!tutor)
             return res.status(400).json({
@@ -192,7 +192,7 @@ router.delete('/', auth, async (req, res) => {
 // @route    GET api/tutors
 // @desc     Get all tutors matching search criteria
 // @access   Public
-router.get('/search', auth, async (req, res) => {
+router.post('/search', auth, async (req, res) => {
     const {
         start,
         course,
@@ -295,7 +295,7 @@ router.get('/search', auth, async (req, res) => {
 // @route    POST api/tutors/block.:id
 // @desc     Block/Unblock tutee using their user id
 // @access   Private
-router.get('/block/:id', auth, async ({
+router.post('/block/:id', auth, async ({
     params: {
         id
     }
@@ -379,13 +379,13 @@ router.post('/schedule', auth, async (req, res) => {
 // Multer function to upload image
 const upload = multer({
     storage: multer.diskStorage({
-        destination: './public/uploads/tutors/',
+        destination: '../frontend/srcc/images/uploads/tutors/',
         filename: (req, file, cb) => {
             cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
         }
     }),
     limits: {
-        fileSize: 2000000
+        fileSize: 1024 * 1024 * 2 // 2MB
     },
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png|gif/;
@@ -413,7 +413,7 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            profilePic: req.file.filename
+            profilePic: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
         });
 
         const tutor = await Tutor.findOne({
