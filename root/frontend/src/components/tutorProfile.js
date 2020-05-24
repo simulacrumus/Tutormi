@@ -81,7 +81,11 @@ const TutorProfile = ({
           variant="contained"
           color="primary"
           size="medium"
-          onClick={async () => await setViewedTutor(id)}
+          onClick={async () => {
+            setViewedTutor(id).then(
+              () => (window.location.href = "/viewTutor")
+            );
+          }}
         >
           Profile
         </Button>
