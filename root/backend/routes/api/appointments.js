@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const nodemailer = require('nodemailer');
+const config = require('config');
+const emailpassword = config.get('emailpassword');
 const auth = require('../../middleware/auth');
 const {
     check,
@@ -10,6 +13,22 @@ const Tutor = require('../../models/tutor.model');
 const Tutee = require('../../models/tutee.model');
 const User = require('../../models/user.model');
 const Appointment = require('../../models/appointment.model');
+
+// Nodemailer setup
+// create reusable transporter object using the default SMTP transport
+let transporter = nodemailer.createTransport({
+    name: "mail.maelitepainting.ca",
+    host: "mail.maelitepainting.ca",
+    port: 465,
+    secure: true,
+    auth: {
+        user: 'test@maelitepainting.ca',
+        pass: emailpassword
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
 
 // @route   POST api/appointments
 // @desc    Create an appointment
@@ -134,7 +153,6 @@ router.get('/:id', auth, async (req, res) => {
 
 });
 
-
 // @route   DELETE api/appintments/:id
 // @desc    Delete appointments by ID
 // @access  Public
@@ -204,7 +222,7 @@ router.delete('/:id', auth, async ({
         }
 
         // add appointment hours to tutor's available hours and delete appointment id from appointments
-        await Tutor.findOneAndUpdate({
+        tutor = await Tutor.findOneAndUpdate({
             _id: appointment.tutor
         }, {
             $addToSet: {
@@ -213,25 +231,52 @@ router.delete('/:id', auth, async ({
             $pull: {
                 appointments: id
             }
-        });
+        }).populate('user', ['email']);
 
         //delete appointment id from appointments
-        await Tutee.findOneAndUpdate({
+        tutee = await Tutee.findOneAndUpdate({
             _id: appointment.tutee
         }, {
             $pull: {
                 appointments: id
             }
-        });
+        }).populate('user', ['email']);
 
         // delete the appointment itself
         await Appointment.findOneAndDelete({
             _id: id
         });
 
+        //notify tutor and tutee by email
+
+        // create html 
+        const htmloutput = `<p>Your appointment has been cancelled</p>
+        <h3>Appointment Details:</h3>
+        <ul>
+            <li><strong>Date: </strong>${hours[0].getFullYear() + '-' + hours[0].getMonth() + '-' + hours[0].getDate()}</li>
+            <li><strong>Time: </strong>${hours[0].getHours() + ':00 - ' + hours[hours.length - 1].getHours() + ':00'}</li>
+            <li><strong>Tutor: </strong>${tutor.user.name}</li>
+            <li><strong>Tutee: </strong>${tutee.user.name}</li>
+            <li><strong>Subject: </strong>${appointment.subject}</li>
+            <li><strong>Notes: </strong>${appointment.note}</li>
+            <li><strong>Date created: </strong></li>
+        </ul>`;
+
+
+        // send mail with defined transport object
+        let info = await transporter.sendMail({
+            from: '"Tutormi" <info@tutormiproject.com>', // sender address
+            to: `${tutor.user.email}, ${tutee.user.email}`, // list of receivers
+            subject: "TUTORMI - APPOINTMENT CANCELLED", // Subject line
+            text: "", // plain text body
+            html: htmloutput, // html body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+
         //return message
         res.json({
-            message: 'Appointment Deleted'
+            message: `Appointment Deleted. Confirmation email sent to ${info.accepted}`,
         });
 
     } catch (err) {
