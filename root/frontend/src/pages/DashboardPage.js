@@ -31,9 +31,9 @@ class DashboardPage extends Component {
 
 function mapStateToProps(state) {
   return {
-    user: state.profileReducer.user,
-    favoriteTutors: state.profileReducer.user.favoriteTutors,
-    viewedTutor: state.profileReducer.viewedTutor,
+    user: state.userReducer.user,
+    favoriteTutors: state.userReducer.user.favoriteTutors,
+    viewedTutor: state.viewedTutorReducer.viewedTutor,
   };
 }
 

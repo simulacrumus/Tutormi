@@ -20,6 +20,7 @@ fetch("/api/auth", {
         })
             .then(response => response.json())
             .then(user => {
+                user.user.type = "tutee";
                 console.log("Current user:", user);
                 store.dispatch({ type: USER_LOGGED_IN, payload: user })
             });

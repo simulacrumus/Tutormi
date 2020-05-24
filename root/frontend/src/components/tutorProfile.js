@@ -81,7 +81,9 @@ const TutorProfile = ({
           variant="contained"
           color="primary"
           size="medium"
-          onClick={async () => await setViewedTutor(id)}
+          onClick={() => {
+            setViewedTutor(id);
+          }}
         >
           Profile
         </Button>
