@@ -30,8 +30,8 @@ class TutorViewPage extends Component {
 
 function mapStateToProps(state) {
   return {
-    user: state.profileReducer.user,
-    viewedTutor: state.profileReducer.viewedTutor,
+    user: state.userReducer.user,
+    viewedTutor: state.viewedTutorReducer,
   };
 }
 
