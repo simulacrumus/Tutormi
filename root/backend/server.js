@@ -6,7 +6,7 @@ const app = express();
 // Connect to database
 connectDB();
 
-app.use(express.static('./public'));
+app.use(express.static('../frontend/public'));
 
 const tutorsRouter = require('./routes/api/tutors');
 const tuteesRouter = require('./routes/api/tutees');

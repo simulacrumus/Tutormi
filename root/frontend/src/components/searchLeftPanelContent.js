@@ -132,7 +132,7 @@ const LeftPanelContent = ({
 };
 
 const mapStateToProps = (state) => ({
-  token: state.profileReducer.token,
+  token: state.userReducer.token,
   tutorList: state.tutorSearchList,
 });
 

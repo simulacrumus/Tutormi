@@ -14,7 +14,7 @@ class Router extends Component {
     return (
       <main>
         <Switch>
-          <Route path="/" component={ProfilePage} exact />
+          <Route path="/" component={SearchMain} exact />
           <Route path="/profile" component={ProfilePage} exact />
           <Route path="/login" component={Login} exact />
           <Route
@@ -23,8 +23,8 @@ class Router extends Component {
               this.props.user.user.type === "tutee" ? (
                 <DashboardPage />
               ) : (
-                  <TutorDashboardPage />
-                )
+                <TutorDashboardPage />
+              )
             }
           />
           <Route path="/viewTutor" component={TutorViewPage} />
@@ -34,8 +34,8 @@ class Router extends Component {
               this.props.user.user.type === "tutee" ? (
                 <SearchMain />
               ) : (
-                  <Redirect to="/dashboard" />
-                )
+                <Redirect to="/dashboard" />
+              )
             }
           />
           <Route path="/login" component={Login} exact />
