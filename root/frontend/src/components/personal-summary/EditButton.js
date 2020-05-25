@@ -50,8 +50,10 @@ function EditButton(props) {
                 (e) => {
                   e.preventDefault();
                   let imageFile = document.getElementById("imageFileUpload").files[0];
+                  console.log("image", imageFile);
                   let formData = new FormData();
                   formData.append("image", imageFile);
+                  console.log("formData", formData);
 
                   fetch("/api/tutors/profile-pic", {
                     method: 'POST',
@@ -134,7 +136,7 @@ function EditButton(props) {
             Close</Button>
           <Button variant="success" onClick={() => {
             let editInformation = {
-              imgPath: document.getElementById("imgInput").value,
+              imgPath: "someImagePath.com", // Change this when image upload is fixed
               name: document.getElementById("nameInput").value,
               bio: document.getElementById("bioInput").value,
               languages: languages,

@@ -1,18 +1,31 @@
-table {
-  text-align: center;
-  background-color: #f5f2fb;
-  /* border-collapse:separate; 
-    border-spacing:0 2px;  */
+.scheduleScrollContainer {
+  overflow-y: scroll;
 }
 
-th,
-td {
+.stickyHeaderRow {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.weeklySchedule thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.weeklySchedule {
+  text-align: center;
+  background-color: #f5f2fb;
+}
+
+.weeklySchedule th, td {
   /* padding: 10px; */
   border-bottom: 0.6px solid #e1e1e1;
   border-right: 0.6px solid #e1e1e1;
 }
 
-th {
+.weeklySchedule th {
   font-weight: normal;
   color: #f2f2f2;
   /* width: 110px; */
@@ -20,13 +33,13 @@ th {
   background-color: #a385e0;
 }
 
-td {
+.weeklySchedule td {
   height: 35px;
 }
 
 .time {
   position: relative;
-  top: 20px;
+  bottom: 20px;
   border: 0px;
   /* border-right: solid #D8D8D8; */
 }
