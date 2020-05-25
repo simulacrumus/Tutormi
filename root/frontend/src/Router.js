@@ -8,6 +8,7 @@ import SearchMain from "./components/SearchMain";
 import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import { connect } from "react-redux";
 import Login from "./components/login/Login";
+import SignUp from "./components/login/SignUp"
 
 class Router extends Component {
 
