@@ -292,44 +292,79 @@ router.post('/search', auth, async (req, res) => {
     }
 });
 
-// @route    POST api/tutors/block.:id
-// @desc     Block/Unblock tutee using their user id
+// @route    PUT api/tutors/block.:id
+// @desc     Block tutor using their user id
 // @access   Private
-router.post('/block/:id', auth, async ({
+router.put('/block/:id', auth, async ({
     params: {
         id
     }
 }, res) => {
     try {
-        const tutee = await Tutee.findOne({
-            id: id
+
+        const tutor = await Tutor.findOneAndUpdate({
+            _id: id
+        }, {
+            $addToSet: {
+                blockedBy: req.user.user.id
+            }
         });
 
-        if (!tutee)
-            return res.status(400).json({
-                msg: 'Tutee not found'
-            });
+        if (!tutor) {
+            res.status(400).json({
+                message: 'Tutor not found'
+            })
+        }
 
-        const tutor = await Tutor.findOne({
-            user: req.user.user.id
+        await Tutee.findOneAndUpdate({
+            _id: req.user.user.id
+        }, {
+            $addToSet: {
+                blockedUsers: tutor.user.id
+            }
         });
 
-        if (tutee.blockedBy.includes(req.user.user.id)) {
-            const index = tutee.blockedBy.indexOf(req.user.user.id);
-            tutee.blockedBy.splice(index, 1);
-        } else {
-            tutee.blockedBy.unshift(req.user.user.id);
+        return res.json(tutee);
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({
+            msg: 'Server error'
+        });
+    }
+});
+
+
+// @route    PUT api/tutors/unblock.:id
+// @desc     Unblock tutor using their user id
+// @access   Private
+router.put('/unblock/:id', auth, async ({
+    params: {
+        id
+    }
+}, res) => {
+    try {
+
+        const tutor = await Tutor.findOneAndUpdate({
+            _id: id
+        }, {
+            $pull: {
+                blockedBy: req.user.user.id
+            }
+        });
+
+        if (!tutor) {
+            res.status(400).json({
+                message: 'Tutor not found'
+            })
         }
 
-        if (tutor.blocked.includes(tutee.user)) {
-            const index = tutor.blocked.indexOf(tutee.user);
-            tutor.blocked.splice(index, 1);
-        } else {
-            tutor.blocked.unshift(tutee.user);
-        }
-
-        tutee = await tutee.save();
-        tutor = await tutor.save();
+        await Tutee.findOneAndUpdate({
+            _id: req.user.user.id
+        }, {
+            $pull: {
+                blockedUsers: tutor.user.id
+            }
+        });
 
         return res.json(tutee);
     } catch (err) {
