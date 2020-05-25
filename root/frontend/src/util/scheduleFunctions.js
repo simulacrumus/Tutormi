@@ -6,11 +6,12 @@ import moment from "moment";
 // Converts available hours to the format used with booked appointments
 export function convertSingleHoursToTimeSlots(availableHours) {
   return availableHours.map((timeHour) => {
-    let date = moment(timeHour);
+    let start = moment(timeHour);
+    let end = start.clone().add(1, "hour");
     return {
       time: {
-        start: date,
-        end: date.clone().add(1, "hour"),
+        start: start,
+        end: end,
       },
     };
   });
@@ -19,13 +20,13 @@ export function convertSingleHoursToTimeSlots(availableHours) {
 // Converts available hours to the format used with booked appointments
 export function convertTimeSlotToSingleHours(timeSlot) {
   let hours = [];
-  let start = moment(new Date(timeSlot.time.start).getTime());
+  let start = timeSlot.time.start.time();
   for (
-    let i = 0, hour = new Date(timeSlot.time.start).getHours();
-    hour < new Date(timeSlot.time.end).getHours();
+    let i = 0, hour = timeSlot.time.start.hours();
+    hour < timeSlot.time.end.hours();
     i++, hour++
   ) {
-    hours.push(new Date(start.clone().add(i, "hour")));
+    hours.push(start.clone().add(i, "hour"));
   }
   return hours;
 }
@@ -45,8 +46,8 @@ export function findTimeSlot(day, hour, slots) {
       this.state.weekStart.year() === slot.time.start.getFullYear() &&
       this.state.weekStart.month() === slot.time.start.getMonth() &&
       this.state.weekStart.date() + day === slot.time.start.getDate() &&
-      hour >= slot.time.start.getHours() &&
-      hour < slot.time.end.getHours()
+      hour >= slot.time.start.hours() &&
+      hour < slot.time.end.hours()
   )[0];
 }
 
@@ -66,10 +67,10 @@ export function removeSlotConflict(tutorAvailableHours, tuteeAppointments) {
       ) {
         if (
           checkIfAppointmentsConflict(
-            tuteeAppointments[i].time.start.getHours(),
-            tuteeAppointments[i].time.end.getHours(),
-            tutorAvailableHours[j].time.start.getHours(),
-            tutorAvailableHours[j].time.end.getHours()
+            tuteeAppointments[i].time.start.hours(),
+            tuteeAppointments[i].time.end.hours(),
+            tutorAvailableHours[j].time.start.hours(),
+            tutorAvailableHours[j].time.end.hours()
           )
         ) {
           tutorAvailableHours.splice(j, 1); // may have to adjust index
@@ -90,8 +91,8 @@ export function convertDateStringsToDates(dateStrings) {
     dates[i] = {
       ...dateStrings[i],
       time: {
-        start: new Date(dateStrings[i].time.start),
-        end: new Date(dateStrings[i].time.end),
+        start: dateStrings[i].time.start,
+        end: dateStrings[i].time.end,
       },
     };
   }
@@ -109,49 +110,65 @@ export function checkIfAppointmentsConflict(start1, end1, start2, end2) {
   ); // Final condition checks if the lines overlap exactly
 }
 
+// export function combineSingleSlots(openHours) {
+//   openHours.sort((timeSlot1, timeSlot2) => timeSlot1.time.start.diff(timeSlot2.time.start));
+//   for (let i = 0; i < openHours.length - 1; i++) {
+//     if (fallsOnSameDay(openHours[i].time.start, openHours[i + 1].time.start)
+//       && openHours[i].time.end.hours() === openHours[i + 1].time.start.hours()) {
+//       openHours[i + 1].time.start.hours(openHours[i].time.start.hours());
+//       openHours.splice(i, 1);
+//       i--; // Need to go back one index so we don't skip the newly joined time slot
+//     }
+//   }
+// }
+
 export function combineSingleSlots(openHours) {
-  openHours.sort(
-    (timeSlot1, timeSlot2) =>
-      timeSlot1.time.start.getTime() - timeSlot2.time.start.getTime()
-  );
+  openHours.sort((timeSlot1, timeSlot2) => timeSlot1.time.start.diff(timeSlot2.time.start));
+
   for (let i = 0; i < openHours.length - 1; i++) {
-    if (
-      openHours[i].time.start.getFullYear() ===
-      openHours[i + 1].time.start.getFullYear() &&
-      openHours[i].time.start.getMonth() ===
-      openHours[i + 1].time.start.getMonth() &&
-      openHours[i].time.start.getDate() ===
-      openHours[i + 1].time.start.getDate() &&
-      openHours[i].time.end.getHours() ===
-      openHours[i + 1].time.start.getHours()
-    ) {
-      openHours[i + 1].time.start.setHours(openHours[i].time.start.getHours());
-      openHours.splice(i, 1);
-      i--; // Need to go back one index so we don't skip the newly joined time slot
+
+    if (openHours[i].time.start.hours() === 23) {
+      console.log("edge");
+      // if (fallsOnSameDay(openHours[i].time.start, openHours[i + 1].time.start)
+      //   && openHours[i + 1].time.end.days() === (openHours[i].time.start.days() + 1)) {
+      //   console.log("Edge point");
+      //   openHours[i + 1].time.start.hours(openHours[i].time.start.hours());
+      //   openHours.splice(i, 1);
+      //   i--; // Need to go back one index so we don't skip the newly joined time slot
+      // }
+    } else {
+      if (openHours[i].time.end.hours() !== 0 && fallsOnSameDay(openHours[i].time.start, openHours[i + 1].time.start)
+        && openHours[i].time.end.hours() === openHours[i + 1].time.start.hours()) {
+        openHours[i + 1].time.start.hours(openHours[i].time.start.hours());
+        openHours.splice(i, 1);
+        i--; // Need to go back one index so we don't skip the newly joined time slot
+      }
     }
+
   }
 }
 
 export function calcTotalHours(hours, timePeriod) {
   let start = moment().startOf(timePeriod);
   let end = moment().endOf(timePeriod);
-  return hours.filter(
-    (hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end)
-  ).length;
+  return hours.filter((hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end)).length;
 }
 
 export function calcTotalHoursPerMonth(hours, numberOfMonthsBack) {
   let start = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").startOf("month");
   let end = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").endOf("month");
-  return hours.filter(
-    (hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end)
-  ).length;
+  return hours.filter((hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end)).length;
 }
 
-export function fallOnSameDay(date1, date2) {
+export function fallsOnSameDay(date1, date2) {
   return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
+    date1.year() === date2.year() &&
+    date1.month() === date2.month() &&
+    date1.date() === date2.date()
   );
 }
+
+export function displayHour12Format(hour) {
+  return moment().set("minute", 0).set("hour", hour).format("hh:mm A");
+}
+

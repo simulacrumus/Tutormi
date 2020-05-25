@@ -7,8 +7,8 @@ fetch("/api/auth", {
         "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        email: "cguiettr@examiner.com",
-        password: "ly2Efl2C"
+        email: "msanter7@biblegateway.com",
+        password: "TTaszczMlSnf"
     })
 })
     .then(response => response.json())
@@ -20,7 +20,7 @@ fetch("/api/auth", {
         })
             .then(response => response.json())
             .then(user => {
-                user.user.type = "tutee";
+                // user.user.type = "tutee";
                 console.log("Current user:", user);
                 store.dispatch({ type: USER_LOGGED_IN, payload: user })
             });

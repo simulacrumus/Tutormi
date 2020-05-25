@@ -4,6 +4,7 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import "./TimeSlotBooked.css";
 import { store } from "../../../store/configureStore.js";
 import { APPOINTMENT_CANCELED } from "../../../store/user/userActions";
+import { displayHour12Format } from "../../../util/scheduleFunctions";
 
 export default class TimeSlotBooked extends Component {
 
@@ -17,7 +18,7 @@ export default class TimeSlotBooked extends Component {
           }
           className="booked"
         >
-          {this.props.start.getHours() + ":00-" + this.props.end.getHours()}:00
+          {displayHour12Format(this.props.start.getHours()) + "-" + displayHour12Format(this.props.end.getHours())}
           PM
         </td>
       </OverlayTrigger>
@@ -33,8 +34,7 @@ export default class TimeSlotBooked extends Component {
               className="timeIcon"
               src={require("../../../images/time-icon.png")}
             ></img>
-            {this.props.start.getHours() + ":00-" + this.props.end.getHours()}
-            :00 PM
+            {displayHour12Format(this.props.start.getHours()) + "-" + displayHour12Format(this.props.end.getHours())}
           </div>
           <img
             className="cancelIcon"

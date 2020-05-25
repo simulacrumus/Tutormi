@@ -5,6 +5,7 @@ import "./TimeSlotOpen.css";
 import { store } from "../../../store/configureStore.js";
 import { AVAILABILITY_CANCELED } from "../../../store/user/userActions";
 import { convertTimeSlotToSingleHours } from "../../../util/scheduleFunctions.js";
+import { displayHour12Format } from "../../../util/scheduleFunctions";
 
 export default class UserOpenTimeSlot extends Component {
 
@@ -13,15 +14,16 @@ export default class UserOpenTimeSlot extends Component {
       <OverlayTrigger trigger="click" placement="bottom" overlay={this.popover(this.props.timeSlot.time)}>
         <td
           rowSpan={
-            parseInt(this.props.timeSlot.time.end.getHours()) -
-            parseInt(this.props.timeSlot.time.start.getHours())
+            parseInt(this.props.timeSlot.time.end.hours()) === 0 ? 24 -
+              parseInt(this.props.timeSlot.time.start.hours()) :
+              parseInt(this.props.timeSlot.time.end.hours()) -
+              parseInt(this.props.timeSlot.time.start.hours())
           }
           className="open"
         >
-          {this.props.timeSlot.time.start.getHours() +
-            ":00-" +
-            this.props.timeSlot.time.end.getHours()}
-          :00 PM
+          {displayHour12Format(this.props.timeSlot.time.start.hours()) +
+            "-" +
+            displayHour12Format(this.props.timeSlot.time.end.hours())}
         </td>
       </OverlayTrigger>
     );
@@ -37,9 +39,9 @@ export default class UserOpenTimeSlot extends Component {
                 className="timeIcon"
                 src={require("../../../images/time-icon.png")}
               ></img>
-              {time.start.getHours() +
+              {time.start.hours() +
                 ":00-" +
-                time.end.getHours()}
+                time.end.hours()}
             :00 PM
             <img
                 className="cancelIcon"

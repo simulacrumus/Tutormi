@@ -12,7 +12,7 @@ class ProfileNavBar extends Component {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
-            <Nav.Link href="/">Profile</Nav.Link>
+            <Nav.Link href="/profile">Profile</Nav.Link>
             <Nav.Link href="/dashboard">Dashboard</Nav.Link>
             {this.props.type === "tutee" ? (
               <Nav.Link href="/search">Search</Nav.Link>

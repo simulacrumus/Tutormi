@@ -10,35 +10,44 @@ import { connect } from "react-redux";
 import Login from "./components/login/Login";
 
 class Router extends Component {
+
+  isTutee = () => this.props.user.user.type === "tutee";
+  isAuthenticated = () => this.props.token !== null && this.props.token !== undefined;
+
   render() {
     return (
       <main>
         <Switch>
-          <Route path="/" component={SearchMain} exact />
-          <Route path="/profile" component={ProfilePage} exact />
+          <Route path="/" component={Login} exact />
+
           <Route path="/login" component={Login} exact />
-          <Route
-            path="/dashboard"
-            render={() =>
-              this.props.user.user.type === "tutee" ? (
-                <DashboardPage />
-              ) : (
-                <TutorDashboardPage />
-              )
-            }
-          />
-          <Route path="/viewTutor" component={TutorViewPage} />
+
+          <Route path="/profile" exact
+            render={() => {
+              return this.isAuthenticated() ? <ProfilePage /> : <Redirect to="/login" />;
+            }} />
+
+          <Route path="/dashboard" exact
+            render={() => {
+              if (!this.isAuthenticated())
+                return <Redirect to="/login" />;
+              else
+                return this.isTutee() ? <DashboardPage /> : <TutorDashboardPage />;
+
+            }} />
+
+          <Route path="/viewTutor" exact component={TutorViewPage} />
+
           <Route
             path="/search"
-            render={() =>
-              this.props.user.user.type === "tutee" ? (
-                <SearchMain />
-              ) : (
-                <Redirect to="/dashboard" />
-              )
-            }
-          />
-          <Route path="/login" component={Login} exact />
+            render={() => {
+              if (!this.isAuthenticated())
+                return <Redirect to="/login" />;
+              else
+                return this.isTutee() ? <SearchMain /> : <Redirect to="/profile" />;
+
+            }} />
+
           <Route path="*" render={() => <h1>404 Page Not Found!</h1>} />{" "}
           {/* Need to make an error component later */}
         </Switch>
@@ -50,6 +59,7 @@ class Router extends Component {
 function mapStateToProps(state) {
   return {
     user: state.userReducer.user,
+    token: state.userReducer.token
   };
 }
 
