@@ -49,7 +49,7 @@ router.post(
         check('courses', 'Course cannot be empty').not().isEmpty(),
         check('languages', 'Languages cannot be empty').not().isEmpty(),
         check('name', 'Name cannot be empty').not().isEmpty(),
-        check('email', 'Email cannot be empty').not().isEmpty().isEmail()
+        check('email', 'Email cannot be empty').isEmail()
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -62,11 +62,7 @@ router.post(
             bio,
             courses,
             languages,
-            linkedin,
-            twitter,
-            facebook,
-            instagram,
-            youtube,
+            social,
             location,
             name,
             email
@@ -76,23 +72,10 @@ router.post(
             user: req.user.user.id,
             location,
             bio,
+            social,
             languages: Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim()),
             courses: Array.isArray(courses) ? courses : courses.split(',').map((course) => course.trim())
         };
-
-        // Build social object and add to profileFields
-        const social = {
-            linkedin,
-            twitter,
-            facebook,
-            instagram,
-            youtube
-        };
-
-        for (const [key, value] of Object.entries(social)) {
-            if (value && value.length > 0) social[key] = value;
-        }
-        tutorProfileFields.social = social;
 
         try {
             await User.findOneAndUpdate({
@@ -292,23 +275,13 @@ router.post('/search', auth, async (req, res) => {
     }
 });
 
-// @route    PUT api/tutors/block.:id
+// @route    PUT api/tutors/block/:id
 // @desc     Block tutor using their user id
 // @access   Private
-router.put('/block/:id', auth, async ({
-    params: {
-        id
-    }
-}, res) => {
+router.put('/block/:id', auth, async (req, res) => {
     try {
 
-        const tutor = await Tutor.findOneAndUpdate({
-            _id: id
-        }, {
-            $addToSet: {
-                blockedBy: req.user.user.id
-            }
-        });
+        let tutor = await Tutor.findById(req.params.id);
 
         if (!tutor) {
             res.status(400).json({
@@ -316,15 +289,25 @@ router.put('/block/:id', auth, async ({
             })
         }
 
+        await Tutor.findOneAndUpdate({
+            _id: req.params.id
+        }, {
+            $addToSet: {
+                blockedBy: req.user.user.id
+            }
+        });
+
         await Tutee.findOneAndUpdate({
-            _id: req.user.user.id
+            user: req.user.user.id
         }, {
             $addToSet: {
                 blockedUsers: tutor.user.id
             }
         });
 
-        return res.json(tutee);
+        tutor = await Tutor.findById(req.params.id);
+
+        return res.json(tutor);
     } catch (err) {
         console.error(err.message);
         return res.status(500).json({
@@ -337,20 +320,10 @@ router.put('/block/:id', auth, async ({
 // @route    PUT api/tutors/unblock.:id
 // @desc     Unblock tutor using their user id
 // @access   Private
-router.put('/unblock/:id', auth, async ({
-    params: {
-        id
-    }
-}, res) => {
+router.put('/unblock/:id', auth, async (req, res) => {
     try {
 
-        const tutor = await Tutor.findOneAndUpdate({
-            _id: id
-        }, {
-            $pull: {
-                blockedBy: req.user.user.id
-            }
-        });
+        let tutor = await Tutor.findById(req.params.id);
 
         if (!tutor) {
             res.status(400).json({
@@ -358,15 +331,25 @@ router.put('/unblock/:id', auth, async ({
             })
         }
 
+        await Tutor.findOneAndUpdate({
+            _id: req.params.id
+        }, {
+            $pull: {
+                blockedBy: req.user.user.id
+            }
+        });
+
         await Tutee.findOneAndUpdate({
-            _id: req.user.user.id
+            user: req.user.user.id
         }, {
             $pull: {
                 blockedUsers: tutor.user.id
             }
         });
 
-        return res.json(tutee);
+        tutor = await Tutor.findById(req.params.id);
+
+        return res.json(tutor);
     } catch (err) {
         console.error(err.message);
         return res.status(500).json({
@@ -414,7 +397,7 @@ router.post('/schedule', auth, async (req, res) => {
 // Multer function to upload image
 const upload = multer({
     storage: multer.diskStorage({
-        destination: '../frontend/srcc/images/uploads/tutors/',
+        destination: '../frontend/src/images/uploads/tutors/',
         filename: (req, file, cb) => {
             cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
         }

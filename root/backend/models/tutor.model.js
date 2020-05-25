@@ -79,4 +79,10 @@ const TutorSchema = new mongoose.Schema({
     }
 });
 
+
+TutorSchema.index({
+    user: 1,
+    rating: 1
+});
+
 module.exports = Tutor = mongoose.model('tutor', TutorSchema);
