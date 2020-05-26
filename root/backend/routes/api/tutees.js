@@ -11,13 +11,13 @@ const { check, validationResult } = require("express-validator");
 // @access  Private
 router.get("/me", auth, async (req, res) => {
   try {
-    const tutee = await (
-      await User.findOne({
-        user: req.user.id,
-      })
-    ).populate("user", ["name", "email", "date"]);
+    const tutee = await 
+      Tutee.findOne({
+        user: req.user.user.id,
+      }).populate('user', ['name', 'email', 'date']);
+    
 
-    if (!tutee || req.user.type != "tutee") {
+    if (!tutee) {
       return res.status(400).json({
         msg: "Whoops! There is no tutee profile for this user",
       });
@@ -149,5 +149,66 @@ router.delete("/", auth, async (req, res) => {
     res.status(500).send("*tuteee profile* Server Error");
   }
 });
+
+// @desc     Test for adding tutees
+router.post(
+  '/addtutees',
+  async (req, res) => {
+
+      const tutees = req.body;
+      for (let index = 0; index < tutees.length; index++) {
+          let {
+              bio,
+              languages,
+              linkedin,
+              twitter,
+              facebook,
+              instagram,
+              location,
+              user
+          } = tutees[index];
+
+          let tuteeProfileFields = {
+              user: user,
+              location: location,
+              bio: bio,
+              languages: Array.isArray(languages) ?
+                  languages : languages.split(',').map((language) => language.trim())
+          };
+          // Build social object and add to profileFields
+          let social = {
+              linkedin,
+              twitter,
+              facebook,
+              instagram
+          };
+
+          for (let [key, value] of Object.entries(social)) {
+              if (value && value.length > 0)
+                  social[key] = value;
+          }
+
+          tuteeProfileFields.social = social;
+
+          try {
+              // Using upsert option (creates new doc if no match is found):
+              let tutee = await Tutee.findOneAndUpdate({
+                  user: user
+              }, {
+                  $set: tuteeProfileFields
+              }, {
+                  new: true,
+                  upsert: true
+              });
+          } catch (err) {
+              console.error(err.message);
+
+          }
+      }
+      res.json({
+          message: 'tutees added'
+      });
+  }
+);
 
 module.exports = router;
