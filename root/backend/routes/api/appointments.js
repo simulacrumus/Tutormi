@@ -36,45 +36,34 @@ router.post('/', [auth, [
         subject,
         tutorid,
         tuteeid,
+        tutorName,
+        tuteeName,
         note
     } = req.body;
 
-    const time = {
-        start,
-        end
-    };
-
-    const newAppointment = {
-        tutee: tuteeid,
-        tutor: tutorid,
-        subject,
-        time,
-        note
-    };
-
     try {
 
-        const tutor = await Tutor.findOne({
+        const tutor1 = await Tutor.findOne({
             _id: tutorid
         }).populate({
             path: 'user',
             select: 'name email'
         });
 
-        if (!tutor) {
+        if (!tutor1) {
             return res.status(400).json({
                 msg: "Tutor not found!"
             });
         }
 
-        const tutee = await Tutee.findOne({
+        const tutee1 = await Tutee.findOne({
             _id: tuteeid
         }).populate({
             path: 'user',
             select: 'name email'
         });
 
-        if (!tutee) {
+        if (!tutee1) {
             return res.status(400).json({
                 msg: "Tutee not found!"
             });
@@ -89,6 +78,31 @@ router.post('/', [auth, [
                 startTime.setHours(startTime.getHours() + 1);
             }
             return hours;
+        };
+
+        const time = {
+            start,
+            end
+        };
+
+
+        const tutor = {
+            id: tutorid,
+            name: tutorName
+        }
+
+        const tutee = {
+            id: tuteeid,
+            name: tuteeName
+        }
+
+        const newAppointment = {
+            tutee,
+            tutor,
+            subject,
+            time,
+            note,
+            date: Date.now
         };
 
         let appointmentHours = new Array();
@@ -147,17 +161,17 @@ router.post('/', [auth, [
         <ul>
             <li><strong>Date: </strong>${appointmentHours[0].getFullYear() + '-' + (appointmentHours[0].getMonth() + 1)+ '-' + appointmentHours[0].getDate()}</li>
             <li><strong>Time: </strong>${appointmentHours[0].getHours() + ':00 - ' + (appointmentHours[appointmentHours.length - 1].getHours() + 1) + ':00'}</li>
-            <li><strong>Tutor: </strong>${tutor3.user.name}</li>
-            <li><strong>Tutee: </strong>${tutee2.user.name}</li>
+            <li><strong>Tutor: </strong>${tutor1.user.name}</li>
+            <li><strong>Tutee: </strong>${tutee1.user.name}</li>
             <li><strong>Subject: </strong>${appointment.subject}</li>
             <li><strong>Notes: </strong>${appointment.note}</li>
-            <li><strong>Date created: </strong></li>
+            <li><strong>Date created: </strong>${appointment.date}</li>
         </ul>`;
 
         // send mail with defined transport object
         let info = await transporter.sendMail({
             from: '"Tutormi" <info@tutormiproject.com>', // sender address
-            to: `${tutor.user.email}, ${tutee.user.email}`, // list of receivers
+            to: `${tutor1.user.email}, ${tutee1.user.email}`, // list of receivers
             subject: "TUTORMI - NEW APPOINTMENT", // Subject line
             text: "", // plain text body
             html: htmloutput, // html body
@@ -227,7 +241,7 @@ router.delete('/:id', auth, async (req, res) => {
         let start = new Date(appointment.time.start);
         let end = new Date(appointment.time.end);
         let hours = new Array();
-        while (start <= end) {
+        while (start < end) {
             hours.push(new Date(start));
             start.setHours(start.getHours() + 1);
         }
@@ -246,7 +260,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
 
         //find tutor of the appointment
-        const tutor = await Tutor.findById(appointment.tutor).populate({
+        const tutor = await Tutor.findById(appointment.tutor.id).populate({
             path: 'user',
             select: 'name email'
         });
@@ -258,7 +272,7 @@ router.delete('/:id', auth, async (req, res) => {
             });
         }
         //find tutee of the appointment
-        const tutee = await Tutee.findById(appointment.tutee).populate({
+        const tutee = await Tutee.findById(appointment.tutee.id).populate({
             path: 'user',
             select: 'name email'
         });
@@ -284,7 +298,7 @@ router.delete('/:id', auth, async (req, res) => {
         const appointmentHours = hours(appointment);
         // add appointment hours to tutor's available hours and delete appointment id from appointments
         await Tutor.findOneAndUpdate({
-            _id: appointment.tutor
+            _id: appointment.tutor.id
         }, {
             $addToSet: {
                 availableHours: appointmentHours
@@ -296,7 +310,7 @@ router.delete('/:id', auth, async (req, res) => {
 
         //delete appointment id from appointments
         await Tutee.findOneAndUpdate({
-            _id: appointment.tutee
+            _id: appointment.tutee.id
         }, {
             $pull: {
                 appointments: req.params.id
@@ -320,7 +334,7 @@ router.delete('/:id', auth, async (req, res) => {
             <li><strong>Tutee: </strong>${tutee.user.name}</li>
             <li><strong>Subject: </strong>${appointment.subject}</li>
             <li><strong>Notes: </strong>${appointment.note}</li>
-            <li><strong>Date created: </strong></li>
+            <li><strong>Date created: </strong><${appointment.date}/li>
         </ul>`;
 
         const emailOptions = {
@@ -332,7 +346,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
 
         // send mail with defined transport object
-        const info = await transporter.sendMail(emailOptions, (err, info) => {
+        await transporter.sendMail(emailOptions, (err, info) => {
             if (error) {
                 return res.status(400).json({
                     error: err
@@ -342,7 +356,7 @@ router.delete('/:id', auth, async (req, res) => {
 
         //return message
         res.json({
-            message: `Appointment Deleted. Confirmation email sent to ${info.accepted}`,
+            message: `Appointment Cancelled. Confirmation email sent to ${tutor.user.email} and ${tutee.user.email}`,
         });
 
     } catch (err) {

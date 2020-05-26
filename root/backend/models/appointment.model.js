@@ -2,12 +2,24 @@ const mongoose = require('mongoose');
 
 const AppointmentSchema = new mongoose.Schema({
     tutee: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'tutor'
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutee'
+        },
+        name: {
+            type: String,
+            required: true
+        }
     },
     tutor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'tutee'
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'tutor'
+        },
+        name: {
+            type: String,
+            required: true
+        }
     },
     time: {
         start: {
@@ -27,7 +39,7 @@ const AppointmentSchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        default: Date.nowx
+        default: Date.now
     }
 });
 
