@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
 const config = require('config');
-const emailpassword = config.get('emailpassword');
+const transporter = require('./../../config/email');
 const auth = require('../../middleware/auth');
 const {
     check,
@@ -13,22 +12,6 @@ const Tutor = require('../../models/tutor.model');
 const Tutee = require('../../models/tutee.model');
 const User = require('../../models/user.model');
 const Appointment = require('../../models/appointment.model');
-
-// Nodemailer setup
-// create reusable transporter object using the default SMTP transport
-let transporter = nodemailer.createTransport({
-    name: "mail.maelitepainting.ca",
-    host: "mail.maelitepainting.ca",
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'test@maelitepainting.ca',
-        pass: emailpassword
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
 
 // @route   POST api/appointments
 // @desc    Create an appointment
@@ -73,7 +56,7 @@ router.post('/', [auth, [
 
         const tutor = await Tutor.findOne({
             _id: tutorid
-        });
+        }).populate('user', 'email name');
 
         if (!tutor) {
             return res.status(400).json({
@@ -83,7 +66,7 @@ router.post('/', [auth, [
 
         const tutee = await Tutee.findOne({
             _id: tuteeid
-        });
+        }).populate('user', 'email name');
 
         if (!tutee) {
             return res.status(400).json({
@@ -91,9 +74,40 @@ router.post('/', [auth, [
             });
         }
 
-        const appointment = Appointment(newAppointment);
+        const hours = (start, end) => {
+            let startTime = new Date(start);
+            let endTime = new Date(end);
+            let hours = new Array();
+            while (startTime <= endTime) {
+                hours.push(new Date(startTime));
+                startTime.setHours(startTime.getHours() + 1);
+            }
+            return hours;
+        };
 
-        appointment = await appointment.save();
+        let appointmentHours = new Array();
+        appointmentHours = hours(start, end);
+
+        const tutor2 = await Tutor.findOne({
+            $and: [{
+                    _id: tutorid
+                },
+                {
+                    availableHours: {
+                        $all: appointmentHours
+                    }
+                }
+            ]
+        });
+
+        if (!tutor2) {
+            return res.status(400).json({
+                msg: "Tutor is unavailable during these hours"
+            })
+        }
+
+        const appointment = Appointment(newAppointment);
+        await appointment.save();
 
         if (!appointment) {
             return res.status(400).json({
@@ -101,15 +115,51 @@ router.post('/', [auth, [
             });
         }
 
-        tutor.appointments.unshift(appointment.id);
+        await Tutor.findOneAndUpdate({
+            _id: tutorid
+        }, {
+            $pull: {
+                availableHours: appointmentHours
+            },
+            $addToSet: {
+                appointments: appointment._id
+            }
+        })
 
-        tutor = await tutor.save();
+        await Tutee.findOneAndUpdate({
+            _id: tuteeid
+        }, {
+            $addToSet: {
+                appointments: appointment._id
+            }
+        })
 
-        tutee.appointments.unshift(appointment.id);
+        const htmloutput = `<p>You have a new appointment</p>
+        <h3>Appointment Details:</h3>
+        <ul>
+            <li><strong>Date: </strong>${appointmentHours[0].getFullYear() + '-' + appointmentHours[0].getMonth() + '-' + appointmentHours[0].getDate()}</li>
+            <li><strong>Time: </strong>${appointmentHours[0].getHours() + ':00 - ' + appointmentHours[appointmentHours.length - 1].getHours() + ':00'}</li>
+            <li><strong>Tutor: </strong>${tutor.user.name}</li>
+            <li><strong>Tutee: </strong>${tutee.user.name}</li>
+            <li><strong>Subject: </strong>${appointment.subject}</li>
+            <li><strong>Notes: </strong>${appointment.note}</li>
+            <li><strong>Date created: </strong></li>
+        </ul>`;
 
-        tutee = await tutee.save();
+        // send mail with defined transport object
+        let info = await transporter.sendMail({
+            from: '"Tutormi" <info@tutormiproject.com>', // sender address
+            to: `${tutor.user.email}, ${tutee.user.email}`, // list of receivers
+            subject: "TUTORMI - NEW APPOINTMENT", // Subject line
+            text: "", // plain text body
+            html: htmloutput, // html body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+
 
         res.json([tutor, tutee]);
+
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -262,17 +312,22 @@ router.delete('/:id', auth, async ({
             <li><strong>Date created: </strong></li>
         </ul>`;
 
-
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
+        const emailOptions = {
             from: '"Tutormi" <info@tutormiproject.com>', // sender address
             to: `${tutor.user.email}, ${tutee.user.email}`, // list of receivers
             subject: "TUTORMI - APPOINTMENT CANCELLED", // Subject line
             text: "", // plain text body
-            html: htmloutput, // html body
-        });
+            html: htmloutput // html body
+        }
 
-        console.log("Message sent: %s", info.messageId);
+        // send mail with defined transport object
+        let info = await transporter.sendMail(emailOptions, (err, info) => {
+            if (error) {
+                res.status(400).json({
+                    error: err
+                });
+            }
+        });
 
         //return message
         res.json({
@@ -285,5 +340,6 @@ router.delete('/:id', auth, async ({
     }
 
 });
+
 
 module.exports = router;
