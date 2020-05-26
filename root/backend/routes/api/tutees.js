@@ -4,7 +4,10 @@ const bcrypt = require("bcryptjs");
 const auth = require("../../middleware/auth");
 const Tutee = require("../../models/tutee.model");
 const User = require("../../models/user.model");
-const { check, validationResult } = require("express-validator");
+const {
+  check,
+  validationResult
+} = require("express-validator");
 
 // @route   GET api/tutees/me
 // @desc    Get current user's tutee profile
@@ -15,7 +18,6 @@ router.get("/me", auth, async (req, res) => {
       Tutee.findOne({
         user: req.user.user.id,
       }).populate('user', ['name', 'email', 'date']);
-    
 
     if (!tutee) {
       return res.status(400).json({
@@ -26,7 +28,7 @@ router.get("/me", auth, async (req, res) => {
     res.json(tutee);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("*tutees* Server Error");
+    res.status(500).send("Server Error");
   }
 });
 
@@ -39,7 +41,9 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({
+        errors: errors.array()
+      });
     }
 
     const {
@@ -73,15 +77,19 @@ router.post(
     if (instagram) tuteeProfileFields.social.instagram = instagram;
 
     try {
-      let profile = await Tutee.findOne({ user: req.user.id });
+      let profile = await Tutee.findOne({
+        user: req.user.id
+      });
 
       if (profile) {
         // Update
-        profile = await Tutee.findOneAndUpdate(
-          { user: req.user.id },
-          { $set: tuteeProfileFields },
-          { new: true }
-        );
+        profile = await Tutee.findOneAndUpdate({
+          user: req.user.id
+        }, {
+          $set: tuteeProfileFields
+        }, {
+          new: true
+        });
 
         return res.json(profile);
       }
@@ -119,13 +127,17 @@ router.get("/user/:id", async (req, res) => {
       user: req.params.id,
     }).populate("user", ["name", "email"]);
     if (!profile) {
-      return res.status(400).json({ msg: "Tutee not found" });
+      return res.status(400).json({
+        msg: "Tutee not found"
+      });
     }
     res.json(profile);
   } catch (err) {
     console.error(err.message);
     if (err.kind == "ObjectId") {
-      return res.status(400).json({ msg: "Tutee not found" });
+      return res.status(400).json({
+        msg: "Tutee not found"
+      });
     }
     res.status(500).send("*tuteee profile* Server Error");
   }
@@ -139,11 +151,17 @@ router.delete("/", auth, async (req, res) => {
     // @todo - remove users posts
 
     // Remove profile
-    await Tutee.findOneAndRemove({ user: req.user.user.id });
+    await Tutee.findOneAndRemove({
+      user: req.user.user.id
+    });
 
     // Remove User
-    await User.findOneAndRemove({ _id: req.user.user.id });
-    res.json({ msg: "Tutee deleted" });
+    await User.findOneAndRemove({
+      _id: req.user.user.id
+    });
+    res.json({
+      msg: "Tutee deleted"
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("*tuteee profile* Server Error");

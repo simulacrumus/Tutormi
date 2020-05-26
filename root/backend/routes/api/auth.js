@@ -56,7 +56,7 @@ router.post(
                     .status(400)
                     .json({
                         errors: [{
-                            msg: 'Invalid Credentials'
+                            message: 'Invalid Credentials'
                         }]
                     });
             }
@@ -68,10 +68,20 @@ router.post(
                     .status(400)
                     .json({
                         errors: [{
-                            msg: 'Invalid Credentials'
+                            message: 'Invalid Credentials'
                         }]
                     });
             }
+
+            // if (!user.confirmed) {
+            //     return res
+            //         .status(400)
+            //         .json({
+            //             errors: [{
+            //                 message: 'Please confirm your email first'
+            //             }]
+            //         });
+            // }
 
             const payload = {
                 user: {

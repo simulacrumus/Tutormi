@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-
+const secret = config.get('jwtSecret');
 
 module.exports = function (req, res, next) {
     // Get the token from the header
@@ -15,7 +15,7 @@ module.exports = function (req, res, next) {
 
     // Verifying token
     try {
-        const decoded = jwt.verify(token, config.get('jwtSecret'));
+        const decoded = jwt.verify(token, secret);
         req.user = decoded;
         next();
     } catch (err) {

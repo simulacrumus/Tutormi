@@ -25,7 +25,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['tutor', 'tutee', 'admin'],
         required: true
+    },
+    confirmed: {
+        type: Boolean,
+        default: false
     }
+
 });
 
 UserSchema.index({
