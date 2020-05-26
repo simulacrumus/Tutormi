@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         max: 30,
-        min: 8
+        min: 6
     },
     date: {
         type: Date,
@@ -25,7 +25,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['tutor', 'tutee', 'admin'],
         required: true
+    },
+    confirmed: {
+        type: Boolean,
+        default: false
     }
+
 });
 
 UserSchema.index({

@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
 const config = require('config');
-const emailpassword = config.get('emailpassword');
 const auth = require('../../middleware/auth');
 const {
     check,
@@ -13,22 +11,6 @@ const Tutor = require('../../models/tutor.model');
 const Tutee = require('../../models/tutee.model');
 const User = require('../../models/user.model');
 const Appointment = require('../../models/appointment.model');
-
-// Nodemailer setup
-// create reusable transporter object using the default SMTP transport
-let transporter = nodemailer.createTransport({
-    name: "mail.maelitepainting.ca",
-    host: "mail.maelitepainting.ca",
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'test@maelitepainting.ca',
-        pass: emailpassword
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
 
 // @route   POST api/appointments
 // @desc    Create an appointment
@@ -262,17 +244,22 @@ router.delete('/:id', auth, async ({
             <li><strong>Date created: </strong></li>
         </ul>`;
 
-
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
+        const emailOptions = {
             from: '"Tutormi" <info@tutormiproject.com>', // sender address
             to: `${tutor.user.email}, ${tutee.user.email}`, // list of receivers
             subject: "TUTORMI - APPOINTMENT CANCELLED", // Subject line
             text: "", // plain text body
-            html: htmloutput, // html body
-        });
+            html: htmloutput // html body
+        }
 
-        console.log("Message sent: %s", info.messageId);
+        // send mail with defined transport object
+        let info = await transporter.sendMail(emailOptions, (err, info) => {
+            if (error) {
+                res.status(400).json({
+                    error: err
+                });
+            }
+        });
 
         //return message
         res.json({
