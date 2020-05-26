@@ -56,7 +56,10 @@ router.post('/', [auth, [
 
         const tutor = await Tutor.findOne({
             _id: tutorid
-        }).populate('user', 'email name');
+        }).populate({
+            path: 'user',
+            select: 'name email'
+        });
 
         if (!tutor) {
             return res.status(400).json({
@@ -66,7 +69,10 @@ router.post('/', [auth, [
 
         const tutee = await Tutee.findOne({
             _id: tuteeid
-        }).populate('user', 'email name');
+        }).populate({
+            path: 'user',
+            select: 'name email'
+        });
 
         if (!tutee) {
             return res.status(400).json({
@@ -106,7 +112,7 @@ router.post('/', [auth, [
             })
         }
 
-        let appointment = Appointment(newAppointment);
+        const appointment = Appointment(newAppointment);
         await appointment.save();
 
         if (!appointment._id) {
@@ -115,7 +121,7 @@ router.post('/', [auth, [
             });
         }
 
-        await Tutor.findOneAndUpdate({
+        const tutor3 = await Tutor.findOneAndUpdate({
             _id: tutorid
         }, {
             $pull: {
@@ -126,23 +132,23 @@ router.post('/', [auth, [
             $addToSet: {
                 appointments: appointment._id
             }
-        })
+        }).populate('user', 'email name')
 
-        await Tutee.findOneAndUpdate({
+        const tutee2 = await Tutee.findOneAndUpdate({
             _id: tuteeid
         }, {
             $addToSet: {
                 appointments: appointment._id
             }
-        })
+        }).populate('user', 'email name')
 
         const htmloutput = `<p>You have a new appointment</p>
         <h3>Appointment Details:</h3>
         <ul>
-            <li><strong>Date: </strong>${appointmentHours[0].getFullYear() + '-' + appointmentHours[0].getMonth() + '-' + appointmentHours[0].getDate()}</li>
-            <li><strong>Time: </strong>${appointmentHours[0].getHours() + ':00 - ' + appointmentHours[appointmentHours.length - 1].getHours() + ':00'}</li>
-            <li><strong>Tutor: </strong>${tutor.user.name}</li>
-            <li><strong>Tutee: </strong>${tutee.user.name}</li>
+            <li><strong>Date: </strong>${appointmentHours[0].getFullYear() + '-' + (appointmentHours[0].getMonth() + 1)+ '-' + appointmentHours[0].getDate()}</li>
+            <li><strong>Time: </strong>${appointmentHours[0].getHours() + ':00 - ' + (appointmentHours[appointmentHours.length - 1].getHours() + 1) + ':00'}</li>
+            <li><strong>Tutor: </strong>${tutor3.user.name}</li>
+            <li><strong>Tutee: </strong>${tutee2.user.name}</li>
             <li><strong>Subject: </strong>${appointment.subject}</li>
             <li><strong>Notes: </strong>${appointment.note}</li>
             <li><strong>Date created: </strong></li>
@@ -160,7 +166,7 @@ router.post('/', [auth, [
         console.log("Message sent: %s", info.messageId);
 
 
-        res.json([tutor, tutee]);
+        res.json([tutor3, tutee2]);
 
     } catch (err) {
         console.error(err.message);
@@ -208,13 +214,9 @@ router.get('/:id', auth, async (req, res) => {
 // @route   DELETE api/appintments/:id
 // @desc    Delete appointments by ID
 // @access  Public
-router.delete('/:id', auth, async ({
-    params: {
-        id
-    }
-}, res) => {
+router.delete('/:id', auth, async (req, res) => {
 
-    if (!id) {
+    if (!req.params.id) {
         res.status(400).json({
             message: 'Appintment ID required to delete'
         });
@@ -234,30 +236,36 @@ router.delete('/:id', auth, async ({
 
     try {
         // Find appointment
-        const appointment = await Appointment.findById(id);
+        const appointment = await Appointment.findById(req.params.id);
 
         // return arror message if appointment doesn't exist in db
         if (!appointment) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: 'No appointment found'
             });
         }
 
         //find tutor of the appointment
-        const tutor = await Tutor.findById(appointment.tutor);
+        const tutor = await Tutor.findById(appointment.tutor).populate({
+            path: 'user',
+            select: 'name email'
+        });
 
         // return error message if tutor of the appointment doesn't exist
         if (!tutor) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Tutor of this appointment doesn't exist anymore"
             });
         }
         //find tutee of the appointment
-        const tutee = await Tutee.findById(appointment.tutee);
+        const tutee = await Tutee.findById(appointment.tutee).populate({
+            path: 'user',
+            select: 'name email'
+        });
 
         // return error message if tutee of the appointment doesn't exist
         if (!tutee) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Tutee of this appointment doesn't exist anymore"
             });
         }
@@ -267,36 +275,37 @@ router.delete('/:id', auth, async ({
 
         // check if the user who intents to delete the appointment either tutee or tutor of the appointment or admin
         // if not, return an error message
-        if (!(tutor.user === req.user.user.id || tutee.user === req.user.user.id || user.type === 'admin')) {
-            res.status(400).json({
+        if (!(tutor.user.id === req.user.user.id || tutee.user.id === req.user.user.id || user.type === 'admin')) {
+            return res.status(400).json({
                 message: "Request denied! You don't have permisson to delete this appointment"
             });
         }
 
+        const appointmentHours = hours(appointment);
         // add appointment hours to tutor's available hours and delete appointment id from appointments
-        tutor = await Tutor.findOneAndUpdate({
+        await Tutor.findOneAndUpdate({
             _id: appointment.tutor
         }, {
             $addToSet: {
-                availableHours: hours(appointment)
+                availableHours: appointmentHours
             },
             $pull: {
-                appointments: id
+                appointments: req.params.id
             }
-        }).populate('user', ['email']);
+        })
 
         //delete appointment id from appointments
-        tutee = await Tutee.findOneAndUpdate({
+        await Tutee.findOneAndUpdate({
             _id: appointment.tutee
         }, {
             $pull: {
-                appointments: id
+                appointments: req.params.id
             }
-        }).populate('user', ['email']);
+        });
 
         // delete the appointment itself
         await Appointment.findOneAndDelete({
-            _id: id
+            _id: req.params.id
         });
 
         //notify tutor and tutee by email
@@ -305,8 +314,8 @@ router.delete('/:id', auth, async ({
         const htmloutput = `<p>Your appointment has been cancelled</p>
         <h3>Appointment Details:</h3>
         <ul>
-            <li><strong>Date: </strong>${hours[0].getFullYear() + '-' + hours[0].getMonth() + '-' + hours[0].getDate()}</li>
-            <li><strong>Time: </strong>${hours[0].getHours() + ':00 - ' + hours[hours.length - 1].getHours() + ':00'}</li>
+            <li><strong>Date: </strong>${appointmentHours[0].getFullYear() + '-' + (appointmentHours[0].getMonth() + 1) + '-' + appointmentHours[0].getDate()}</li>
+            <li><strong>Time: </strong>${appointmentHours[0].getHours() + ':00 - ' + (appointmentHours[appointmentHours.length - 1].getHours() + 1) + ':00'}</li>
             <li><strong>Tutor: </strong>${tutor.user.name}</li>
             <li><strong>Tutee: </strong>${tutee.user.name}</li>
             <li><strong>Subject: </strong>${appointment.subject}</li>
@@ -323,9 +332,9 @@ router.delete('/:id', auth, async ({
         }
 
         // send mail with defined transport object
-        let info = await transporter.sendMail(emailOptions, (err, info) => {
+        const info = await transporter.sendMail(emailOptions, (err, info) => {
             if (error) {
-                res.status(400).json({
+                return res.status(400).json({
                     error: err
                 });
             }
