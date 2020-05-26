@@ -23,6 +23,7 @@ export default function tutorSearchListReducer(state = [], action) {
           },
         ];
       }
+      break;
 
     case deleteTutor.type:
       return state.filter((tutor) => tutor === action.payload.tutor);
