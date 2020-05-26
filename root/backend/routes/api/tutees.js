@@ -15,9 +15,9 @@ router.get("/me", auth, async (req, res) => {
       await User.findOne({
         user: req.user.id,
       })
-    ).populate("user", ["name", "email", "date"]);
+    ).populate("user", ["name", "email", "date", "type"]);
 
-    if (!tutee || req.user.type != "tutee") {
+    if (!tutee) {
       return res.status(400).json({
         msg: "Whoops! There is no tutee profile for this user",
       });

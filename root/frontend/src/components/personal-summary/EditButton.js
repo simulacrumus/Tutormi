@@ -136,7 +136,8 @@ function EditButton(props) {
             Close</Button>
           <Button variant="success" onClick={() => {
             let editInformation = {
-              imgPath: "someImagePath.com", // Change this when image upload is fixed
+              // imgPath: "someImagePath.com", // Change this when image upload is fixed
+              email: props.user.user.email,
               name: document.getElementById("nameInput").value,
               bio: document.getElementById("bioInput").value,
               languages: languages,

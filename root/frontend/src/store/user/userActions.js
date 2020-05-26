@@ -22,7 +22,7 @@ export async function updateUser(updateInfo) {
             "Content-Type": "application/json",
             "x-auth-token": store.getState().userReducer.token
         },
-        body: JSON.stringify(store.getState().userReducer.user)
+        body: JSON.stringify(updateInfo)
     }).then((response) => response.json()).then((updatedUser) => console.log(updatedUser));
 }
 
