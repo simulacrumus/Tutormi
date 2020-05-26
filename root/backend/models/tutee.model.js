@@ -13,27 +13,10 @@ const TuteeSchema = new mongoose.Schema({
     type: String,
     max: 25
   },
-  appointments: [{
-    appointment: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "appointment"
-    }
-  }],
-  ratings: [{
-    tutor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-    },
-    rate: {
-      type: Number,
-    }
-  }],
-  following: [{
-    tutor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user"
-    }
-  }],
+  following: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "user"
+  },
   blockedUsers: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "user"
@@ -72,6 +55,10 @@ const TuteeSchema = new mongoose.Schema({
     instagram: {
       type: String
     }
+  },
+  date: {
+    type: Date,
+    default: Date.now
   }
 });
 
