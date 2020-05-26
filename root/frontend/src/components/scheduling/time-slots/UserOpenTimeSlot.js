@@ -15,18 +15,29 @@ export default class UserOpenTimeSlot extends Component {
         <td
           rowSpan={
             parseInt(this.props.timeSlot.time.end.hours()) === 0 ? 24 -
-              parseInt(this.props.timeSlot.time.start.hours()) :
+              this.lowerBounds() :
               parseInt(this.props.timeSlot.time.end.hours()) -
-              parseInt(this.props.timeSlot.time.start.hours())
+              this.lowerBounds()
           }
           className="open"
         >
           {displayHour12Format(this.props.timeSlot.time.start.hours()) +
             "-" +
             displayHour12Format(this.props.timeSlot.time.end.hours())}
+          <br />
+          <i>{this.isPartlyHidden() ? "(Partly Hidden)" : ""}</i>
         </td>
       </OverlayTrigger>
     );
+  }
+
+  lowerBounds() {
+    return parseInt(this.props.displayRange[0]) < parseInt(this.props.timeSlot.time.start.hours()) ? parseInt(this.props.timeSlot.time.start.hours()) : parseInt(this.props.displayRange[0]);
+  }
+
+  isPartlyHidden() {
+    return this.props.timeSlot.time.start.hours() < this.props.displayRange[0]
+      || this.props.timeSlot.time.end.hours() > this.props.displayRange[1] + 1;
   }
 
   popover(time) {

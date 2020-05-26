@@ -9,7 +9,6 @@ import { connect } from "react-redux";
 class TimeSlotOpen extends Component {
 
   render() {
-    console.log("new");
     return (
       <OverlayTrigger trigger="click" placement="bottom" overlay={this.popover(this.props.timeSlot.time)}>
         <td

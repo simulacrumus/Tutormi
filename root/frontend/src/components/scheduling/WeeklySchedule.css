@@ -46,14 +46,23 @@
 
 .weekControlSection {
   display: flex;
+  flex-direction: column;
   background-color: #e6dff5;
-  /* color: #F5F2FB; */
   margin-bottom: 3px;
   font-weight: normal;
   padding: 10px;
 }
 
-.weekControlSection h5 {
+.weekControlSection h6 {
+  margin-top: 10px;
+  align-self: center;
+}
+
+.weekControlSectionTop {
+  display: flex;
+}
+
+.weekControlSectionTop h5 {
   margin-left: 5px;
   margin-right: 5px;
 }
