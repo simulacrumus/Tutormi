@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const config = require('config');
+const transporter = require('./../../config/email');
 const auth = require('../../middleware/auth');
 const {
     check,
@@ -55,7 +56,7 @@ router.post('/', [auth, [
 
         const tutor = await Tutor.findOne({
             _id: tutorid
-        }).populate('user', ['email', 'name']);
+        }).populate('user', 'email name');
 
         if (!tutor) {
             return res.status(400).json({
@@ -65,7 +66,7 @@ router.post('/', [auth, [
 
         const tutee = await Tutee.findOne({
             _id: tuteeid
-        }).populate('user', ['email', 'name']);
+        }).populate('user', 'email name');
 
         if (!tutee) {
             return res.status(400).json({
@@ -87,21 +88,26 @@ router.post('/', [auth, [
         let appointmentHours = new Array();
         appointmentHours = hours(start, end);
 
-        const tutor2 = await Tutor.find({
-            availableHours: {
-                $in: appointmentHours        
-            },
-                _id: tutorid
+        const tutor2 = await Tutor.findOne({
+            $and: [{
+                    _id: tutorid
+                },
+                {
+                    availableHours: {
+                        $all: appointmentHours
+                    }
+                }
+            ]
         });
 
-        if(!tutor2) {
+        if (!tutor2) {
             return res.status(400).json({
                 msg: "Tutor is unavailable during these hours"
             })
-        } 
-        
+        }
+
         const appointment = Appointment(newAppointment);
-        appointment = await appointment.save();
+        await appointment.save();
 
         if (!appointment) {
             return res.status(400).json({
@@ -112,20 +118,19 @@ router.post('/', [auth, [
         await Tutor.findOneAndUpdate({
             _id: tutorid
         }, {
-            availableHours: {
-                $pull: appointmentHours
+            $pull: {
+                availableHours: appointmentHours
             },
-            appointments: {
-                $addToSet: appointment.id
+            $addToSet: {
+                appointments: appointment._id
             }
-
         })
 
         await Tutee.findOneAndUpdate({
             _id: tuteeid
         }, {
-            appointments: {
-                $addToSet: appointment.id
+            $addToSet: {
+                appointments: appointment._id
             }
         })
 
