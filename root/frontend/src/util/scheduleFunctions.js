@@ -20,7 +20,7 @@ export function convertSingleHoursToTimeSlots(availableHours) {
 // Converts available hours to the format used with booked appointments
 export function convertTimeSlotToSingleHours(timeSlot) {
   let hours = [];
-  let start = timeSlot.time.start.time();
+  let start = timeSlot.time.start;
   for (
     let i = 0, hour = timeSlot.time.start.hours();
     hour < timeSlot.time.end.hours();

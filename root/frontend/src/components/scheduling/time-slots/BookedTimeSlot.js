@@ -1,24 +1,23 @@
 import React, { Component } from "react";
 import Popover from "react-bootstrap/Popover";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import "./TimeSlotBooked.css";
 import { store } from "../../../store/configureStore.js";
 import { APPOINTMENT_CANCELED } from "../../../store/user/userActions";
 import { displayHour12Format } from "../../../util/scheduleFunctions";
 
-export default class TimeSlotBooked extends Component {
+export default class BookedTimeSlot extends Component {
 
   render() {
     return (
       <OverlayTrigger trigger="click" placement="bottom" overlay={this.popover}>
         <td
           rowSpan={
-            parseInt(this.props.end.getHours()) -
-            parseInt(this.props.start.getHours())
+            parseInt(this.props.end.hours()) -
+            parseInt(this.props.start.hours())
           }
           className="booked"
         >
-          {displayHour12Format(this.props.start.getHours()) + "-" + displayHour12Format(this.props.end.getHours())}
+          {displayHour12Format(this.props.start.hours()) + "-" + displayHour12Format(this.props.end.hours())}
           PM
         </td>
       </OverlayTrigger>
@@ -34,7 +33,7 @@ export default class TimeSlotBooked extends Component {
               className="timeIcon"
               src={require("../../../images/time-icon.png")}
             ></img>
-            {displayHour12Format(this.props.start.getHours()) + "-" + displayHour12Format(this.props.end.getHours())}
+            {displayHour12Format(this.props.start.hours()) + "-" + displayHour12Format(this.props.end.hours())}
           </div>
           <img
             className="cancelIcon"

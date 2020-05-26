@@ -1,18 +1,29 @@
 import { store } from './store/configureStore';
 import { USER_LOGGED_IN, TOKEN_ACQUIRED } from './store/user/userActions';
 
+// Tutor
+let testPerson = {
+    email: "msanter7@biblegateway.com",
+    password: "TTaszczMlSnf"
+};
+
+//Tutee
+// let testPerson = {
+//     email: "qhave1@nydailynews.com",
+//     password: "K6SQANk9IZds"
+// };
+
 fetch("/api/auth", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-        email: "msanter7@biblegateway.com",
-        password: "TTaszczMlSnf"
-    })
+    body: JSON.stringify(testPerson)
 })
     .then(response => response.json())
     .then(responseToken => {
+        console.log(responseToken.token)
+
         store.dispatch({ type: TOKEN_ACQUIRED, payload: responseToken.token })
         fetch("/api/tutors/me", {
             method: "GET",
@@ -20,11 +31,13 @@ fetch("/api/auth", {
         })
             .then(response => response.json())
             .then(user => {
-                // user.user.type = "tutee";
+                user.user.type = "tutee";
                 console.log("Current user:", user);
                 store.dispatch({ type: USER_LOGGED_IN, payload: user })
             });
     });
+
+
 
 // Initial Global State 
 const initialState = {
