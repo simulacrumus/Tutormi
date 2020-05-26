@@ -2,7 +2,14 @@
   font-family:  'Nunito', sans-serif;  
 
 } */
-
+#formBasicEmail.error {
+  border: 1px solid #EADAE4;
+}
+.error {
+  color:#db2269;
+  font-size: 0.625em;
+  display: relative;
+}
 .parentLoginFormBoxContainer {
   height: 97vh;
   width: 100%;
@@ -23,6 +30,7 @@
   min-width: 100px;
   min-height: 400px;
   padding: 20px 40px;
+  padding-bottom: 40px;
   border-radius: 6px;
   box-shadow: 0px 8px 36px #222;
   background-color: #fefefe;
@@ -36,6 +44,7 @@
   font-weight: lighter;
   margin-top: 0.25em;
   color: #222;
+  padding-bottom: 35px;
 }
 
  .login-form{
