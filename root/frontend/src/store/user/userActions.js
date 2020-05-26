@@ -48,15 +48,15 @@ export function bookAppointment(tutorId, time, subject, note) {
     });
 }
 
-export async function logInUser() { // Give this function a username and password paramter later
+export async function logInUser(email, password) { // Give this function a username and password paramter later
     fetch("/api/auth", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            email: "cguiettr@examiner.com",
-            password: "ly2Efl2C"
+            email: email,
+            password: password
         })
     })
         .then(response => response.json())
