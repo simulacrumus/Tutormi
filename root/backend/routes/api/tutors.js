@@ -72,19 +72,14 @@ router.post(
             user: req.user.user.id,
             location,
             bio,
+            name,
+            email,
             social,
             languages: Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim()),
             courses: Array.isArray(courses) ? courses : courses.split(',').map((course) => course.trim())
         };
 
         try {
-            await User.findOneAndUpdate({
-                _id: req.user.user.id
-            }, {
-                name: name,
-                email: email
-            });
-
             // Using upsert option (creates new doc if no match is found):
             let tutor = await Tutor.findOneAndUpdate({
                 user: req.user.user.id
