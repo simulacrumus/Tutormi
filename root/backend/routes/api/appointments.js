@@ -78,7 +78,7 @@ router.post('/', [auth, [
             let startTime = new Date(start);
             let endTime = new Date(end);
             let hours = new Array();
-            while (startTime <= endTime) {
+            while (startTime < endTime) {
                 hours.push(new Date(startTime));
                 startTime.setHours(startTime.getHours() + 1);
             }
@@ -106,10 +106,10 @@ router.post('/', [auth, [
             })
         }
 
-        const appointment = Appointment(newAppointment);
+        let appointment = Appointment(newAppointment);
         await appointment.save();
 
-        if (!appointment) {
+        if (!appointment._id) {
             return res.status(400).json({
                 msg: "Appointment couldn't save!"
             });
@@ -119,7 +119,9 @@ router.post('/', [auth, [
             _id: tutorid
         }, {
             $pull: {
-                availableHours: appointmentHours
+                availableHours: {
+                    $in: appointmentHours
+                }
             },
             $addToSet: {
                 appointments: appointment._id
