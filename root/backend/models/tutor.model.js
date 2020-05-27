@@ -76,6 +76,10 @@ const TutorSchema = new mongoose.Schema({
     location: {
         type: String,
         max: 30
+    },
+    date: {
+        type: Date,
+        default: Date.now
     }
 });
 

@@ -2,11 +2,14 @@ import initialState from '../../initialState';
 import moment from 'moment';
 import {
     USER_LOGGED_IN, TOKEN_ACQUIRED, USER_INFO_UPDATED, AVAILABILITY_OPENED,
-    AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED
+    AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED,
+    TUTEE_CHOSE_ONE_APPOINTMENT_HOUR, TEMP_LIST_CLEARED, TEMP_HOUR_REMOVED
 } from './userActions';
+import { fallsOnSameDay } from "../../util/scheduleFunctions"
 
 export default function userReducer(state = initialState, action) {
-    let copiedAvailableHours = state.user.availableHours.slice();
+    let copiedAvailableHours = state.user.availableHours !== undefined
+        ? state.user.availableHours.slice() : undefined;
     let copiedNewAppointments = state.user.appointments.slice();
 
     switch (action.type) {
@@ -45,16 +48,27 @@ export default function userReducer(state = initialState, action) {
             copiedNewAppointments.push(action.payload);
             return { ...state, user: { ...state.user, appointments: copiedNewAppointments } };
 
-        case APPOINTMENT_CANCELED: // Awful way of doing it because date formats are all messed up, will clean later 
+        case APPOINTMENT_CANCELED:
             let deletedAppointments = state.user.appointments.filter((appointment) =>
-                !(appointment.tutorID === action.payload.tutorID &&
-                    new Date(appointment.time.start).getHours() === action.payload.time.start.getHours() &&
-                    new Date(appointment.time.start).getDay() === action.payload.time.start.getDay() &&
-                    new Date(appointment.time.start).getDay() === action.payload.time.start.getDay() &&
-                    new Date(appointment.time.end).getHours() === action.payload.time.end.getHours()));
+                !(appointment.tutor === action.payload.tutor && appointment.tutor === action.payload.tutor
+                    && moment(appointment.time.start).isSame(moment(action.payload.time.start))
+                    && moment(appointment.time.end).isSame(moment(action.payload.time.end))));
             return {
                 ...state, user: { ...state.user, appointments: deletedAppointments }
             }
+
+        case TUTEE_CHOSE_ONE_APPOINTMENT_HOUR:
+            let newTempList = state.tempBooking.slice();
+            newTempList.push(action.payload);
+            return { ...state, tempBooking: newTempList };
+
+        case TEMP_HOUR_REMOVED:
+            let newTempList2 = state.tempBooking.slice();
+            newTempList2 = newTempList2.filter((timeSlot) => !(moment(timeSlot.time.start).isSame(moment(action.payload.time.start))));
+            return { ...state, tempBooking: newTempList2 };
+
+        case TEMP_LIST_CLEARED:
+            return { ...state, tempBooking: [] };
 
         default:
             return state;

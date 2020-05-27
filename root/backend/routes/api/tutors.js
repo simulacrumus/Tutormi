@@ -72,19 +72,14 @@ router.post(
             user: req.user.user.id,
             location,
             bio,
+            name,
+            email,
             social,
             languages: Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim()),
             courses: Array.isArray(courses) ? courses : courses.split(',').map((course) => course.trim())
         };
 
         try {
-            await User.findOneAndUpdate({
-                _id: req.user.user.id
-            }, {
-                name: name,
-                email: email
-            });
-
             // Using upsert option (creates new doc if no match is found):
             let tutor = await Tutor.findOneAndUpdate({
                 user: req.user.user.id
@@ -264,6 +259,14 @@ router.post('/search', auth, async (req, res) => {
             };
         }
 
+        query.blockedUsers = {
+            $nin: req.user.user.id
+        }
+
+        query.blockedBy = {
+            $nin: req.user.user.id
+        }
+
         const tutors = await Tutor.find(query)
             .select('courses languages rating bio location')
             .populate('user', '-_id -password -type -date -__v -email');
@@ -432,6 +435,34 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
             user: req.user.user.id
         }, {
             profilePic: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
+        });
+
+        const tutor = await Tutor.findOne({
+            user: req.user.user.id
+        });
+
+        res.json(tutor);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route    POST api/tutors/cover-pic
+// @desc     Upload or update cover picture of the tutor
+// @access   Private
+router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
+    if (req.file == undefined) {
+        res.status(400).json({
+            message: 'Please provide an image file with 2MB max size'
+        });
+    }
+
+    try {
+        await Tutor.findOneAndUpdate({
+            user: req.user.user.id
+        }, {
+            cover: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
         });
 
         const tutor = await Tutor.findOne({

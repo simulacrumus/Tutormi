@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
 const config = require('config');
-const emailpassword = config.get('emailpassword');
+const transporter = require('./../../config/email');
 const auth = require('../../middleware/auth');
 const {
     check,
@@ -13,22 +12,6 @@ const Tutor = require('../../models/tutor.model');
 const Tutee = require('../../models/tutee.model');
 const User = require('../../models/user.model');
 const Appointment = require('../../models/appointment.model');
-
-// Nodemailer setup
-// create reusable transporter object using the default SMTP transport
-let transporter = nodemailer.createTransport({
-    name: "mail.maelitepainting.ca",
-    host: "mail.maelitepainting.ca",
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'test@maelitepainting.ca',
-        pass: emailpassword
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
 
 // @route   POST api/appointments
 // @desc    Create an appointment
@@ -53,63 +36,152 @@ router.post('/', [auth, [
         subject,
         tutorid,
         tuteeid,
+        tutorName,
+        tuteeName,
         note
     } = req.body;
 
-    const time = {
-        start,
-        end
-    };
-
-    const newAppointment = {
-        tutee: tuteeid,
-        tutor: tutorid,
-        subject,
-        time,
-        note
-    };
-
     try {
 
-        const tutor = await Tutor.findOne({
+        const tutor1 = await Tutor.findOne({
             _id: tutorid
+        }).populate({
+            path: 'user',
+            select: 'name email'
         });
 
-        if (!tutor) {
+        if (!tutor1) {
             return res.status(400).json({
                 msg: "Tutor not found!"
             });
         }
 
-        const tutee = await Tutee.findOne({
+        const tutee1 = await Tutee.findOne({
             _id: tuteeid
+        }).populate({
+            path: 'user',
+            select: 'name email'
         });
 
-        if (!tutee) {
+        if (!tutee1) {
             return res.status(400).json({
                 msg: "Tutee not found!"
             });
         }
 
+        const hours = (start, end) => {
+            let startTime = new Date(start);
+            let endTime = new Date(end);
+            let hours = new Array();
+            while (startTime < endTime) {
+                hours.push(new Date(startTime));
+                startTime.setHours(startTime.getHours() + 1);
+            }
+            return hours;
+        };
+
+        const time = {
+            start,
+            end
+        };
+
+
+        const tutor = {
+            id: tutorid,
+            name: tutorName
+        }
+
+        const tutee = {
+            id: tuteeid,
+            name: tuteeName
+        }
+
+        const newAppointment = {
+            tutee,
+            tutor,
+            subject,
+            time,
+            note,
+            date: Date.now
+        };
+
+        let appointmentHours = new Array();
+        appointmentHours = hours(start, end);
+
+        const tutor2 = await Tutor.findOne({
+            $and: [{
+                    _id: tutorid
+                },
+                {
+                    availableHours: {
+                        $all: appointmentHours
+                    }
+                }
+            ]
+        });
+
+        if (!tutor2) {
+            return res.status(400).json({
+                msg: "Tutor is unavailable during these hours"
+            })
+        }
+
         const appointment = Appointment(newAppointment);
+        await appointment.save();
 
-        appointment = await appointment.save();
-
-        if (!appointment) {
+        if (!appointment._id) {
             return res.status(400).json({
                 msg: "Appointment couldn't save!"
             });
         }
 
-        tutor.appointments.unshift(appointment.id);
+        const tutor3 = await Tutor.findOneAndUpdate({
+            _id: tutorid
+        }, {
+            $pull: {
+                availableHours: {
+                    $in: appointmentHours
+                }
+            },
+            $addToSet: {
+                appointments: appointment._id
+            }
+        }).populate('user', 'email name')
 
-        tutor = await tutor.save();
+        const tutee2 = await Tutee.findOneAndUpdate({
+            _id: tuteeid
+        }, {
+            $addToSet: {
+                appointments: appointment._id
+            }
+        }).populate('user', 'email name')
 
-        tutee.appointments.unshift(appointment.id);
+        const htmloutput = `<p>You have a new appointment</p>
+        <h3>Appointment Details:</h3>
+        <ul>
+            <li><strong>Date: </strong>${appointmentHours[0].getFullYear() + '-' + (appointmentHours[0].getMonth() + 1)+ '-' + appointmentHours[0].getDate()}</li>
+            <li><strong>Time: </strong>${appointmentHours[0].getHours() + ':00 - ' + (appointmentHours[appointmentHours.length - 1].getHours() + 1) + ':00'}</li>
+            <li><strong>Tutor: </strong>${tutor1.user.name}</li>
+            <li><strong>Tutee: </strong>${tutee1.user.name}</li>
+            <li><strong>Subject: </strong>${appointment.subject}</li>
+            <li><strong>Notes: </strong>${appointment.note}</li>
+            <li><strong>Date created: </strong>${appointment.date}</li>
+        </ul>`;
 
-        tutee = await tutee.save();
+        // send mail with defined transport object
+        let info = await transporter.sendMail({
+            from: '"Tutormi" <info@tutormiproject.com>', // sender address
+            to: `${tutor1.user.email}, ${tutee1.user.email}`, // list of receivers
+            subject: "TUTORMI - NEW APPOINTMENT", // Subject line
+            text: "", // plain text body
+            html: htmloutput, // html body
+        });
 
-        res.json([tutor, tutee]);
+        console.log("Message sent: %s", info.messageId);
+
+
+        res.json([tutor3, tutee2]);
+
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -156,13 +228,9 @@ router.get('/:id', auth, async (req, res) => {
 // @route   DELETE api/appintments/:id
 // @desc    Delete appointments by ID
 // @access  Public
-router.delete('/:id', auth, async ({
-    params: {
-        id
-    }
-}, res) => {
+router.delete('/:id', auth, async (req, res) => {
 
-    if (!id) {
+    if (!req.params.id) {
         res.status(400).json({
             message: 'Appintment ID required to delete'
         });
@@ -173,7 +241,7 @@ router.delete('/:id', auth, async ({
         let start = new Date(appointment.time.start);
         let end = new Date(appointment.time.end);
         let hours = new Array();
-        while (start <= end) {
+        while (start < end) {
             hours.push(new Date(start));
             start.setHours(start.getHours() + 1);
         }
@@ -182,30 +250,36 @@ router.delete('/:id', auth, async ({
 
     try {
         // Find appointment
-        const appointment = await Appointment.findById(id);
+        const appointment = await Appointment.findById(req.params.id);
 
         // return arror message if appointment doesn't exist in db
         if (!appointment) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: 'No appointment found'
             });
         }
 
         //find tutor of the appointment
-        const tutor = await Tutor.findById(appointment.tutor);
+        const tutor = await Tutor.findById(appointment.tutor.id).populate({
+            path: 'user',
+            select: 'name email'
+        });
 
         // return error message if tutor of the appointment doesn't exist
         if (!tutor) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Tutor of this appointment doesn't exist anymore"
             });
         }
         //find tutee of the appointment
-        const tutee = await Tutee.findById(appointment.tutee);
+        const tutee = await Tutee.findById(appointment.tutee.id).populate({
+            path: 'user',
+            select: 'name email'
+        });
 
         // return error message if tutee of the appointment doesn't exist
         if (!tutee) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Tutee of this appointment doesn't exist anymore"
             });
         }
@@ -215,36 +289,37 @@ router.delete('/:id', auth, async ({
 
         // check if the user who intents to delete the appointment either tutee or tutor of the appointment or admin
         // if not, return an error message
-        if (!(tutor.user === req.user.user.id || tutee.user === req.user.user.id || user.type === 'admin')) {
-            res.status(400).json({
+        if (!(tutor.user.id === req.user.user.id || tutee.user.id === req.user.user.id || user.type === 'admin')) {
+            return res.status(400).json({
                 message: "Request denied! You don't have permisson to delete this appointment"
             });
         }
 
+        const appointmentHours = hours(appointment);
         // add appointment hours to tutor's available hours and delete appointment id from appointments
-        tutor = await Tutor.findOneAndUpdate({
-            _id: appointment.tutor
+        await Tutor.findOneAndUpdate({
+            _id: appointment.tutor.id
         }, {
             $addToSet: {
-                availableHours: hours(appointment)
+                availableHours: appointmentHours
             },
             $pull: {
-                appointments: id
+                appointments: req.params.id
             }
-        }).populate('user', ['email']);
+        })
 
         //delete appointment id from appointments
-        tutee = await Tutee.findOneAndUpdate({
-            _id: appointment.tutee
+        await Tutee.findOneAndUpdate({
+            _id: appointment.tutee.id
         }, {
             $pull: {
-                appointments: id
+                appointments: req.params.id
             }
-        }).populate('user', ['email']);
+        });
 
         // delete the appointment itself
         await Appointment.findOneAndDelete({
-            _id: id
+            _id: req.params.id
         });
 
         //notify tutor and tutee by email
@@ -253,30 +328,35 @@ router.delete('/:id', auth, async ({
         const htmloutput = `<p>Your appointment has been cancelled</p>
         <h3>Appointment Details:</h3>
         <ul>
-            <li><strong>Date: </strong>${hours[0].getFullYear() + '-' + hours[0].getMonth() + '-' + hours[0].getDate()}</li>
-            <li><strong>Time: </strong>${hours[0].getHours() + ':00 - ' + hours[hours.length - 1].getHours() + ':00'}</li>
+            <li><strong>Date: </strong>${appointmentHours[0].getFullYear() + '-' + (appointmentHours[0].getMonth() + 1) + '-' + appointmentHours[0].getDate()}</li>
+            <li><strong>Time: </strong>${appointmentHours[0].getHours() + ':00 - ' + (appointmentHours[appointmentHours.length - 1].getHours() + 1) + ':00'}</li>
             <li><strong>Tutor: </strong>${tutor.user.name}</li>
             <li><strong>Tutee: </strong>${tutee.user.name}</li>
             <li><strong>Subject: </strong>${appointment.subject}</li>
             <li><strong>Notes: </strong>${appointment.note}</li>
-            <li><strong>Date created: </strong></li>
+            <li><strong>Date created: </strong><${appointment.date}/li>
         </ul>`;
 
-
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
+        const emailOptions = {
             from: '"Tutormi" <info@tutormiproject.com>', // sender address
             to: `${tutor.user.email}, ${tutee.user.email}`, // list of receivers
             subject: "TUTORMI - APPOINTMENT CANCELLED", // Subject line
             text: "", // plain text body
-            html: htmloutput, // html body
-        });
+            html: htmloutput // html body
+        }
 
-        console.log("Message sent: %s", info.messageId);
+        // send mail with defined transport object
+        await transporter.sendMail(emailOptions, (err, info) => {
+            if (error) {
+                return res.status(400).json({
+                    error: err
+                });
+            }
+        });
 
         //return message
         res.json({
-            message: `Appointment Deleted. Confirmation email sent to ${info.accepted}`,
+            message: `Appointment Cancelled. Confirmation email sent to ${tutor.user.email} and ${tutee.user.email}`,
         });
 
     } catch (err) {
@@ -285,5 +365,6 @@ router.delete('/:id', auth, async ({
     }
 
 });
+
 
 module.exports = router;

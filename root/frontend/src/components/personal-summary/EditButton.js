@@ -78,18 +78,23 @@ function EditButton(props) {
               <Form.Control as="textarea" rows="3" defaultValue={props.user.bio} id="bioInput" />
             </Form.Group>
 
-            <Form.Label>Courses</Form.Label>
-            <div className="myAddInputRow">
-              <Form.Control id="courseInput" type="text" placeholder="Add a course" onChange={() => { }} />
-              <AddBoxIcon fontSize="large" className="editFormAddIcon" onClick={() => {
-                let updatedCourses = courses.slice();
-                updatedCourses.push(document.getElementById("courseInput").value);
-                setCourses(updatedCourses);
-              }} />
-            </div>
-            <div className="removableBoxHolder">
-              {courses.map((course) => <RemovableBox content={course} list={courses} setList={setCourses} />)}
-            </div>
+            {courses !== undefined ?
+              <>
+                <Form.Label>Courses</Form.Label>
+                <div className="myAddInputRow">
+                  <Form.Control id="courseInput" type="text" placeholder="Add a course" onChange={() => { }} />
+                  <AddBoxIcon fontSize="large" className="editFormAddIcon" onClick={() => {
+                    let updatedCourses = courses.slice();
+                    updatedCourses.push(document.getElementById("courseInput").value);
+                    setCourses(updatedCourses);
+                  }} />
+                </div>
+                <div className="removableBoxHolder">
+                  {courses.map((course) => <RemovableBox content={course} list={courses} setList={setCourses} />)}
+                </div>
+              </>
+              : null}
+
             <Form.Label>Languages</Form.Label>
             <div className="myAddInputRow">
               <Form.Control id="languageInput" type="text" placeholder="Add a language" onChange={() => { }} />
@@ -136,7 +141,8 @@ function EditButton(props) {
             Close</Button>
           <Button variant="success" onClick={() => {
             let editInformation = {
-              imgPath: "someImagePath.com", // Change this when image upload is fixed
+              // imgPath: "someImagePath.com", // Change this when image upload is fixed
+              email: props.user.user.email,
               name: document.getElementById("nameInput").value,
               bio: document.getElementById("bioInput").value,
               languages: languages,

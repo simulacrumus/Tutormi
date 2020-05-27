@@ -5,6 +5,8 @@ import moment from "moment";
 
 // Converts available hours to the format used with booked appointments
 export function convertSingleHoursToTimeSlots(availableHours) {
+  if (availableHours === undefined)
+    return []
   return availableHours.map((timeHour) => {
     let start = moment(timeHour);
     let end = start.clone().add(1, "hour");
@@ -17,10 +19,10 @@ export function convertSingleHoursToTimeSlots(availableHours) {
   });
 }
 
-// Converts available hours to the format used with booked appointments
+
 export function convertTimeSlotToSingleHours(timeSlot) {
   let hours = [];
-  let start = timeSlot.time.start.time();
+  let start = timeSlot.time.start;
   for (
     let i = 0, hour = timeSlot.time.start.hours();
     hour < timeSlot.time.end.hours();
@@ -58,12 +60,12 @@ export function removeSlotConflict(tutorAvailableHours, tuteeAppointments) {
     for (let j = 0; j < tutorAvailableHours.length; j++) {
       // Check if the two slots fall on the same exact date
       if (
-        tuteeAppointments[i].time.start.getFullYear() ===
-        tutorAvailableHours[j].time.start.getFullYear() &&
-        tuteeAppointments[i].time.start.getMonth() ===
-        tutorAvailableHours[j].time.start.getMonth() &&
-        tuteeAppointments[i].time.start.getDate() ===
-        tutorAvailableHours[j].time.start.getDate()
+        tuteeAppointments[i].time.start.years() ===
+        tutorAvailableHours[j].time.start.years() &&
+        tuteeAppointments[i].time.start.months() ===
+        tutorAvailableHours[j].time.start.months() &&
+        tuteeAppointments[i].time.start.date() ===
+        tutorAvailableHours[j].time.start.date()
       ) {
         if (
           checkIfAppointmentsConflict(
@@ -83,16 +85,12 @@ export function removeSlotConflict(tutorAvailableHours, tuteeAppointments) {
 // Since in local storage dates are converted to strings we need to convert all the strings back to dates while maintaining the other data
 export function convertDateStringsToDates(dateStrings) {
   let dates = [];
-  for (
-    let i = 0;
-    typeof dateStrings !== "undefined" && i < dateStrings.length;
-    i++
-  ) {
+  for (let i = 0; typeof dateStrings !== "undefined" && i < dateStrings.length; i++) {
     dates[i] = {
       ...dateStrings[i],
       time: {
-        start: dateStrings[i].time.start,
-        end: dateStrings[i].time.end,
+        start: moment(dateStrings[i].time.start),
+        end: moment(dateStrings[i].time.end),
       },
     };
   }
@@ -128,7 +126,6 @@ export function combineSingleSlots(openHours) {
   for (let i = 0; i < openHours.length - 1; i++) {
 
     if (openHours[i].time.start.hours() === 23) {
-      console.log("edge");
       // if (fallsOnSameDay(openHours[i].time.start, openHours[i + 1].time.start)
       //   && openHours[i + 1].time.end.days() === (openHours[i].time.start.days() + 1)) {
       //   console.log("Edge point");
