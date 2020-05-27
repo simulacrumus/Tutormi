@@ -6,7 +6,7 @@ import { Component } from "react";
 import { connect } from "react-redux";
 //import Modal from 'react'
 import CustomButton from "./CustomButton.js";
-import * as actions from "../../store/user/userActions";
+import { logInUser } from "../../store/user/userActions";
 import login from "./Signin";
 import "./Login.css";
 
@@ -76,11 +76,10 @@ class Login extends Component {
       this.state.password
     ) {
       console.info("Valid Form");
-      this.props.onAuth(this.state.email.value, this.state.password.value)
+      logInUser(this.state.email, this.state.password);
     } else {
       console.error("Invalid Form");
     }
-    
   }
 
   render() {
@@ -169,9 +168,4 @@ class Login extends Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onAuth: (email, password) => dispatch(actions.logInUser(email, password))
-  };
-};
-export default connect(null, mapDispatchToProps)(Login);
+export default Login;

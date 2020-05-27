@@ -1,4 +1,4 @@
-import { store } from '../configureStore';
+import { store } from "../configureStore";
 
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
@@ -20,10 +20,10 @@ export function clearList() {
 }
 
 export async function updateUser(updateInfo) {
-    await store.dispatch({
-        type: USER_INFO_UPDATED,
-        payload: updateInfo
-    });
+  await store.dispatch({
+    type: USER_INFO_UPDATED,
+    payload: updateInfo,
+  });
 
     fetch("/api/tutors", {
         method: "POST",
@@ -51,11 +51,12 @@ export function removeTemporaryBookingHour(temporaryHour) {
 }
 
 export function openAvailabilityHour(availabilityDate) {
-    store.dispatch({
-        type: AVAILABILITY_OPENED,
-        payload: availabilityDate
-    });
+  store.dispatch({
+    type: AVAILABILITY_OPENED,
+    payload: availabilityDate,
+  });
 }
+
 
 export function bookAppointment(appointment) {
     store.dispatch({
@@ -64,27 +65,32 @@ export function bookAppointment(appointment) {
     });
 }
 
-export async function logInUser(email, password) { // Give this function a username and password paramter later
-    fetch("/api/auth", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: email,
-            password: password
-        })
+export async function logInUser(email, password) {
+  // Give this function a username and password paramter later
+  fetch("/api/auth", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  })
+    .then((response) => {
+      console.log(response);
+      return response.json();
     })
-        .then(response => response.json())
-        .then(responseToken => {
-            store.dispatch({ type: TOKEN_ACQUIRED, payload: responseToken.token })
-            fetch("/api/tutors/me", {
-                method: "GET",
-                headers: { "x-auth-token": responseToken.token },
-            })
-                .then(response => response.json())
-                .then(user => {
-                    store.dispatch({ type: USER_LOGGED_IN, payload: user })
-                });
-        });
+    .then((responseToken) => {
+      console.log(responseToken);
+      store.dispatch({ type: TOKEN_ACQUIRED, payload: responseToken.token });
+      //   fetch("/api/tutors/me", {
+      //     method: "GET",
+      //     headers: { "x-auth-token": responseToken.token },
+      //   })
+      //     .then((response) => response.json())
+      //     .then((user) => {
+      //       store.dispatch({ type: USER_LOGGED_IN, payload: user });
+      //     });
+    });
 }
