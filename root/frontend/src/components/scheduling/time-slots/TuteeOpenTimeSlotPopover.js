@@ -45,7 +45,6 @@ export default class TuteeOpenTimeSlotPopover extends Component {
                 },
                 subject: document.getElementById("coursesSelect").value,
                 note: document.getElementById("notesInput").value,
-                //date: new Date(),
               }
               bookAppointment(newAppointment);
               updateViewedTutorSchedule(newAppointment);

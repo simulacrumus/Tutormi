@@ -6,17 +6,14 @@ import { connect } from "react-redux";
 import FavoriteTutorsView from "../components/favorite-tutors/FavoriteTutorsView.js";
 import ScheduleMetrics from "../components/scheduling/ScheduleMetrics.js";
 
-class TutorDashboardPage extends Component {
+export default class TutorDashboardPage extends Component {
   render() {
     return (
       <div>
         <ProfileNavBar />
         <div className="tutorDashboardContainer">
           <div className="tutorInnerDashboardContainer">
-            <WeeklySchedule
-              appointments={this.props.user.appointments}
-              tutorHours={this.props.user.availableHours}
-            />
+            <WeeklySchedule />
           </div>
           <div className="tutorInnerDashboardContainer">
             <ScheduleMetrics />
@@ -26,11 +23,3 @@ class TutorDashboardPage extends Component {
     );
   }
 }
-
-function mapStateToProps(state) {
-  return {
-    user: state.userReducer.user,
-  };
-}
-
-export default connect(mapStateToProps)(TutorDashboardPage);

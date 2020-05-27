@@ -5,7 +5,7 @@ import viewedTutorReducer from "./viewed-tutor/viewedTutorReducer";
 
 // All reducers must be listed here so that they can be combined and associated with the store
 export default combineReducers({
-  userReducer: userReducer,
-  viewedTutorReducer: viewedTutorReducer,
+  user: userReducer,
+  viewedTutor: viewedTutorReducer,
   tutorSearchList: tutorSearchListReducer,
 });

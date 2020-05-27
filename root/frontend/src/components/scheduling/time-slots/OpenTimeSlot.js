@@ -43,9 +43,9 @@ class OpenTimeSlot extends Component {
 
 function mapStateToProps(state) {
   return {
-    type: state.userReducer.user.user.type,
-    tuteeId: state.userReducer.user._id,
-    viewedTutor: state.viewedTutorReducer.viewedTutor
+    type: state.user.user.user.type,
+    tuteeId: state.user.user._id,
+    viewedTutor: state.viewedTutor.viewedTutor
   };
 }
 

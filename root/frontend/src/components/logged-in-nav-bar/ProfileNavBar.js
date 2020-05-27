@@ -32,9 +32,9 @@ class ProfileNavBar extends Component {
 
 function mapStateToProps(state) {
   return {
-    name: state.userReducer.user.user.name,
-    imgPath: state.userReducer.user.imgPath,
-    type: state.userReducer.user.user.type,
+    name: state.user.user.user.name,
+    imgPath: state.user.user.imgPath,
+    type: state.user.user.user.type,
   };
 }
 

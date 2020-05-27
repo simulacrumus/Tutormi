@@ -20,8 +20,8 @@ class ProfilePage extends Component {
 
 function mapStateToProps(state) {
   return {
-    user: state.userReducer.user,
-    viewedTutor: state.viewedTutorReducer,
+    user: state.user.user,
+    viewedTutor: state.viewedTutor,
   };
 }
 

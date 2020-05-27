@@ -7,7 +7,7 @@ import TutorOpenableTimeSlot from "./time-slots/TutorOpenableTimeSlot";
 import moment from "moment";
 import { connect } from "react-redux";
 import {
-  convertSingleHoursToTimeSlots, findTimeSlot, removeSlotConflict, convertDateStringsToDates, checkIfAppointmentsConflict,
+  convertSingleHoursToTimeSlots, removeSlotConflict, convertDateStringsToDates,
   combineSingleSlots, displayHour12Format, fallsOnSameDay
 } from "../../util/scheduleFunctions.js";
 import ArrowBackIosOutlinedIcon from "@material-ui/icons/ArrowBackIosOutlined";
@@ -19,6 +19,7 @@ import { createMuiTheme } from "@material-ui/core";
 import purple from "@material-ui/core/colors/purple";
 import Button from "react-bootstrap/Button";
 import Slider from '@material-ui/core/Slider';
+import { isTutee, isViewedTutorSet } from "../../util/authenticationFunctions";
 
 const customTheme = createMuiTheme({ palette: { primary: purple } });
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -120,14 +121,15 @@ class WeeklySchedule extends Component {
 
   fillRows() {
     let appointments = convertDateStringsToDates(this.props.user.appointments); // User's appointments (can be tutee or tutor)
-
-    let availableHours = this.props.user.user.type === "tutor" ? convertSingleHoursToTimeSlots(this.props.user.availableHours) :
-      convertSingleHoursToTimeSlots(this.props.viewedTutor.availableHours);
+    let availableHours = []; // The available hours of a tutor (either the user or a viewed tutor)
+    if (!isTutee())  // User is a tutor
+      availableHours = this.props.user.availableHours;
+    else if (isViewedTutorSet()) // If the tutee user is viewing a tutor show the viewed tutors available hours
+      availableHours = this.props.viewedTutor.availableHours;
 
     // userAvailableHours = convertDateStringsToDates(userAvailableHours); // Don't know if I need this anymore
-    if (availableHours === undefined)
-      availableHours = [];
 
+    availableHours = convertSingleHoursToTimeSlots(availableHours);
     combineSingleSlots(availableHours);
 
     removeSlotConflict(availableHours, appointments); // This will remove any tutor open hours that cant be booked because of pre-existing conflicts
@@ -147,14 +149,11 @@ class WeeklySchedule extends Component {
           if (hour === availableHourSlot.time.start.hours() || hour === this.state.hourRange[0])
             row[day] = <OpenTimeSlot timeSlot={availableHourSlot} displayRange={this.state.hourRange} />;
 
-        } else {
-          if (this.state.weekStart.clone().add(day, "day").isBefore(moment())) { // The past is highlighted
+        } else { // No available hours or appointments to display for this hour
+          if (this.state.weekStart.clone().add(day, "day").isBefore(moment()))  // The past is highlighted visually and cannot be interacted with
             row[day] = <td className="pastSlot"></td>;
-          } else {  // Tutor's can interact with empty cells and open them, tutees cannot
-            row[day] = this.props.user.user.type === "tutor" ?
-              <TutorOpenableTimeSlot date={this.state.weekStart.clone().add(day, "days").add(hour, "hours")} />
-              : <td></td>;
-          }
+          else  // Tutor's can interact with empty cells and open them, tutees cannot
+            row[day] = isTutee() ? <td></td> : <TutorOpenableTimeSlot date={this.state.weekStart.clone().add(day, "days").add(hour, "hours")} />;
         }
       }
 
@@ -186,10 +185,9 @@ class WeeklySchedule extends Component {
 
 function mapStateToProps(state) {
   return {
-    user: state.userReducer.user,
-    viewedTutor: state.viewedTutorReducer.viewedTutor,
-    token: state.userReducer.token,
-    tempBooking: state.userReducer.tempBooking
+    user: state.user.user,
+    viewedTutor: state.viewedTutor.viewedTutor,
+    token: state.user.token,
   };
 }
 

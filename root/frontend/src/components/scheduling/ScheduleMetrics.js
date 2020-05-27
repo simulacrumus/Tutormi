@@ -99,8 +99,8 @@ class ScheduleMetrics extends Component {
 
 function mapStateToProps(state) {
   return {
-    appointments: state.userReducer.user.appointments,
-    availableHours: state.userReducer.user.availableHours,
+    appointments: state.user.user.appointments,
+    availableHours: state.user.user.availableHours,
   };
 }
 

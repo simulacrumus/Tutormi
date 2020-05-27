@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import "./PersonalSummary.css";
 import { SocialIcon } from "react-social-icons";
 import EditButton from "./EditButton.js";
