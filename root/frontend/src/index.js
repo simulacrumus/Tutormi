@@ -7,7 +7,7 @@ import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 import "bootstrap/dist/css/bootstrap.css"; // Bootstrap styles
 import { BrowserRouter } from "react-router-dom";
-import Router from "./Router";
+import Router from "./router";
 
 ReactDOM.render(
   <Provider store={store}>

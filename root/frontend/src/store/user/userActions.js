@@ -1,4 +1,6 @@
 import { store } from "../configureStore";
+import { cancelViewedTutorAppointment } from "../viewed-tutor/viewedTutorActions";
+import { isViewedTutorSet } from "../../util/authenticationFunctions";
 
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
@@ -12,6 +14,16 @@ export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
 
 export function logout() {
     store.dispatch({ type: USER_LOGGED_OUT });
+}
+
+export function cancelAppointment(appointment) {
+    store.dispatch({
+        type: APPOINTMENT_CANCELED,
+        payload: appointment
+    });
+
+    if (isViewedTutorSet()) // Clear the viewed tutor appointment to keep page responsive
+        cancelViewedTutorAppointment(appointment)
 }
 
 export async function updateUser(updateInfo) {
@@ -67,6 +79,7 @@ export async function logInUser(email, password) {
     });
 
     const user = await userResponse.json();
+    user.user.type = "tutor";
 
     // Can check if user was returned and everything is ok here
 

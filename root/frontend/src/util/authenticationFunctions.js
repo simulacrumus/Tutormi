@@ -1,7 +1,7 @@
 import { store } from "../store/configureStore";
 
-export const isLoggedIn = () => store.getState().userReducer.isLoggedIn;
+export const isLoggedIn = () => store.getState().user.isLoggedIn;
 
-export const isTutee = () => store.getState().userReducer.user.user.type === "tutee";
+export const isTutee = () => store.getState().user.user.user.type === "tutee";
 
-export const isViewedTutorSet = () => store.getState().viewedTutorReducer.viewedTutor !== null;
+export const isViewedTutorSet = () => store.getState().viewedTutor.viewedTutor !== null;

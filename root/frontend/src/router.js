@@ -1,12 +1,10 @@
 import React, { Component } from "react";
-import "./index.css";
 import ProfilePage from "./pages/ProfilePage.js";
-import DashboardPage from "./pages/DashboardPage.js";
-import TutorViewPage from "./pages/TutorViewPage.js";
+import TuteeDashboardPage from "./pages/TuteeDashboardPage";
+import ViewTutorPage from "./pages/ViewTutorPage";
 import { Route, Switch, Redirect } from "react-router-dom";
 import SearchMain from "./components/SearchMain";
 import TutorDashboardPage from "./pages/TutorDashboardPage.js";
-import { connect } from "react-redux";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
 import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunctions";
@@ -31,7 +29,7 @@ export default class Router extends Component {
               if (!isLoggedIn())
                 return <Redirect to="/login" />;
               else
-                return isTutee() ? <DashboardPage /> : <TutorDashboardPage />;
+                return isTutee() ? <TuteeDashboardPage /> : <TutorDashboardPage />;
 
             }} />
 
@@ -40,7 +38,7 @@ export default class Router extends Component {
               if (!isLoggedIn())
                 return <Redirect to="/login" />;
               else
-                return isViewedTutorSet() ? <TutorViewPage /> : <Redirect to="/profile" />;
+                return isViewedTutorSet() ? <ViewTutorPage /> : <Redirect to="/profile" />;
 
             }} />/>
 

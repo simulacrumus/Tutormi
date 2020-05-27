@@ -22,6 +22,13 @@ export function clearViewedTutor() {
     store.dispatch({ type: VIEWED_TUTOR_CLEARED })
 }
 
+export function cancelViewedTutorAppointment(appointment) {
+    store.dispatch({
+        type: VIEWED_TUTOR_APPOINTMENT_CANCELED,
+        payload: appointment
+    });
+}
+
 export function updateViewedTutorSchedule(appointment) {
     store.dispatch({
         type: VIEWED_TUTOR_AVAILABILITY_UPDATED,

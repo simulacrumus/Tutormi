@@ -50,7 +50,7 @@ class FavoriteTutorsView extends Component {
 
 function mapStateToProps(state) {
   return {
-    favoriteTutors: state.userReducer.user.favoriteTutors,
+    favoriteTutors: state.user.user.favoriteTutors,
   };
 }
 

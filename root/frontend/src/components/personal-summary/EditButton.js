@@ -168,8 +168,8 @@ function EditButton(props) {
 
 function mapStateToProps(state) {
   return {
-    user: state.userReducer.user,
-    token: state.userReducer.token
+    user: state.user.user,
+    token: state.user.token
 
   };
 }
