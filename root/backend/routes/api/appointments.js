@@ -36,8 +36,6 @@ router.post('/', [auth, [
         subject,
         tutorid,
         tuteeid,
-        tutorName,
-        tuteeName,
         note
     } = req.body;
 
@@ -88,12 +86,12 @@ router.post('/', [auth, [
 
         const tutor = {
             id: tutorid,
-            name: tutorName
+            name: tutor1.user.name
         }
 
         const tutee = {
             id: tuteeid,
-            name: tuteeName
+            name: tutee1.user.name
         }
 
         const newAppointment = {
@@ -101,8 +99,7 @@ router.post('/', [auth, [
             tutor,
             subject,
             time,
-            note,
-            date: Date.now
+            note
         };
 
         let appointmentHours = new Array();
@@ -334,7 +331,7 @@ router.delete('/:id', auth, async (req, res) => {
             <li><strong>Tutee: </strong>${tutee.user.name}</li>
             <li><strong>Subject: </strong>${appointment.subject}</li>
             <li><strong>Notes: </strong>${appointment.note}</li>
-            <li><strong>Date created: </strong><${appointment.date}/li>
+            <li><strong>Time of cancellation: </strong>${appointment.date}</li>
         </ul>`;
 
         const emailOptions = {

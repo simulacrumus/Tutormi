@@ -21,8 +21,10 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-            user: req.user.user.id
-        }).populate('user', ['name', 'email', 'date', 'type']);
+                user: req.user.user.id
+            })
+            .populate('user', ['name', 'email', 'date', 'type'])
+            .populate('appointments');
 
         if (!tutor) {
             return res.status(400).json({
@@ -102,7 +104,9 @@ router.post(
 // @access   Public
 router.get('/', async (req, res) => {
     try {
-        const tutors = await Tutor.find().populate('user', ['name', 'email', 'type']);
+        const tutors = await Tutor.find()
+            .populate('user', ['name', 'email', 'type'])
+            .populate('appointment');;
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -120,8 +124,10 @@ router.get('/user/:id', async ({
 }, res) => {
     try {
         const tutor = await Tutor.findOne({
-            _id: id
-        }).populate('user', ['name', 'email', 'type']).populate('appointments');
+                _id: id
+            })
+            .populate('user', ['name', 'email', 'type'])
+            .populate('appointments');
 
         if (!tutor)
             return res.status(400).json({
@@ -222,11 +228,11 @@ router.post('/search', auth, async (req, res) => {
                             $in: usersIDs
                         }
                     },
-                    {
-                        bio: {
-                            $regex: key
-                        }
-                    },
+                    // {
+                    //     bio: {
+                    //         $regex: key
+                    //     }
+                    // },
                     {
                         location: {
                             $regex: key

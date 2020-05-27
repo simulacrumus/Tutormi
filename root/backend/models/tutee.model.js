@@ -13,22 +13,22 @@ const TuteeSchema = new mongoose.Schema({
     type: String,
     max: 25
   },
-  following: {
-    type: [mongoose.Schema.Types.ObjectId],
+  following: [{
+    type: mongoose.Schema.Types.ObjectId,
     ref: "user"
-  },
-  blockedUsers: {
-    type: [mongoose.Schema.Types.ObjectId],
+  }],
+  blockedUsers: [{
+    type: mongoose.Schema.Types.ObjectId,
     ref: "user"
-  },
-  blockedBy: {
-    type: [mongoose.Schema.Types.ObjectId],
+  }],
+  blockedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
     ref: "user"
-  },
-  appointments: {
-    type: [mongoose.Schema.Types.ObjectId],
+  }],
+  appointments: [{
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'appointment'
-  },
+  }],
   languages: {
     type: [String],
     max: 20
@@ -54,6 +54,20 @@ const TuteeSchema = new mongoose.Schema({
     },
     instagram: {
       type: String
+    }
+  },
+  bookingRange: {
+    minimum: {
+      type: Number,
+      min: 0,
+      max: 22,
+      default: 8
+    },
+    maximum: {
+      type: Number,
+      min: 1,
+      max: 23,
+      default: 20
     }
   },
   date: {
