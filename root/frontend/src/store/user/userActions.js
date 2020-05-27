@@ -1,4 +1,4 @@
-import { store } from '../configureStore';
+import { store } from "../configureStore";
 
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
@@ -11,64 +11,71 @@ export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
 
 export async function updateUser(updateInfo) {
-    await store.dispatch({
-        type: USER_INFO_UPDATED,
-        payload: updateInfo
-    });
+  await store.dispatch({
+    type: USER_INFO_UPDATED,
+    payload: updateInfo,
+  });
 
-    fetch("/api/tutors", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-auth-token": store.getState().userReducer.token
-        },
-        body: JSON.stringify(store.getState().userReducer.user)
-    }).then((response) => response.json()).then((updatedUser) => console.log(updatedUser));
+  fetch("/api/tutors", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": store.getState().userReducer.token,
+    },
+    body: JSON.stringify(store.getState().userReducer.user),
+  })
+    .then((response) => response.json())
+    .then((updatedUser) => console.log(updatedUser));
 }
 
 export function openAvailabilityHour(availabilityDate) {
-    store.dispatch({
-        type: AVAILABILITY_OPENED,
-        payload: availabilityDate
-    });
+  store.dispatch({
+    type: AVAILABILITY_OPENED,
+    payload: availabilityDate,
+  });
 }
 
 export function bookAppointment(tutorId, time, subject, note) {
-    store.dispatch({
-        type: APPOINTMENT_BOOKED,
-        payload: {
-            tutorID: tutorId,
-            time: {
-                start: time.start,
-                end: time.end
-            },
-            subject: subject,
-            note: note
-        }
-    });
+  store.dispatch({
+    type: APPOINTMENT_BOOKED,
+    payload: {
+      tutorID: tutorId,
+      time: {
+        start: time.start,
+        end: time.end,
+      },
+      subject: subject,
+      note: note,
+    },
+  });
 }
 
-export async function logInUser(email, password) { // Give this function a username and password paramter later
-    fetch("/api/auth", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: email,
-            password: password
-        })
+export async function logInUser(email, password) {
+  // Give this function a username and password paramter later
+  fetch("/api/auth", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  })
+    .then((response) => {
+      console.log(response);
+      return response.json();
     })
-        .then(response => response.json())
-        .then(responseToken => {
-            store.dispatch({ type: TOKEN_ACQUIRED, payload: responseToken.token })
-            fetch("/api/tutors/me", {
-                method: "GET",
-                headers: { "x-auth-token": responseToken.token },
-            })
-                .then(response => response.json())
-                .then(user => {
-                    store.dispatch({ type: USER_LOGGED_IN, payload: user })
-                });
-        });
+    .then((responseToken) => {
+      console.log(responseToken);
+      store.dispatch({ type: TOKEN_ACQUIRED, payload: responseToken.token });
+      //   fetch("/api/tutors/me", {
+      //     method: "GET",
+      //     headers: { "x-auth-token": responseToken.token },
+      //   })
+      //     .then((response) => response.json())
+      //     .then((user) => {
+      //       store.dispatch({ type: USER_LOGGED_IN, payload: user });
+      //     });
+    });
 }
