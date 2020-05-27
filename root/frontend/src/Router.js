@@ -9,11 +9,9 @@ import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import { connect } from "react-redux";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
+import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunctions";
 
-class Router extends Component {
-
-  isTutee = () => this.props.user.user.type === "tutee";
-  isAuthenticated = () => this.props.token !== null && this.props.token !== undefined;
+export default class Router extends Component {
 
   render() {
     return (
@@ -25,27 +23,34 @@ class Router extends Component {
 
           <Route path="/profile" exact
             render={() => {
-              return this.isAuthenticated() ? <ProfilePage /> : <Redirect to="/login" />;
+              return isLoggedIn() ? <ProfilePage /> : <Redirect to="/login" />;
             }} />
 
           <Route path="/dashboard" exact
             render={() => {
-              if (!this.isAuthenticated())
+              if (!isLoggedIn())
                 return <Redirect to="/login" />;
               else
-                return this.isTutee() ? <DashboardPage /> : <TutorDashboardPage />;
+                return isTutee() ? <DashboardPage /> : <TutorDashboardPage />;
 
             }} />
 
-          <Route path="/viewTutor" exact component={TutorViewPage} />
+          <Route path="/viewTutor" exact
+            render={() => {
+              if (!isLoggedIn())
+                return <Redirect to="/login" />;
+              else
+                return isViewedTutorSet() ? <TutorViewPage /> : <Redirect to="/profile" />;
+
+            }} />/>
 
           <Route
             path="/search"
             render={() => {
-              if (!this.isAuthenticated())
+              if (!isLoggedIn())
                 return <Redirect to="/login" />;
               else
-                return this.isTutee() ? <SearchMain /> : <Redirect to="/profile" />;
+                return isTutee() ? <SearchMain /> : <Redirect to="/profile" />;
 
             }} />
 
@@ -56,12 +61,3 @@ class Router extends Component {
     );
   }
 }
-
-function mapStateToProps(state) {
-  return {
-    user: state.userReducer.user,
-    token: state.userReducer.token
-  };
-}
-
-export default connect(mapStateToProps)(Router);

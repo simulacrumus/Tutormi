@@ -50,18 +50,17 @@ function EditButton(props) {
                 (e) => {
                   e.preventDefault();
                   let imageFile = document.getElementById("imageFileUpload").files[0];
-                  console.log("image", imageFile);
                   let formData = new FormData();
                   formData.append("image", imageFile);
-                  console.log("formData", formData);
 
                   fetch("/api/tutors/profile-pic", {
                     method: 'POST',
                     headers: { "x-auth-token": props.token },
                     body: formData,
-                  }).then(response => {
-                    console.log(response)
-                  });
+                  }).then(response => { console.log('response', response.text); return response.json() })
+                    .then(responseJson => {
+                      console.log(responseJson)
+                    });
 
                 }}>Save</button>
               <img id="myPreview"></img>
