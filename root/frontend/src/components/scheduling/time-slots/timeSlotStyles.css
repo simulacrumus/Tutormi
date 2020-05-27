@@ -77,3 +77,21 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+.availableHourCell {
+    color: #eaeaea;
+    background-color: #4db6ac;
+}
+
+.availableHourCell:hover {
+    background-color: #409c93;
+}
+
+.temporaryAppointmentHour {
+    color: #f4f4f4;
+    background-color: #c1d579;
+}
+
+.temporaryAppointmentHour:hover {
+    background-color: #adbf6c;
+}

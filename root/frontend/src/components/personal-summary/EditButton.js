@@ -78,18 +78,23 @@ function EditButton(props) {
               <Form.Control as="textarea" rows="3" defaultValue={props.user.bio} id="bioInput" />
             </Form.Group>
 
-            <Form.Label>Courses</Form.Label>
-            <div className="myAddInputRow">
-              <Form.Control id="courseInput" type="text" placeholder="Add a course" onChange={() => { }} />
-              <AddBoxIcon fontSize="large" className="editFormAddIcon" onClick={() => {
-                let updatedCourses = courses.slice();
-                updatedCourses.push(document.getElementById("courseInput").value);
-                setCourses(updatedCourses);
-              }} />
-            </div>
-            <div className="removableBoxHolder">
-              {courses.map((course) => <RemovableBox content={course} list={courses} setList={setCourses} />)}
-            </div>
+            {courses !== undefined ?
+              <>
+                <Form.Label>Courses</Form.Label>
+                <div className="myAddInputRow">
+                  <Form.Control id="courseInput" type="text" placeholder="Add a course" onChange={() => { }} />
+                  <AddBoxIcon fontSize="large" className="editFormAddIcon" onClick={() => {
+                    let updatedCourses = courses.slice();
+                    updatedCourses.push(document.getElementById("courseInput").value);
+                    setCourses(updatedCourses);
+                  }} />
+                </div>
+                <div className="removableBoxHolder">
+                  {courses.map((course) => <RemovableBox content={course} list={courses} setList={setCourses} />)}
+                </div>
+              </>
+              : null}
+
             <Form.Label>Languages</Form.Label>
             <div className="myAddInputRow">
               <Form.Control id="languageInput" type="text" placeholder="Add a language" onChange={() => { }} />

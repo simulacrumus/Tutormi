@@ -1,67 +1,41 @@
 import React, { Component } from "react";
-import Popover from "react-bootstrap/Popover";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import { store } from "../../../store/configureStore.js";
-import { APPOINTMENT_CANCELED } from "../../../store/user/userActions";
 import { displayHour12Format } from "../../../util/scheduleFunctions";
+import BookedTimeSlotPopover from "./BookedTimeSlotPopover";
 
 export default class BookedTimeSlot extends Component {
 
   render() {
     return (
-      <OverlayTrigger trigger="click" placement="bottom" overlay={this.popover}>
+      <OverlayTrigger trigger="click" placement="auto" overlay={<BookedTimeSlotPopover appointment={this.props.appointment} />}>
         <td
           rowSpan={
-            parseInt(this.props.end.hours()) -
-            parseInt(this.props.start.hours())
+            parseInt(this.props.appointment.time.end.hours()) === 0 ? 24 -
+              this.lowerBounds() :
+              parseInt(this.props.appointment.time.end.hours()) -
+              this.lowerBounds()
           }
           className="booked"
         >
-          {displayHour12Format(this.props.start.hours()) + "-" + displayHour12Format(this.props.end.hours())}
-          PM
+          {displayHour12Format(this.props.appointment.time.start.hours()) +
+            "-" +
+            displayHour12Format(this.props.appointment.time.end.hours())}
+          <br />
+          <i>{this.isPartlyHidden() ? "(Partly Hidden)" : ""}</i>
         </td>
       </OverlayTrigger>
     );
   }
 
-  popover = (
-    <Popover id="popover-basic">
-      <Popover.Title>
-        <div className="popoverTitleContainer">
-          <div>
-            <img
-              className="timeIcon"
-              src={require("../../../images/time-icon.png")}
-            ></img>
-            {displayHour12Format(this.props.start.hours()) + "-" + displayHour12Format(this.props.end.hours())}
-          </div>
-          <img
-            className="cancelIcon"
-            src={require("../../../images/cancel-icon.png")}
-            onClick={() => this.cancelAppointment()}
-          ></img>
-        </div>
-      </Popover.Title>
-      <Popover.Content>
-        Tutor: <strong>{this.props.name}</strong>
-        <br />
-        Subject: <strong>{this.props.subject}</strong>
-        <br />
-        Notes: <strong>{this.props.note}</strong>
-      </Popover.Content>
-    </Popover>
-  );
-
-  cancelAppointment() {
-    store.dispatch({
-      type: APPOINTMENT_CANCELED,
-      payload: {
-        tutorID: this.props._id,
-        time: {
-          start: this.props.start,
-          end: this.props.end,
-        },
-      },
-    });
+  lowerBounds() {
+    return parseInt(this.props.displayRange[0]) < parseInt(this.props.appointment.time.start.hours()) ? parseInt(this.props.appointment.time.start.hours()) : parseInt(this.props.displayRange[0]);
   }
+
+  isPartlyHidden() {
+    return this.props.appointment.time.start.hours() < this.props.displayRange[0]
+      || this.props.appointment.time.end.hours() > this.props.displayRange[1] + 1;
+  }
+
 }
+
+
