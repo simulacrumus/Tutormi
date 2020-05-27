@@ -1,23 +1,28 @@
-import initialState from '../../initialState';
 import moment from 'moment';
 import {
-    USER_LOGGED_IN, TOKEN_ACQUIRED, USER_INFO_UPDATED, AVAILABILITY_OPENED,
-    AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED,
-    TUTEE_CHOSE_ONE_APPOINTMENT_HOUR, TEMP_LIST_CLEARED, TEMP_HOUR_REMOVED
+    USER_LOGGED_IN, USER_INFO_UPDATED, AVAILABILITY_OPENED,
+    AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT
 } from './userActions';
 import { fallsOnSameDay } from "../../util/scheduleFunctions"
 
+const initialState = {
+    user: null, // User who is currently logged into the app
+    token: null, // Token used to make API calls
+    isLoggedIn: false // Whether the user is logged in or not
+}
+
 export default function userReducer(state = initialState, action) {
-    let copiedAvailableHours = state.user.availableHours !== undefined
-        ? state.user.availableHours.slice() : undefined;
-    let copiedNewAppointments = state.user.appointments.slice();
+    let copiedAvailableHours;
+    let copiedNewAppointments;
+
+    if (state.user !== null) {
+        copiedAvailableHours = state.user.availableHours !== undefined ? state.user.availableHours.slice() : undefined;
+        copiedNewAppointments = state.user.appointments.slice();
+    }
 
     switch (action.type) {
         case USER_LOGGED_IN:
-            return { ...state, user: action.payload }
-
-        case TOKEN_ACQUIRED:
-            return { ...state, token: action.payload }
+            return { user: action.payload.user, token: action.payload.token, isLoggedIn: true }
 
         case USER_INFO_UPDATED:
             return {
@@ -57,18 +62,8 @@ export default function userReducer(state = initialState, action) {
                 ...state, user: { ...state.user, appointments: deletedAppointments }
             }
 
-        case TUTEE_CHOSE_ONE_APPOINTMENT_HOUR:
-            let newTempList = state.tempBooking.slice();
-            newTempList.push(action.payload);
-            return { ...state, tempBooking: newTempList };
-
-        case TEMP_HOUR_REMOVED:
-            let newTempList2 = state.tempBooking.slice();
-            newTempList2 = newTempList2.filter((timeSlot) => !(moment(timeSlot.time.start).isSame(moment(action.payload.time.start))));
-            return { ...state, tempBooking: newTempList2 };
-
-        case TEMP_LIST_CLEARED:
-            return { ...state, tempBooking: [] };
+        case USER_LOGGED_OUT:
+            return initialState;
 
         default:
             return state;

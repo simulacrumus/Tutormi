@@ -3,7 +3,6 @@ import "./WeeklySchedule.css";
 import "./time-slots/timeSlotStyles.css";
 import BookedTimeSlot from "./time-slots/BookedTimeSlot";
 import OpenTimeSlot from "./time-slots/OpenTimeSlot";
-import AvailableHourCell from "./time-slots/AvailableHourCell";
 import TutorOpenableTimeSlot from "./time-slots/TutorOpenableTimeSlot";
 import moment from "moment";
 import { connect } from "react-redux";
@@ -20,8 +19,6 @@ import { createMuiTheme } from "@material-ui/core";
 import purple from "@material-ui/core/colors/purple";
 import Button from "react-bootstrap/Button";
 import Slider from '@material-ui/core/Slider';
-import { updateViewedTutorSchedule } from "../../store/viewed-tutor/viewedTutorActions";
-import { bookAppointment, clearList } from "../../store/user/userActions";
 
 const customTheme = createMuiTheme({ palette: { primary: purple } });
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -52,9 +49,7 @@ class WeeklySchedule extends Component {
               <h5>Week starting on {this.state.weekStart.format("MMM DD YYYY")}</h5>
               <ArrowForwardIosOutlinedIcon className="weekChangeIcons"
                 onClick={() => this.setState({ weekStart: this.state.weekStart.clone().add(1, "week").startOf("week"), })} />
-
             </div>
-
 
             <ThemeProvider theme={customTheme}>
               <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -85,39 +80,6 @@ class WeeklySchedule extends Component {
               }}>
               {this.state.isSaving ? "Saving..." : "Save Schedule"}
             </Button>
-
-
-            <Button variant="secondary" size="sm" onClick={() => {
-              let apt = convertDateStringsToDates(this.props.tempBooking);
-              // apt = convertDateStringsToDates(apt);
-              console.log(apt);
-              combineSingleSlots(apt);
-              console.log(apt);
-              var appt;
-              for (appt of apt) {
-                let newAppointment = {
-                  tutor: this.props.viewedTutor._id,
-                  tutee: this.props.tuteeId,
-                  time: {
-                    end: appt.time.end,
-                    start: appt.time.start
-                  },
-                  subject: "j",// document.getElementById("coursesSelect").value,
-                  note: "h",// document.getElementById("notesInput").value,
-                  date: new Date(),
-                }
-                bookAppointment(newAppointment);
-                updateViewedTutorSchedule(newAppointment);
-              }
-              clearList();
-
-
-            }}>
-              Book
-            </Button>
-
-
-
           </div>
           <h6>Display range</h6>
           <ThemeProvider theme={customTheme}>
@@ -162,11 +124,11 @@ class WeeklySchedule extends Component {
     let availableHours = this.props.user.user.type === "tutor" ? convertSingleHoursToTimeSlots(this.props.user.availableHours) :
       convertSingleHoursToTimeSlots(this.props.viewedTutor.availableHours);
 
-    // userAvailableHours = convertDateStringsToDates(userAvailableHours);
-    if (this.props.user.user.type === "tutor")
-      combineSingleSlots(availableHours);
+    // userAvailableHours = convertDateStringsToDates(userAvailableHours); // Don't know if I need this anymore
     if (availableHours === undefined)
       availableHours = [];
+
+    combineSingleSlots(availableHours);
 
     removeSlotConflict(availableHours, appointments); // This will remove any tutor open hours that cant be booked because of pre-existing conflicts
 
@@ -183,9 +145,7 @@ class WeeklySchedule extends Component {
 
         } else if (availableHourSlot !== undefined) {   // Display user available hours (only if user is tutor)
           if (hour === availableHourSlot.time.start.hours() || hour === this.state.hourRange[0])
-            row[day] = this.props.user.user.type === "tutee" ?
-              <OpenTimeSlot timeSlot={availableHourSlot} displayRange={this.state.hourRange} />
-              : <AvailableHourCell timeSlot={availableHourSlot} />;
+            row[day] = <OpenTimeSlot timeSlot={availableHourSlot} displayRange={this.state.hourRange} />;
 
         } else {
           if (this.state.weekStart.clone().add(day, "day").isBefore(moment())) { // The past is highlighted

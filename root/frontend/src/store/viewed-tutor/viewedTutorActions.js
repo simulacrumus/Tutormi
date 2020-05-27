@@ -15,7 +15,11 @@ export async function setViewedTutor(id) {
         .then(viewedTutor => {
             store.dispatch({ type: VIEWED_TUTOR_SET, payload: viewedTutor });
         })
-        .then(() => window.location.href = "/viewTutor");
+        .then(() => window.location.href = "/viewTutor"); // This should not always relocate, fix it later
+}
+
+export function clearViewedTutor() {
+    store.dispatch({ type: VIEWED_TUTOR_CLEARED })
 }
 
 export function updateViewedTutorSchedule(appointment) {

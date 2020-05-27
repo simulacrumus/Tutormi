@@ -5,13 +5,13 @@ import {
 import moment from 'moment';
 import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
 
-export default function viewedTutorReducer(state = { viewedTutor: {} }, action) {
+export default function viewedTutorReducer(state = { viewedTutor: null }, action) {
   switch (action.type) {
     case VIEWED_TUTOR_SET:
       return { ...state, viewedTutor: action.payload };
 
     case VIEWED_TUTOR_CLEARED:
-      return { ...state, viewedTutor: null };
+      return { viewedTutor: null };
 
     case VIEWED_TUTOR_AVAILABILITY_UPDATED:
       let copiedAvailableHours = state.viewedTutor.availableHours.slice();

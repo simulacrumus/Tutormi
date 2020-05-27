@@ -37,7 +37,7 @@ export default class TuteeOpenTimeSlotPopover extends Component {
           <button
             onClick={() => {
               let newAppointment = {
-                tutor: this.props.viewedTutor._id,
+                tutor: this.props.viewedTutor._id, // change name!!!!!
                 tutee: this.props.tuteeId,
                 time: {
                   end: this.props.timeSlot.time.end.set("hours", this.state.end),
@@ -45,7 +45,7 @@ export default class TuteeOpenTimeSlotPopover extends Component {
                 },
                 subject: document.getElementById("coursesSelect").value,
                 note: document.getElementById("notesInput").value,
-                date: new Date(),
+                //date: new Date(),
               }
               bookAppointment(newAppointment);
               updateViewedTutorSchedule(newAppointment);
