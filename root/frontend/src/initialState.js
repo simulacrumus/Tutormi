@@ -1,10 +1,14 @@
 import { store } from './store/configureStore';
 import { USER_LOGGED_IN, TOKEN_ACQUIRED } from './store/user/userActions';
 
-// Tutor
+// Tutors
+// let testPerson = {
+//     email: "msanter7@biblegateway.com",
+//     password: "TTaszczMlSnf"
+// };
 let testPerson = {
-    email: "msanter7@biblegateway.com",
-    password: "TTaszczMlSnf"
+    email: "mrockh@dedecms.com",
+    password: "vZt4Kr"
 };
 
 //Tutee
@@ -31,7 +35,7 @@ fetch("/api/auth", {
         })
             .then(response => response.json())
             .then(user => {
-                user.user.type = "tutee";
+                // user.user.type = "tutee"
                 console.log("Current user:", user);
                 store.dispatch({ type: USER_LOGGED_IN, payload: user })
             });
@@ -45,6 +49,7 @@ const initialState = {
         availableHours: [],
         appointments: []
     },
+    tempBooking: [], // Stores hours while tutor is choosing hours for their appointment
     token: null // Token used to make API calls
 }
 

@@ -13,9 +13,9 @@ export default class PersonalSummary extends Component {
           <h6>{this.props.person.user.email}</h6>
           <p>{this.props.person.bio}</p>
           <p>
-            {this.props.person.user.type === "tutor"
+            {this.props.person.courses !== undefined // Change condition later
               ? "Course(s): " +
-                this.props.person.courses.map((course) => ` ${course} `)
+              this.props.person.courses.map((course) => ` ${course} `)
               : null}
             <br />
             Language(s):

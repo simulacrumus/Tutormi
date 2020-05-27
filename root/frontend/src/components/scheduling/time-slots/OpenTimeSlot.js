@@ -9,9 +9,10 @@ class OpenTimeSlot extends Component {
 
   render() {
     return (
-      <OverlayTrigger trigger="click" placement="auto"
+      <OverlayTrigger trigger="click" placement="auto" id="idk"
         overlay={this.props.type === "tutor" ? <TutorOpenTimeSlotPopover timeSlot={this.props.timeSlot} />
-          : <TuteeOpenTimeSlotPopover timeSlot={this.props.timeSlot} viewedTutor={this.props.viewedTutor} />} >
+          : <TuteeOpenTimeSlotPopover timeSlot={this.props.timeSlot} viewedTutor={this.props.viewedTutor}
+            tuteeId={this.props.tuteeId} />} >
         <td className="open"
           rowSpan={
             parseInt(this.props.timeSlot.time.end.hours()) === 0 ? 24 -
@@ -43,6 +44,7 @@ class OpenTimeSlot extends Component {
 function mapStateToProps(state) {
   return {
     type: state.userReducer.user.user.type,
+    tuteeId: state.userReducer.user._id,
     viewedTutor: state.viewedTutorReducer.viewedTutor
   };
 }

@@ -3,6 +3,7 @@ import "./WeeklySchedule.css";
 import "./time-slots/timeSlotStyles.css";
 import BookedTimeSlot from "./time-slots/BookedTimeSlot";
 import OpenTimeSlot from "./time-slots/OpenTimeSlot";
+import AvailableHourCell from "./time-slots/AvailableHourCell";
 import TutorOpenableTimeSlot from "./time-slots/TutorOpenableTimeSlot";
 import moment from "moment";
 import { connect } from "react-redux";
@@ -19,6 +20,8 @@ import { createMuiTheme } from "@material-ui/core";
 import purple from "@material-ui/core/colors/purple";
 import Button from "react-bootstrap/Button";
 import Slider from '@material-ui/core/Slider';
+import { updateViewedTutorSchedule } from "../../store/viewed-tutor/viewedTutorActions";
+import { bookAppointment, clearList } from "../../store/user/userActions";
 
 const customTheme = createMuiTheme({ palette: { primary: purple } });
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -83,6 +86,38 @@ class WeeklySchedule extends Component {
               {this.state.isSaving ? "Saving..." : "Save Schedule"}
             </Button>
 
+
+            <Button variant="secondary" size="sm" onClick={() => {
+              let apt = convertDateStringsToDates(this.props.tempBooking);
+              // apt = convertDateStringsToDates(apt);
+              console.log(apt);
+              combineSingleSlots(apt);
+              console.log(apt);
+              var appt;
+              for (appt of apt) {
+                let newAppointment = {
+                  tutor: this.props.viewedTutor._id,
+                  tutee: this.props.tuteeId,
+                  time: {
+                    end: appt.time.end,
+                    start: appt.time.start
+                  },
+                  subject: "j",// document.getElementById("coursesSelect").value,
+                  note: "h",// document.getElementById("notesInput").value,
+                  date: new Date(),
+                }
+                bookAppointment(newAppointment);
+                updateViewedTutorSchedule(newAppointment);
+              }
+              clearList();
+
+
+            }}>
+              Book
+            </Button>
+
+
+
           </div>
           <h6>Display range</h6>
           <ThemeProvider theme={customTheme}>
@@ -123,16 +158,17 @@ class WeeklySchedule extends Component {
 
   fillRows() {
     let appointments = convertDateStringsToDates(this.props.user.appointments); // User's appointments (can be tutee or tutor)
+
     let availableHours = this.props.user.user.type === "tutor" ? convertSingleHoursToTimeSlots(this.props.user.availableHours) :
       convertSingleHoursToTimeSlots(this.props.viewedTutor.availableHours);
 
     // userAvailableHours = convertDateStringsToDates(userAvailableHours);
-    if (availableHours !== undefined)
+    if (this.props.user.user.type === "tutor")
       combineSingleSlots(availableHours);
-    else
+    if (availableHours === undefined)
       availableHours = [];
 
-    // removeSlotConflict(viewedTutorAvailableHours, appointments); // This will remove any tutor open hours that cant be booked because of pre-existing conflicts
+    removeSlotConflict(availableHours, appointments); // This will remove any tutor open hours that cant be booked because of pre-existing conflicts
 
     let table = [];
     for (let hour = this.state.hourRange[0]; hour <= this.state.hourRange[1]; hour++) {
@@ -141,25 +177,27 @@ class WeeklySchedule extends Component {
         let appointmentSlot = this.findTimeSlot(day, hour, appointments);
         let availableHourSlot = this.findTimeSlot(day, hour, availableHours);
 
-        if (typeof appointmentSlot !== "undefined") {
-          if (hour === appointmentSlot.time.start.hours())
-            row[day] = (
-              <BookedTimeSlot start={appointmentSlot.time.start} end={appointmentSlot.time.end} name={appointmentSlot.tutorID}
-                subject={appointmentSlot.subject}
-                note={appointmentSlot.note} />
-            );
-        } else if (typeof availableHourSlot !== "undefined") {   // Display user available hours (only if user is tutor)
+        if (appointmentSlot !== undefined) {
+          if (hour === appointmentSlot.time.start.hours() || hour === this.state.hourRange[0])
+            row[day] = <BookedTimeSlot appointment={appointmentSlot} displayRange={this.state.hourRange} />;
+
+        } else if (availableHourSlot !== undefined) {   // Display user available hours (only if user is tutor)
           if (hour === availableHourSlot.time.start.hours() || hour === this.state.hourRange[0])
-            row[day] = <OpenTimeSlot timeSlot={availableHourSlot} displayRange={this.state.hourRange} />;
+            row[day] = this.props.user.user.type === "tutee" ?
+              <OpenTimeSlot timeSlot={availableHourSlot} displayRange={this.state.hourRange} />
+              : <AvailableHourCell timeSlot={availableHourSlot} />;
+
         } else {
           if (this.state.weekStart.clone().add(day, "day").isBefore(moment())) { // The past is highlighted
             row[day] = <td className="pastSlot"></td>;
           } else {  // Tutor's can interact with empty cells and open them, tutees cannot
             row[day] = this.props.user.user.type === "tutor" ?
-              <TutorOpenableTimeSlot date={this.state.weekStart.clone().add(day, "days").add(hour, "hours")} /> : <td></td>;
+              <TutorOpenableTimeSlot date={this.state.weekStart.clone().add(day, "days").add(hour, "hours")} />
+              : <td></td>;
           }
         }
       }
+
       let displayHour = hour !== this.state.hourRange[0] ? displayHour12Format(hour) : "";
       row.unshift(<td className="time"> {`${displayHour}`} </td>);
       table.push(<tr>{row}</tr>);
@@ -191,6 +229,7 @@ function mapStateToProps(state) {
     user: state.userReducer.user,
     viewedTutor: state.viewedTutorReducer.viewedTutor,
     token: state.userReducer.token,
+    tempBooking: state.userReducer.tempBooking
   };
 }
 
