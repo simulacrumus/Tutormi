@@ -13,14 +13,14 @@ const TutorSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
-    appointments: {
-        type: [mongoose.Schema.Types.ObjectId],
+    appointments: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'appointment'
-    },
-    followers: {
-        type: [mongoose.Schema.Types.ObjectId],
+    }],
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
-    },
+    }],
     profilePic: {
         type: String
     },
@@ -45,14 +45,14 @@ const TutorSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
-    blockedUsers: {
-        type: [mongoose.Schema.Types.ObjectId],
+    blockedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
-    },
-    blockedBy: {
-        type: [mongoose.Schema.Types.ObjectId],
+    }],
+    blockedBy: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
-    },
+    }],
     availableHours: {
         type: [Date]
     },
