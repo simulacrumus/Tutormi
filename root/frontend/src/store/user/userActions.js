@@ -13,103 +13,119 @@ export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
 
 export function logout() {
-    store.dispatch({ type: USER_LOGGED_OUT });
+  store.dispatch({ type: USER_LOGGED_OUT });
 }
 
 export function cancelAppointment(appointment) {
-    store.dispatch({
-        type: APPOINTMENT_CANCELED,
-        payload: appointment
-    });
+  store.dispatch({
+    type: APPOINTMENT_CANCELED,
+    payload: appointment,
+  });
 
-    if (isViewedTutorSet()) // Clear the viewed tutor appointment to keep page responsive
-        cancelViewedTutorAppointment(appointment)
+  if (isViewedTutorSet())
+    // Clear the viewed tutor appointment to keep page responsive
+    cancelViewedTutorAppointment(appointment);
 }
 
 export async function updateUser(updateInfo) {
-    await store.dispatch({
-        type: USER_INFO_UPDATED,
-        payload: updateInfo,
-    });
+  await store.dispatch({
+    type: USER_INFO_UPDATED,
+    payload: updateInfo,
+  });
 
-    fetch("/api/tutors", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-auth-token": store.getState().userReducer.token
-        },
-        body: JSON.stringify(updateInfo)
-    }).then((response) => response.json()).then((updatedUser) => console.log(updatedUser));
+  fetch("/api/tutors", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": store.getState().userReducer.token,
+    },
+    body: JSON.stringify(updateInfo),
+  })
+    .then((response) => response.json())
+    .then((updatedUser) => console.log(updatedUser));
 }
 
 export function openAvailabilityHour(availabilityDate) {
-    store.dispatch({
-        type: AVAILABILITY_OPENED,
-        payload: availabilityDate,
-    });
+  store.dispatch({
+    type: AVAILABILITY_OPENED,
+    payload: availabilityDate,
+  });
 }
-
 
 export function bookAppointment(appointment) {
-    store.dispatch({
-        type: APPOINTMENT_BOOKED,
-        payload: appointment
-    });
+  store.dispatch({
+    type: APPOINTMENT_BOOKED,
+    payload: appointment,
+  });
 }
 
-export async function logInUser(email, password) {
+export async function logInUser(email, password, userType) {
+  let authResponse = await fetch("/api/auth", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  });
 
-    let authResponse = await fetch("/api/auth", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            email: email,
-            password: password,
-        }),
-    });
-
-    const responseToken = await authResponse.json();
-    // Can check and deal with the authorization response here
-
+  let user = "";
+  const responseToken = await authResponse.json();
+  // Can check and deal with the authorization response here
+  if (userType === "tutor") {
     let userResponse = await fetch("/api/tutors/me", {
-        method: "GET",
-        headers: { "x-auth-token": responseToken.token },
+      method: "GET",
+      headers: { "x-auth-token": responseToken.token },
     });
 
-    const user = await userResponse.json();
-    user.user.type = "tutor";
-
-    // Can check if user was returned and everything is ok here
-
-    store.dispatch({ // Only update the store if everything was ok
-        type: USER_LOGGED_IN,
-        payload: { user: user, token: responseToken.token }
+    user = await userResponse.json();
+  
+    console.log(user)
+  } 
+  else 
+  
+  {
+    let userResponse = await fetch("/api/tutees/me", {
+      method: "GET",
+      headers: { "x-auth-token": responseToken.token },
     });
 
-    // fetch("/api/auth", {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //         email: email,
-    //         password: password,
-    //     }),
-    // })
-    //     .then((response) => {
-    //         return response.json();
-    //     })
-    //     .then((responseToken) => {
-    //         let token = responseToken;
-    //         fetch("/api/tutors/me", {
-    //             method: "GET",
-    //             headers: { "x-auth-token": responseToken.token },
-    //         })
-    //             .then((response) => response.json())
-    //             .then((user) => {
-    //                 store.dispatch({ type: USER_LOGGED_IN, payload: { user: user, token: token } });
-    //             });
-    //     });
+    user = await userResponse.json();
+    
+    console.log(user)
+  }
+  // Can check if user was returned and everything is ok here
+  user.user.type = userType;
+  store.dispatch({
+    // Only update the store if everything was ok
+    type: USER_LOGGED_IN,
+    payload: { user: user, token: responseToken.token },
+  });
+
+  // fetch("/api/auth", {
+  //     method: "POST",
+  //     headers: {
+  //         "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //         email: email,
+  //         password: password,
+  //     }),
+  // })
+  //     .then((response) => {
+  //         return response.json();
+  //     })
+  //     .then((responseToken) => {
+  //         let token = responseToken;
+  //         fetch("/api/tutors/me", {
+  //             method: "GET",
+  //             headers: { "x-auth-token": responseToken.token },
+  //         })
+  //             .then((response) => response.json())
+  //             .then((user) => {
+  //                 store.dispatch({ type: USER_LOGGED_IN, payload: { user: user, token: token } });
+  //             });
+  //     });
 }
