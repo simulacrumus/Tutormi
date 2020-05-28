@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const imagesPath = require('../../../frontend/src/images/uploads/imagesPath')
 const multer = require('multer');
 const auth = require('../../middleware/auth');
 const {
@@ -106,7 +107,7 @@ router.get('/', async (req, res) => {
     try {
         const tutors = await Tutor.find()
             .populate('user', ['name', 'email', 'type'])
-            .populate('appointment');;
+            .populate('appointments');;
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -195,7 +196,7 @@ router.post('/search', auth, async (req, res) => {
             let startTime = new Date(start);
             let endTime = new Date(end);
             let hours = new Array();
-            while (startTime <= endTime) {
+            while (startTime < endTime) {
                 hours.push(new Date(startTime));
                 startTime.setHours(startTime.getHours() + 1);
             }
@@ -228,11 +229,6 @@ router.post('/search', auth, async (req, res) => {
                             $in: usersIDs
                         }
                     },
-                    // {
-                    //     bio: {
-                    //         $regex: key
-                    //     }
-                    // },
                     {
                         location: {
                             $regex: key
@@ -406,7 +402,7 @@ router.post('/schedule', auth, async (req, res) => {
 // Multer function to upload image
 const upload = multer({
     storage: multer.diskStorage({
-        destination: '../frontend/src/images/uploads/tutors/',
+        destination: '../frontend/src/images/uploads/',
         filename: (req, file, cb) => {
             cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
         }
@@ -440,7 +436,8 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            profilePic: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
+            profilePic: `${imagesPath}/${req.file.filename}`
+            // profilePic: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
         });
 
         const tutor = await Tutor.findOne({
@@ -468,7 +465,7 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            cover: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
+            cover: `${imagesPath}/${req.file.filename}`
         });
 
         const tutor = await Tutor.findOne({
