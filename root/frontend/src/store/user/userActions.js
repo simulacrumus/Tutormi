@@ -73,13 +73,14 @@ export async function logInUser(email, password) {
     const responseToken = await authResponse.json();
     // Can check and deal with the authorization response here
 
-    let userResponse = await fetch("/api/tutors/me", {
+    let userResponse = await fetch("/api/tutees/me", {
         method: "GET",
         headers: { "x-auth-token": responseToken.token },
     });
 
     const user = await userResponse.json();
-    user.user.type = "tutor";
+    console.log(user);
+    user.user.type = "tutee";
 
     // Can check if user was returned and everything is ok here
 
@@ -87,29 +88,4 @@ export async function logInUser(email, password) {
         type: USER_LOGGED_IN,
         payload: { user: user, token: responseToken.token }
     });
-
-    // fetch("/api/auth", {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //         email: email,
-    //         password: password,
-    //     }),
-    // })
-    //     .then((response) => {
-    //         return response.json();
-    //     })
-    //     .then((responseToken) => {
-    //         let token = responseToken;
-    //         fetch("/api/tutors/me", {
-    //             method: "GET",
-    //             headers: { "x-auth-token": responseToken.token },
-    //         })
-    //             .then((response) => response.json())
-    //             .then((user) => {
-    //                 store.dispatch({ type: USER_LOGGED_IN, payload: { user: user, token: token } });
-    //             });
-    //     });
 }

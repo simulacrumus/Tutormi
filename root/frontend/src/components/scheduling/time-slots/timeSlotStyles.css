@@ -77,3 +77,13 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+.savingAppointmentArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.savingAppointmentArea h6 {
+    align-self: start;
+}

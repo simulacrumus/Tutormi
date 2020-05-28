@@ -8,7 +8,8 @@ import { fallsOnSameDay } from "../../util/scheduleFunctions"
 const initialState = {
     user: null, // User who is currently logged into the app
     token: null, // Token used to make API calls
-    isLoggedIn: false // Whether the user is logged in or not
+    isLoggedIn: false, // Whether the user is logged in or not
+    loading: false
 }
 
 export default function userReducer(state = initialState, action) {
