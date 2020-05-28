@@ -132,7 +132,7 @@ router.post('/', [auth, [
             });
         }
 
-        const tutor3 = await Tutor.findOneAndUpdate({
+        await Tutor.findOneAndUpdate({
             _id: tutorid
         }, {
             $pull: {
@@ -143,15 +143,15 @@ router.post('/', [auth, [
             $addToSet: {
                 appointments: appointment._id
             }
-        }).populate('user', 'email name')
+        })
 
-        const tutee2 = await Tutee.findOneAndUpdate({
+        await Tutee.findOneAndUpdate({
             _id: tuteeid
         }, {
             $addToSet: {
                 appointments: appointment._id
             }
-        }).populate('user', 'email name')
+        })
 
         const htmloutput = `<p>You have a new appointment</p>
         <h3>Appointment Details:</h3>
@@ -177,7 +177,7 @@ router.post('/', [auth, [
         console.log("Message sent: %s", info.messageId);
 
 
-        res.json([tutor3, tutee2]);
+        res.json(appointment);
 
     } catch (err) {
         console.error(err.message);
@@ -222,7 +222,7 @@ router.get('/:id', auth, async (req, res) => {
 
 });
 
-// @route   DELETE api/appintments/:id
+// @route   DELETE api/appointments/:id
 // @desc    Delete appointments by ID
 // @access  Public
 router.delete('/:id', auth, async (req, res) => {

@@ -11,7 +11,7 @@ import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunc
 
 export default class Router extends Component {
 
-  render() {
+  render() { 
     return (
       <main>
         <Switch>

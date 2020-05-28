@@ -77,6 +77,20 @@ const TutorSchema = new mongoose.Schema({
         type: String,
         max: 30
     },
+    bookingRange: {
+        minimum: {
+            type: Number,
+            min: 0,
+            max: 22,
+            default: 8
+        },
+        maximum: {
+            type: Number,
+            min: 1,
+            max: 23,
+            default: 20
+        }
+    },
     date: {
         type: Date,
         default: Date.now

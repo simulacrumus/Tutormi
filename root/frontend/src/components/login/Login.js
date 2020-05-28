@@ -18,12 +18,14 @@ const validateForm = (errors) => {
   Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
   return valid;
 };
+const userType = "";
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
       password: "",
+      userType: "",
       errors: {
         email: "",
         password: "",
@@ -76,7 +78,7 @@ class Login extends Component {
       this.state.password
     ) {
       console.info("Valid Form");
-      logInUser(this.state.email, this.state.password);
+      logInUser(this.state.email, this.state.password, this.state.userType);
     } else {
       console.error("Invalid Form");
     }
@@ -129,7 +131,8 @@ class Login extends Component {
             <CustomButton
               name="login"
               onClick={() => {
-                this.type.setState("tutor");
+                this.setState({...this.state, userType: "tutor"});
+                //window.location.href = "/profile";
               }}
             >
               Login as a tutor
@@ -137,7 +140,7 @@ class Login extends Component {
             <CustomButton
               name="login"
               onClick={() => {
-                this.type.setState("tutor");
+                this.setState({...this.state, userType: "tutee"});
               }}
             >
               Login as a tutee
