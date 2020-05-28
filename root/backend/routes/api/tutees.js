@@ -17,7 +17,7 @@ router.get("/me", auth, async (req, res) => {
     const tutee = await
     Tutee.findOne({
       user: req.user.user.id,
-    }).populate('user', ['name', 'email', 'date']);
+    }).populate('user', ['name', 'email', 'date']).populate('appointments');
 
     if (!tutee) {
       return res.status(400).json({
@@ -110,7 +110,7 @@ router.post(
 // @access  Public
 router.get("/", async (req, res) => {
   try {
-    const profiles = await Tutee.find().populate("user", ["name", "email"]);
+    const profiles = await Tutee.find().populate("user", ["name", "email"]).populate('appointments');;
     res.json(profiles);
   } catch (err) {
     console.error(err.message);
@@ -125,7 +125,7 @@ router.get("/user/:id", async (req, res) => {
   try {
     const profile = await Tutee.findOne({
       _id: req.params.id,
-    }).populate("user", ["name", "email"]);
+    }).populate("user", ["name", "email"]).populate('appointments');;
     if (!profile) {
       return res.status(400).json({
         msg: "Tutee not found"
