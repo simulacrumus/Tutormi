@@ -59,73 +59,35 @@ export function bookAppointment(appointment) {
   });
 }
 
-export async function logInUser(email, password, userType) {
-  let authResponse = await fetch("/api/auth", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password,
-    }),
-  });
+export async function logInUser(email, password) {
 
-  let user = "";
-  const responseToken = await authResponse.json();
-  // Can check and deal with the authorization response here
-  if (userType === "tutor") {
-    let userResponse = await fetch("/api/tutors/me", {
-      method: "GET",
-      headers: { "x-auth-token": responseToken.token },
+    let authResponse = await fetch("/api/auth", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password,
+        }),
     });
 
-    user = await userResponse.json();
-  
-    console.log(user)
-  } 
-  else 
-  
-  {
+    const responseToken = await authResponse.json();
+    // Can check and deal with the authorization response here
+
     let userResponse = await fetch("/api/tutees/me", {
-      method: "GET",
-      headers: { "x-auth-token": responseToken.token },
+        method: "GET",
+        headers: { "x-auth-token": responseToken.token },
     });
 
-    user = await userResponse.json();
-    
-    console.log(user)
-  }
-  // Can check if user was returned and everything is ok here
-  user.user.type = userType;
-  store.dispatch({
-    // Only update the store if everything was ok
-    type: USER_LOGGED_IN,
-    payload: { user: user, token: responseToken.token },
-  });
+    const user = await userResponse.json();
+    console.log(user);
+    user.user.type = "tutee";
 
-  // fetch("/api/auth", {
-  //     method: "POST",
-  //     headers: {
-  //         "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //         email: email,
-  //         password: password,
-  //     }),
-  // })
-  //     .then((response) => {
-  //         return response.json();
-  //     })
-  //     .then((responseToken) => {
-  //         let token = responseToken;
-  //         fetch("/api/tutors/me", {
-  //             method: "GET",
-  //             headers: { "x-auth-token": responseToken.token },
-  //         })
-  //             .then((response) => response.json())
-  //             .then((user) => {
-  //                 store.dispatch({ type: USER_LOGGED_IN, payload: { user: user, token: token } });
-  //             });
-  //     });
+    // Can check if user was returned and everything is ok here
+
+    store.dispatch({ // Only update the store if everything was ok
+        type: USER_LOGGED_IN,
+        payload: { user: user, token: responseToken.token }
+    });
 }

@@ -1,41 +1,37 @@
 import React, { Component } from "react";
 import "./WeeklySchedule.css";
-import "./time-slots/timeSlotStyles.css";
-import BookedTimeSlot from "./time-slots/BookedTimeSlot";
-import OpenTimeSlot from "./time-slots/OpenTimeSlot";
-import TutorOpenableTimeSlot from "./time-slots/TutorOpenableTimeSlot";
 import moment from "moment";
 import { connect } from "react-redux";
-import {
-  convertSingleHoursToTimeSlots, removeSlotConflict, convertDateStringsToDates,
-  combineSingleSlots, displayHour12Format, fallsOnSameDay
-} from "../../util/scheduleFunctions.js";
+import { displayHour12Format } from "../../util/scheduleFunctions.js";
 import ArrowBackIosOutlinedIcon from "@material-ui/icons/ArrowBackIosOutlined";
 import ArrowForwardIosOutlinedIcon from "@material-ui/icons/ArrowForwardIosOutlined";
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import { ThemeProvider } from "@material-ui/styles";
-import { createMuiTheme } from "@material-ui/core";
-import purple from "@material-ui/core/colors/purple";
 import Button from "react-bootstrap/Button";
 import Slider from '@material-ui/core/Slider';
 import { isTutee, isViewedTutorSet } from "../../util/authenticationFunctions";
+import { saveTutorAvailableHours } from "../../util/apiCallFunctions";
+import WeeklyScheduleTable from "./WeeklyScheduleTable";
+import customTheme from "../../styles/materialUiTheme";
 
-const customTheme = createMuiTheme({ palette: { primary: purple } });
-const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-function createHours() {
-  let hours = [];
-  for (let hour = 1; hour <= 23; hour = hour + 3) {
-    hours[hour] = { value: hour, label: displayHour12Format(hour) }
-  }
-  return hours;
+function createSliderHours() {
+  let sliderHours = [];
+  for (let hour = 1; hour <= 23; hour = hour + 3)
+    sliderHours[hour] = { value: hour, label: displayHour12Format(hour) }
+  return sliderHours;
 }
-const sliderHours = createHours();
+
+const sliderHours = createSliderHours();
 
 class WeeklySchedule extends Component {
 
-  state = { weekStart: moment().startOf("week"), chosenDay: moment(), isSaving: false, hourRange: [8, 19] };
+  state = {
+    weekStart: moment().startOf("week"),
+    chosenDay: moment(),
+    isSaving: false,
+    hourRange: [8, 20] // Use user values later
+  };
 
   render() {
     return (
@@ -62,25 +58,19 @@ class WeeklySchedule extends Component {
               </MuiPickersUtilsProvider>
             </ThemeProvider>
 
-            <Button variant="secondary" size="sm" disabled={this.state.isSaving}
-              onClick={() => {
-                if (!this.state.isSaving) {
-                  this.setState({ ...this.state, isSaving: true });
-                  let sendDate = { hours: this.props.user.availableHours };
-                  fetch("/api/tutors/schedule", {
-                    method: "POST",
-                    headers: {
-                      "X-Auth-Token": this.props.token,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(sendDate),
-                  }).then((response) => {
-                    this.setState({ ...this.state, isSaving: false });
-                  });
-                }
-              }}>
-              {this.state.isSaving ? "Saving..." : "Save Schedule"}
-            </Button>
+            {!isTutee
+              ? <Button variant="secondary" size="sm" disabled={this.state.isSaving}
+                onClick={() => {
+                  if (!this.state.isSaving) {
+                    this.setState({ ...this.state, isSaving: true });
+                    saveTutorAvailableHours({ hours: this.props.userAvailableHours })
+                      .then(() => this.setState({ ...this.state, isSaving: false }));
+                  }
+                }}>
+                {this.state.isSaving ? "Saving..." : "Save Available Hours"}
+              </Button>
+              : null}
+
           </div>
           <h6>Display range</h6>
           <ThemeProvider theme={customTheme}>
@@ -92,102 +82,19 @@ class WeeklySchedule extends Component {
           </ThemeProvider>
         </div>
 
-        <div className="scheduleScrollContainer">
-          <table className="weeklySchedule">
-            <thead>
-              <tr>
-                <th></th>
-                {this.makeDayHeaderCells()}
-              </tr>
-            </thead>
-            <tbody>
-              {this.fillRows()}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        <WeeklyScheduleTable weekStart={this.state.weekStart} hourRange={this.state.hourRange} />
+
+      </div >
     );
-  }
-
-  makeDayHeaderCells() {
-    let headerCells = [];
-    for (let day = 0; day < DAYS_OF_WEEK.length; day++)
-      headerCells[day] = (
-        <th>
-          {`${DAYS_OF_WEEK[day]}`}<br />{this.state.weekStart.clone().add(day, "day").format("DD/MM/YYYY")}
-        </th>);
-    return headerCells;
-  }
-
-  fillRows() {
-    let appointments = convertDateStringsToDates(this.props.user.appointments); // User's appointments (can be tutee or tutor)
-    let availableHours = []; // The available hours of a tutor (either the user or a viewed tutor)
-    if (!isTutee())  // User is a tutor
-      availableHours = this.props.user.availableHours;
-    else if (isViewedTutorSet()) // If the tutee user is viewing a tutor show the viewed tutors available hours
-      availableHours = this.props.viewedTutor.availableHours;
-
-    // userAvailableHours = convertDateStringsToDates(userAvailableHours); // Don't know if I need this anymore
-
-    availableHours = convertSingleHoursToTimeSlots(availableHours);
-    combineSingleSlots(availableHours);
-
-    removeSlotConflict(availableHours, appointments); // This will remove any tutor open hours that cant be booked because of pre-existing conflicts
-
-    let table = [];
-    for (let hour = this.state.hourRange[0]; hour <= this.state.hourRange[1]; hour++) {
-      let row = [];
-      for (let day = 0; day < 7; day++) {
-        let appointmentSlot = this.findTimeSlot(day, hour, appointments);
-        let availableHourSlot = this.findTimeSlot(day, hour, availableHours);
-
-        if (appointmentSlot !== undefined) {
-          if (hour === appointmentSlot.time.start.hours() || hour === this.state.hourRange[0])
-            row[day] = <BookedTimeSlot appointment={appointmentSlot} displayRange={this.state.hourRange} />;
-
-        } else if (availableHourSlot !== undefined) {   // Display user available hours (only if user is tutor)
-          if (hour === availableHourSlot.time.start.hours() || hour === this.state.hourRange[0])
-            row[day] = <OpenTimeSlot timeSlot={availableHourSlot} displayRange={this.state.hourRange} />;
-
-        } else { // No available hours or appointments to display for this hour
-          if (this.state.weekStart.clone().add(day, "day").isBefore(moment()))  // The past is highlighted visually and cannot be interacted with
-            row[day] = <td className="pastSlot"></td>;
-          else  // Tutor's can interact with empty cells and open them, tutees cannot
-            row[day] = isTutee() ? <td></td> : <TutorOpenableTimeSlot date={this.state.weekStart.clone().add(day, "days").add(hour, "hours")} />;
-        }
-      }
-
-      let displayHour = hour !== this.state.hourRange[0] ? displayHour12Format(hour) : "";
-      row.unshift(<td className="time"> {`${displayHour}`} </td>);
-      table.push(<tr>{row}</tr>);
-    }
-    return table;
-  }
-
-  // Finds and returns the single point (or undefined) in a collection of slots that meet the condition of day and hour
-  findTimeSlot(day, hour, slots) {
-    for (let i = 0; i < slots.length; i++) {
-      if (slots[i].time.end.hours() === 0) {
-        if (fallsOnSameDay(this.state.weekStart.clone().add(day, "day"), moment(slots[i].time.start))
-          && hour >= slots[i].time.start.hours() && hour < 24) {
-          return slots[i];
-        }
-      } else {
-        if (fallsOnSameDay(this.state.weekStart.clone().add(day, "day"), moment(slots[i].time.start))
-          && hour >= slots[i].time.start.hours() && hour < slots[i].time.end.hours()) {
-          return slots[i];
-        }
-      }
-    }
   }
 
 }
 
 function mapStateToProps(state) {
   return {
-    user: state.user.user,
-    viewedTutor: state.viewedTutor.viewedTutor,
-    token: state.user.token,
+    // minRange: state.user.user.bookingRange.minimum,
+    // maxRange: state.user.user.bookingRange.maximum,
+    userAvailableHours: state.user.user.availableHours,
   };
 }
 

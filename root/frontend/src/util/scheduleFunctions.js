@@ -16,8 +16,8 @@ export function convertSingleHoursToTimeSlots(availableHours) {
 
 export function convertTimeSlotToSingleHours(timeSlot) {
   let hours = [];
-  let start = timeSlot.time.start;
-  for (let i = 0, hour = timeSlot.time.start.hours(); hour < timeSlot.time.end.hours(); i++, hour++)
+  let start = moment(timeSlot.time.start);
+  for (let i = 0, hour = moment(timeSlot.time.start).hours(); hour < moment(timeSlot.time.end).hours(); i++, hour++)
     hours.push(start.clone().add(i, "hour"));
 
   return hours;
