@@ -36,3 +36,9 @@
   height: 60px;
   width: 80px;
 }
+
+.editProfileModal {
+  max-height: 80vh;
+  min-height: 80vh;
+  min-width: 55vw;
+}

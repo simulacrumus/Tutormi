@@ -3,6 +3,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import "./ProfileNavBar.css";
 import { connect } from "react-redux";
+import { logout } from "../../store/user/userActions";
 
 class ProfileNavBar extends Component {
   render() {
@@ -21,7 +22,7 @@ class ProfileNavBar extends Component {
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
-            Signed in as: <a href="#login">{this.props.name}</a>
+            Signed in as: <a href="/login" onClick={() => logout()}>{this.props.name}</a>
           </Navbar.Text>
           <img src={this.props.imgPath}></img>
         </Navbar.Collapse>
