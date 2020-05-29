@@ -15,8 +15,6 @@ const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "F
 
 class WeeklyScheduleTable extends Component {
 
-    props = { weekStart: moment().startOf("week"), chosenDay: moment(), isSaving: false, hourRange: [8, 19] };
-
     render() {
         return (
             <div className="scheduleScrollContainer">
@@ -56,9 +54,8 @@ class WeeklyScheduleTable extends Component {
         // userAvailableHours = convertDateStringsToDates(userAvailableHours); // Don't know if I need this anymore
 
         availableHours = convertSingleHoursToTimeSlots(availableHours);
-        combineSingleSlots(availableHours);
-
         removeSlotConflict(availableHours, appointments); // This will remove any tutor open hours that cant be booked because of pre-existing conflicts
+        combineSingleSlots(availableHours);
 
         let table = [];
         for (let hour = this.props.hourRange[0]; hour <= this.props.hourRange[1]; hour++) {

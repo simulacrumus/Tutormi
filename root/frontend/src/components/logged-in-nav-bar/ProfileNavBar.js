@@ -24,7 +24,8 @@ class ProfileNavBar extends Component {
           <Navbar.Text>
             Signed in as: <a href="/login" onClick={() => logout()}>{this.props.name}</a>
           </Navbar.Text>
-          <img src={this.props.imgPath}></img>
+          <img src={this.props.profilePic === undefined ? require("../../images/uploads/default-profile-pic.png")
+            : require(`../../images/uploads/${this.props.profilePic}`)}></img>
         </Navbar.Collapse>
       </Navbar>
     );
@@ -34,7 +35,7 @@ class ProfileNavBar extends Component {
 function mapStateToProps(state) {
   return {
     name: state.user.user.user.name,
-    imgPath: state.user.user.imgPath,
+    profilePic: state.user.user.profilePic,
     type: state.user.user.user.type,
   };
 }

@@ -35,5 +35,4 @@ export async function saveTutorAvailableHours(availableHours) {
         },
         body: JSON.stringify(availableHours),
     });
-
 }

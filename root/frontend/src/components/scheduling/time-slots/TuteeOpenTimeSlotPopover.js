@@ -13,7 +13,11 @@ import { isViewedTutorSet } from "../../../util/authenticationFunctions";
 
 export default class TuteeOpenTimeSlotPopover extends Component {
 
-  state = { start: this.props.timeSlot.time.start.hours(), end: this.props.timeSlot.time.end.hours(), isSaving: false }
+  state = {
+    start: this.props.timeSlot.time.start.hours(),
+    end: this.props.timeSlot.time.end.hours() === 0 ? 24 : this.props.timeSlot.time.end.hours(),
+    isSaving: false
+  }
 
   render() {
     return (
@@ -39,7 +43,7 @@ export default class TuteeOpenTimeSlotPopover extends Component {
                 {this.makeMenuItems(this.props.timeSlot.time.start.hours(), this.state.end - 1)}
               </Select>
               <Select value={this.state.end} onChange={(e) => this.setState({ ...this.state, end: e.target.value })}>
-                {this.makeMenuItems(this.state.start + 1, this.props.timeSlot.time.end.hours())}
+                {this.makeMenuItems(this.state.start + 1, this.props.timeSlot.time.end.hours() === 0 ? 24 : this.props.timeSlot.time.end.hours())}
               </Select>
               <button
                 onClick={() => {
@@ -47,16 +51,16 @@ export default class TuteeOpenTimeSlotPopover extends Component {
                   let newAppointment = {
                     tutorid: this.props.viewedTutor._id,
                     tuteeid: this.props.tuteeId,
-                    end: this.props.timeSlot.time.end.set("hours", this.state.end),
+                    end: this.state.end === 24 ? this.props.timeSlot.time.end : this.props.timeSlot.time.end.set("hours", this.state.end),
                     start: this.props.timeSlot.time.start.set("hours", this.state.start),
                     subject: document.getElementById("coursesSelect").value,
                     note: document.getElementById("notesInput").value,
                   }
                   saveAppointment(newAppointment) // Save appointment server side
                     .then((bookedAppointment) => {
-                      // bookAppointment(bookedAppointment); // Update the user (tutee) state
-                      // if (isViewedTutorSet())
-                      //   updateViewedTutorSchedule(bookedAppointment); // Update the viewed tutor state if they are currently set
+                      bookAppointment(bookedAppointment); // Update the user (tutee) state
+                      if (isViewedTutorSet())
+                        updateViewedTutorSchedule(bookedAppointment); // Update the viewed tutor state if they are currently set
                       this.setState({ ...this.state, isSaving: false });
                     });
                 }

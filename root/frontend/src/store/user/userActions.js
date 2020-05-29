@@ -5,6 +5,7 @@ import { isViewedTutorSet } from "../../util/authenticationFunctions";
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
 export const USER_INFO_UPDATED = "USER_INFO_UPDATED";
+export const USER_IMAGE_UPDATED = "USER_IMAGE_UPDATED";
 export const USER_LOGGED_OUT = "USER_LOGGED_OUT";
 export const USER_CREATED_ACCOUNT = "USER_CREATED_ACCOUNT";
 // Schedule specific actions
@@ -122,48 +123,51 @@ export async function logInUser(email, password, userType) {
 }
 
 export function logout() {
-  store.dispatch({ type: USER_LOGGED_OUT });
+    store.dispatch({ type: USER_LOGGED_OUT });
+}
+
+export function changeUserImage(profilePic) {
+    store.dispatch({ type: USER_IMAGE_UPDATED, payload: profilePic });
 }
 
 export function cancelAppointment(appointment) {
-  store.dispatch({
-    type: APPOINTMENT_CANCELED,
-    payload: appointment,
-  });
+    store.dispatch({
+        type: APPOINTMENT_CANCELED,
+        payload: appointment,
+    });
 
-  if (isViewedTutorSet())
-    // Clear the viewed tutor appointment to keep page responsive
-    cancelViewedTutorAppointment(appointment);
+    if (isViewedTutorSet() && store.getState().viewedTutor.viewedTutor._id === appointment.tutor.id)
+        cancelViewedTutorAppointment(appointment); // Clear the viewed tutor appointment to keep page responsive
 }
 
 export async function updateUser(updateInfo) {
-  await store.dispatch({
-    type: USER_INFO_UPDATED,
-    payload: updateInfo,
-  });
+    await store.dispatch({
+        type: USER_INFO_UPDATED,
+        payload: updateInfo,
+    });
 
-  fetch("/api/tutors", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-auth-token": store.getState().userReducer.token,
-    },
-    body: JSON.stringify(updateInfo),
-  })
-    .then((response) => response.json())
-    .then((updatedUser) => console.log(updatedUser));
+    fetch("/api/tutors", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": store.getState().userReducer.token,
+        },
+        body: JSON.stringify(updateInfo),
+    })
+        .then((response) => response.json())
+        .then((updatedUser) => console.log(updatedUser));
 }
 
 export function openAvailabilityHour(availabilityDate) {
-  store.dispatch({
-    type: AVAILABILITY_OPENED,
-    payload: availabilityDate,
-  });
+    store.dispatch({
+        type: AVAILABILITY_OPENED,
+        payload: availabilityDate,
+    });
 }
 
 export function bookAppointment(appointment) {
-  store.dispatch({
-    type: APPOINTMENT_BOOKED,
-    payload: appointment,
-  });
+    store.dispatch({
+        type: APPOINTMENT_BOOKED,
+        payload: appointment,
+    });
 }
