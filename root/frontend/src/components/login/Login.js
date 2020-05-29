@@ -4,11 +4,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Form } from "react-bootstrap";
 import { Component } from "react";
 import { connect } from "react-redux";
+import MainNavigation from "../navigation/MainNavigation"
 //import Modal from 'react'
 import CustomButton from "./CustomButton.js";
 import { logInUser } from "../../store/user/userActions";
 import login from "./Signin";
 import "./Login.css";
+
+
 
 const validEmailRegex = RegExp(
   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
@@ -29,6 +32,7 @@ class Login extends Component {
       errors: {
         email: "",
         password: "",
+        login: "",
       },
     };
 
@@ -39,7 +43,7 @@ class Login extends Component {
     event.preventDefault();
     const { name, value } = event.target;
     let errors = this.state.errors;
-    console.log(name, value);
+    // console.log(name, value);
 
     switch (name) {
       case "email":
@@ -66,28 +70,48 @@ class Login extends Component {
     }
 
     this.setState({ errors, [name]: value }, () => {
-      console.log(errors);
+      //console.log(errors);
     });
   }
 
-  handleSubmit(event) {
+  async handleSubmit(event) {
+    let errors = this.state.errors;
+    console.log(
+      "Handle Submit says: this is a user type: " + this.state.userType
+    );
     event.preventDefault();
     if (
       validateForm(this.state.errors) &&
       this.state.email &&
       this.state.password
     ) {
-      console.info("Valid Form");
-      logInUser(this.state.email, this.state.password, this.state.userType);
-    } else {
-      console.error("Invalid Form");
+      console.info("HANDLE SUBMIT SAYS: Valid Form");
+      let login = await logInUser(
+        this.state.email,
+        this.state.password,
+        this.state.userType
+      );
+      console.log("value of LOGIN returned is: ", login);
+      if (!login) {
+        window.location.href = "/profile";
+      } else {
+        document.getElementById("submittion-error").innerHTML = login;
+        // await this.setState({ ...this.state, errors: { login: login } }, () => {
+        //   console.log(errors);
+        // });
+        console.error("HANDLE SUBMIT SAYS: invalid Form");
+      }
     }
+
   }
 
   render() {
+
+    console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state); //to check the most up to date state
     const { errors } = this.state;
     return (
       <div className="parentLoginFormBoxContainer">
+  <MainNavigation />
         <div className="loginFormBoxContainer">
           <h1 className="welcomeSign">Sign In</h1>
 
@@ -128,11 +152,16 @@ class Login extends Component {
                 label="Remember me"
               />
             </Form.Group>
+
+            <Form.Text id="submittion-error" className="error">
+              {errors.login}
+            </Form.Text>
+
             <CustomButton
               name="login"
               onClick={() => {
-                this.setState({...this.state, userType: "tutor"});
-                //window.location.href = "/profile";
+                console.log("random message");
+                this.setState({ ...this.state, userType: "tutor" });
               }}
             >
               Login as a tutor
@@ -140,7 +169,7 @@ class Login extends Component {
             <CustomButton
               name="login"
               onClick={() => {
-                this.setState({...this.state, userType: "tutee"});
+                this.setState({ ...this.state, userType: "tutee" });
               }}
             >
               Login as a tutee
@@ -159,7 +188,7 @@ class Login extends Component {
             className="buttonSignUp"
             onClick={() => {
               //setCount(count + 1);
-              window.location.href = "/components/login/SignUp.js";
+              window.location.href = "/signup";
             }}
           >
             sign up
