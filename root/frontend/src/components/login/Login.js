@@ -131,7 +131,7 @@ class Login extends Component {
             <CustomButton
               name="login"
               onClick={() => {
-                this.setState({...this.state, userType: "tutor"});
+                this.setState({ ...this.state, userType: "tutor" });
                 //window.location.href = "/profile";
               }}
             >
@@ -140,7 +140,7 @@ class Login extends Component {
             <CustomButton
               name="login"
               onClick={() => {
-                this.setState({...this.state, userType: "tutee"});
+                this.setState({ ...this.state, userType: "tutee" });
               }}
             >
               Login as a tutee

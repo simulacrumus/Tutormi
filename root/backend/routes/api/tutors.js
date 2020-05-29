@@ -22,8 +22,8 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-                user: req.user.user.id
-            })
+            user: req.user.user.id
+        })
             .populate('user', ['name', 'email', 'date', 'type'])
             .populate('appointments');
 
@@ -125,8 +125,8 @@ router.get('/user/:id', async ({
 }, res) => {
     try {
         const tutor = await Tutor.findOne({
-                _id: id
-            })
+            _id: id
+        })
             .populate('user', ['name', 'email', 'type'])
             .populate('appointments');
 
@@ -209,15 +209,15 @@ router.post('/search', auth, async (req, res) => {
         if (key) {
             const users = await User.find({
                 $or: [{
-                        name: {
-                            $regex: key
-                        }
-                    },
-                    {
-                        email: {
-                            $regex: key
-                        }
+                    name: {
+                        $regex: key
                     }
+                },
+                {
+                    email: {
+                        $regex: key
+                    }
+                }
                 ]
             }).select({
                 _id: 1
@@ -225,15 +225,15 @@ router.post('/search', auth, async (req, res) => {
             const usersIDs = users.map((user) => user._id);
             query = {
                 $or: [{
-                        user: {
-                            $in: usersIDs
-                        }
-                    },
-                    {
-                        location: {
-                            $regex: key
-                        }
+                    user: {
+                        $in: usersIDs
                     }
+                },
+                {
+                    location: {
+                        $regex: key
+                    }
+                }
                 ]
             };
         }
@@ -436,7 +436,7 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            profilePic: `${imagesPath}/${req.file.filename}`
+            profilePic: `${req.file.filename}`
             // profilePic: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
         });
 
@@ -465,7 +465,7 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            cover: `${imagesPath}/${req.file.filename}`
+            cover: req.file.filename
         });
 
         const tutor = await Tutor.findOne({

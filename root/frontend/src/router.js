@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import ProfilePage from "./pages/ProfilePage.js";
 import TuteeDashboardPage from "./pages/TuteeDashboardPage";
 import ViewTutorPage from "./pages/ViewTutorPage";
+import HomePage from "./pages/HomePage";
 import { Route, Switch, Redirect } from "react-router-dom";
 import SearchMain from "./components/SearchMain";
 import TutorDashboardPage from "./pages/TutorDashboardPage.js";
@@ -11,11 +12,11 @@ import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunc
 
 export default class Router extends Component {
 
-  render() { 
+  render() {
     return (
       <main>
         <Switch>
-          <Route path="/" component={Login} exact />
+          <Route path="/" component={HomePage} exact />
 
           <Route path="/login" component={Login} exact />
 

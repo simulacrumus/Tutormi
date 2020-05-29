@@ -27,10 +27,7 @@ export default function viewedTutorReducer(state = { viewedTutor: null }, action
     case VIEWED_TUTOR_APPOINTMENT_CANCELED:
       let updatedOpenHours = state.viewedTutor.availableHours.concat(convertTimeSlotToSingleHours(action.payload));
 
-      let deletedAppointments = state.viewedTutor.appointments.filter((appointment) =>
-        !(appointment.tutor === action.payload.tutor && appointment.tutor === action.payload.tutor
-          && moment(appointment.time.start).isSame(moment(action.payload.time.start))
-          && moment(appointment.time.end).isSame(moment(action.payload.time.end))));
+      let deletedAppointments = state.viewedTutor.appointments.filter((appointment) => !(appointment._id === action.payload._id));
       return {
         ...state, viewedTutor: {
           ...state.viewedTutor,

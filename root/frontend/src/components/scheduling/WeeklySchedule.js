@@ -58,8 +58,8 @@ class WeeklySchedule extends Component {
               </MuiPickersUtilsProvider>
             </ThemeProvider>
 
-            {!isTutee
-              ? <Button variant="secondary" size="sm" disabled={this.state.isSaving}
+            {!isTutee() &&
+              <Button variant="secondary" size="sm" disabled={this.state.isSaving}
                 onClick={() => {
                   if (!this.state.isSaving) {
                     this.setState({ ...this.state, isSaving: true });
@@ -68,8 +68,7 @@ class WeeklySchedule extends Component {
                   }
                 }}>
                 {this.state.isSaving ? "Saving..." : "Save Available Hours"}
-              </Button>
-              : null}
+              </Button>}
 
           </div>
           <h6>Display range</h6>

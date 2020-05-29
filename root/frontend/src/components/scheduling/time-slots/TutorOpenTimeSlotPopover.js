@@ -11,7 +11,10 @@ import PopoverTitleContainer from "./PopoverTitleContainer";
 
 export default class TutorOpenTimeSlotPopover extends Component {
 
-    state = { start: this.props.timeSlot.time.start.hours(), end: this.props.timeSlot.time.end.hours() }
+    state = {
+        start: this.props.timeSlot.time.start.hours(),
+        end: this.props.timeSlot.time.end.hours() === 0 ? 24 : this.props.timeSlot.time.end.hours()
+    }
 
     render() {
         return (
@@ -22,7 +25,7 @@ export default class TutorOpenTimeSlotPopover extends Component {
                         {this.makeMenuItems(this.props.timeSlot.time.start.hours(), this.state.end - 1)}
                     </Select>
                     <Select value={this.state.end} onChange={(e) => this.setState({ ...this.state, end: e.target.value })}>
-                        {this.makeMenuItems(this.state.start + 1, this.props.timeSlot.time.end.hours())}
+                        {this.makeMenuItems(this.state.start + 1, this.props.timeSlot.time.end.hours() === 0 ? 24 : this.props.timeSlot.time.end.hours())}
                     </Select>
                     <img className="cancelIcon" src={require("../../../images/cancel-icon.png")} onClick={() => this.cancelAvailability()}>
                     </img>
@@ -44,7 +47,7 @@ export default class TutorOpenTimeSlotPopover extends Component {
             payload: convertTimeSlotToSingleHours({
                 time:
                 {
-                    end: this.props.timeSlot.time.end.set("hours", this.state.end),
+                    end: this.state.end === 24 ? this.props.timeSlot.time.end : this.props.timeSlot.time.end.set("hours", this.state.end),
                     start: this.props.timeSlot.time.start.set("hours", this.state.start)
                 }
             }),

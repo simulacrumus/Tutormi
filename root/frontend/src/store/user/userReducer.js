@@ -1,23 +1,23 @@
 import moment from 'moment';
 import {
     USER_LOGGED_IN, USER_INFO_UPDATED, AVAILABILITY_OPENED,
-    AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT
+    AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT,
+    USER_IMAGE_UPDATED
 } from './userActions';
-import { fallsOnSameDay } from "../../util/scheduleFunctions"
+import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
 
 const initialState = {
     user: null, // User who is currently logged into the app
     token: null, // Token used to make API calls
     isLoggedIn: false, // Whether the user is logged in or not
-    loading: false
 }
 
 export default function userReducer(state = initialState, action) {
     let copiedAvailableHours;
     let copiedNewAppointments;
 
-    if (state.user !== null) {
-        copiedAvailableHours = state.user.availableHours !== undefined ? state.user.availableHours.slice() : undefined;
+    if (state.isLoggedIn) {
+        copiedAvailableHours = state.user.user.type === "tutor" ? state.user.availableHours.slice() : undefined;
         copiedNewAppointments = state.user.appointments.slice();
     }
 
@@ -55,13 +55,20 @@ export default function userReducer(state = initialState, action) {
             return { ...state, user: { ...state.user, appointments: copiedNewAppointments } };
 
         case APPOINTMENT_CANCELED:
-            let deletedAppointments = state.user.appointments.filter((appointment) =>
-                !(appointment.tutor === action.payload.tutor && appointment.tutor === action.payload.tutor
-                    && moment(appointment.time.start).isSame(moment(action.payload.time.start))
-                    && moment(appointment.time.end).isSame(moment(action.payload.time.end))));
-            return {
-                ...state, user: { ...state.user, appointments: deletedAppointments }
+            let deletedAppointments = state.user.appointments.filter((appointment) => !(appointment._id === action.payload._id));
+            if (state.user.user.type === "tutee") {
+                return { ...state, user: { ...state.user, appointments: deletedAppointments } }
+            } else { // If the user is a tutor their available hours must be updated
+                return {
+                    ...state, user: {
+                        ...state.user, appointments: deletedAppointments,
+                        availableHours: copiedAvailableHours.concat(convertTimeSlotToSingleHours(action.payload))
+                    }
+                }
             }
+
+        case USER_IMAGE_UPDATED:
+            return { ...state, user: { ...state.user, profilePic: action.payload } }
 
         case USER_LOGGED_OUT:
             return initialState;

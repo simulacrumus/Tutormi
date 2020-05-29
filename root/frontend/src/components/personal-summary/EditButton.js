@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { connect } from "react-redux";
-import { updateUser } from "../../store/user/userActions";
+import { updateUser, changeUserImage } from "../../store/user/userActions";
 import RemovableBox from './RemovableBox';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import FacebookIcon from '@material-ui/icons/Facebook';
@@ -17,6 +17,7 @@ import Tab from '@material-ui/core/Tab';
 import AppBar from '@material-ui/core/AppBar';
 import { ThemeProvider } from "@material-ui/styles";
 import customTheme from "../../styles/materialUiTheme";
+import { store } from "../../store/configureStore";
 
 function EditButton(props) {
   const [show, setShow] = React.useState(false);
@@ -83,11 +84,12 @@ function EditButton(props) {
                         body: formData,
                       }).then(response => { console.log('response', response.text); return response.json() })
                         .then(responseJson => {
-                          console.log(responseJson)
+                          changeUserImage(responseJson.profilePic); // Tell backend to only return image
                         });
 
                     }}>Save</button>
-                  <img id="myPreview"></img>
+                  <img id="myPreview" src={props.user.profilePic === undefined ? require("../../images/uploads/default-profile-pic.png")
+                    : require(`../../images/uploads/${props.user.profilePic}`)}></img>
                 </div>
 
                 <Form.Label>Email address</Form.Label>
