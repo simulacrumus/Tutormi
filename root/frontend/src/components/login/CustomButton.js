@@ -3,7 +3,7 @@ import classes from "./CustomButton.css";
 
 const CustomButton = (props) => (
   // reusable button component, class name
-  <button className={props.name}>
+  <button onClick={props.onClick} className={props.name}>
     {props.children}
   </button>
 );
