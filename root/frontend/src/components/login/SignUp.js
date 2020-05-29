@@ -1,6 +1,6 @@
 import React from 'react'
 import "./Login.css";
-
+import CustomButton from "./CustomButton.js";
 
 
 const SingUp = () => {
@@ -37,9 +37,9 @@ const SingUp = () => {
         />
       </div>
 
-      <button type="submit" className="btn btn-primary btn-block">
+      <CustomButton  className="login">
         Sign Up
-      </button>
+        </CustomButton>
       <p className="forgot-password text-right">
         Already registered <a href="./Login.js">sign in?</a>
       </p>
