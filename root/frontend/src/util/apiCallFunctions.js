@@ -36,3 +36,28 @@ export async function saveTutorAvailableHours(availableHours) {
         body: JSON.stringify(availableHours),
     });
 }
+
+export async function createAccount (name, email, password, type) {
+    console.log(typeof name,typeof email,typeof password,typeof type)
+    let authResponse = await fetch("/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },      
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        password: password,
+        type: type,
+      }),
+    });
+    console.log( JSON.stringify({
+        name: name,
+        email: email,
+        password: password,
+        type: type,
+      }))
+    console.log(authResponse)
+    authResponse = await authResponse.json()
+    console.log(authResponse)
+  }

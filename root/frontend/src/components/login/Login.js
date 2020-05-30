@@ -106,12 +106,12 @@ class Login extends Component {
   }
 
   render() {
-
-    console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state); //to check the most up to date state
+   // console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state); //to check the most up to date state
     const { errors } = this.state;
     return (
       <div className="parentLoginFormBoxContainer">
-  <MainNavigation />
+   <MainNavigation />
+ 
         <div className="loginFormBoxContainer">
           <h1 className="welcomeSign">Sign In</h1>
 
@@ -184,15 +184,16 @@ class Login extends Component {
           </Form.Text>
           <Form.Text>Or</Form.Text>
           <br />
-          <Button
-            className="buttonSignUp"
+          <CustomButton
+            name="buttonSignUp"
             onClick={() => {
               //setCount(count + 1);
+                //  this.props.flip()
               window.location.href = "/signup";
             }}
           >
             sign up
-          </Button>
+          </CustomButton>
           {/* <p>Join {count} users that already signed up</p> */}
         </div>
       </div> // end of "parentLoginFormBoxContainer"

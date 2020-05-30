@@ -15,15 +15,6 @@ const NavigationLinks = (props) => {
         <li>
           <NavLink to="/about">About</NavLink>
         </li>
-        <li>
-          <NavLink to="/search" exact>
-            Search tutors
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink to="/components/login/SignUp.js">Sign up</NavLink>
-        </li> 
       </ul>
     </CSSTransition>
   );
