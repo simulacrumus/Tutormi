@@ -1,200 +1,159 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './EditButton.css';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { connect } from "react-redux";
-import { updateUser, changeUserImage } from "../../store/user/userActions";
-import RemovableBox from './RemovableBox';
-import AddBoxIcon from '@material-ui/icons/AddBox';
-import FacebookIcon from '@material-ui/icons/Facebook';
-import InstagramIcon from '@material-ui/icons/Instagram';
-import LinkedInIcon from '@material-ui/icons/LinkedIn';
-import TwitterIcon from '@material-ui/icons/Twitter';
-import YouTubeIcon from '@material-ui/icons/YouTube';
+import { updateUser } from "../../store/user/userActions";
+import ListUpdateArea from './ListUpdateArea';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppBar from '@material-ui/core/AppBar';
 import { ThemeProvider } from "@material-ui/styles";
 import customTheme from "../../styles/materialUiTheme";
-import { store } from "../../store/configureStore";
+import EditSocialArea from "./EditSocialArea";
+import ChangeProfilePictureArea from "./ChangeProfilePictureArea";
+import { updateUserInformation } from "../../util/apiCallFunctions";
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Button from '@material-ui/core/Button';
 
-function EditButton(props) {
-  const [show, setShow] = React.useState(false);
-  const [courses, setCourses] = React.useState(props.user.courses);
-  const [languages, setLanguages] = React.useState(props.user.languages);
+class EditButton extends Component {
 
-  const [tabValue, setTabValue] = React.useState(0);
-
-  const handleClose = () => setShow(false);
-
-  const handleShow = () => {
-    // The modal needs to always have the most up to date courses and languages on show
-    setCourses(props.user.courses);
-    setLanguages(props.user.languages);
-    setShow(true);
-  };
-
-  const changeTab = (e, newTabValue) => {
-    setTabValue(newTabValue);
+  constructor(props) {
+    super(props);
+    this.state = { showEditModal: false, user: this.props.user, tabValue: 0, isSaving: false, errors: "" }
+    this.updateSocialAccount = this.updateSocialAccount.bind(this);
   }
 
-  return (
-    <>
-      <img className="editIcon" src={require("../../images/edit-icon.png")} onClick={handleShow} ></img>
-      <Modal show={show} onHide={handleClose} animation={false} centered dialogClassName="editProfileModal">
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Information</Modal.Title>
-        </Modal.Header>
+  render() {
+    return (
+      <>
+        <img className="editIcon" src={require("../../images/edit-icon.png")} onClick={() => this.handleShow()} ></img>
+        <Modal show={this.state.showEditModal} onHide={() => this.setState({ ...this.state, showEditModal: false })} animation={false} centered dialogClassName="editProfileModal">
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Information</Modal.Title>
+          </Modal.Header>
 
-        <div className="editProfileModal">
-          <Modal.Body>
-            <ThemeProvider theme={customTheme}>
-              <AppBar position="static">
-                <Tabs onChange={changeTab} value={tabValue} variant="fullWidth">
-                  <Tab label="Main Information" />
-                  <Tab label="Secondary Information" />
-                  <Tab label="Change Password" />
-                </Tabs>
-              </AppBar>
-            </ThemeProvider>
-            <br />
+          <div className="editProfileModal">
+            <Modal.Body>
+              <ThemeProvider theme={customTheme}>
+                <AppBar position="static">
+                  <Tabs onChange={this.changeTab} value={this.state.tabValue} variant="fullWidth">
+                    <Tab label="Main Information" />
+                    <Tab label="Secondary Information" />
+                    <Tab label="Change Password" />
+                  </Tabs>
+                </AppBar>
+              </ThemeProvider>
+              <br />
 
-            {tabValue === 0 &&
-              <Form>
-                <Form.Label>Profile Picture</Form.Label>
+              {this.state.tabValue === 0 &&
+                <Form>
+                  <ChangeProfilePictureArea profilePic={this.props.user.profilePic} />
 
-                <div className="imageUploadContainer">
-                  <input type="file" id="imageFileUpload" accept="image/*"
-                    onChange={e => {
-                      let imageFile = document.getElementById("imageFileUpload").files[0];
-                      document.getElementById("myPreview").src = URL.createObjectURL(imageFile);
+                  <Form.Group>
+                    <Form.Label>Email address</Form.Label>
+                    <Form.Control type="email" value={this.state.user.user.email}
+                      onChange={(e) => this.setState({ ...this.state, user: { ...this.state.user, user: { ...this.state.user.user, email: e.target.value } } })} />
+                  </Form.Group>
+
+                  <Form.Group>
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control type="text" value={this.state.user.user.name}
+                      onChange={(e) => this.setState({ ...this.state, user: { ...this.state.user, user: { ...this.state.user.user, name: e.target.value } } })} />
+                  </Form.Group>
+
+                  <Form.Group >
+                    <Form.Label>Bio</Form.Label>
+                    <Form.Control as="textarea" rows="3" value={this.state.user.bio}
+                      onChange={(e) => this.setState({ ...this.state, user: { ...this.state.user, bio: e.target.value } })} />
+                  </Form.Group>
+
+                  {this.props.user.user.type === "tutor" &&
+                    <ListUpdateArea list={this.state.user.courses} label="Courses" type="course" setList={this.setCourses} />}
+                </Form>
+              }
+
+              {this.state.tabValue === 1 &&
+                <Form>
+                  <ListUpdateArea list={this.state.user.languages} label="Languages" type="language" setList={this.setLanguages} />
+
+                  <Form.Group>
+                    <Form.Label>Location</Form.Label>
+                    <Form.Control type="text" value={this.state.user.location}
+                      onChange={(e) => this.setState({ ...this.state, user: { ...this.state.user, location: e.target.value } })} />
+                  </Form.Group>
+
+                  <EditSocialArea updateSocialAccount={this.updateSocialAccount} social={this.state.user.social} />
+                </Form>}
+
+              <br />
+              <ThemeProvider theme={customTheme}>
+                {this.state.isSaving && <LinearProgress />}
+              </ThemeProvider >
+              {this.state.errors !== "" && <h6 className="editFormErrorMessage">{this.state.errors}</h6>}
+            </Modal.Body>
+          </div>
+
+
+
+          <Modal.Footer>
+            <ThemeProvider theme={customTheme} >
+              <Button color="primary" variant="contained" onClick={() => {
+                this.setState({ ...this.state, isSaving: true })
+                let editInformation = {
+                  email: this.state.user.user.email,
+                  name: this.state.user.user.name,
+                  bio: this.state.user.bio,
+                  languages: this.state.user.languages,
+                  location: this.state.user.location,
+                  courses: this.state.user.courses,
+                  social: this.state.user.social
+                };
+                updateUserInformation(editInformation)  // Update the server with the new user information
+                  .then((updateResponse) => {
+                    if (updateResponse.errors === undefined) { // No errors occurred when updating
+                      updateUser(editInformation);
+                      this.setState({ ...this.state, isSaving: false, showEditModal: false }); // Close the modal 
+                    } else {
+                      this.setState({ ...this.state, isSaving: false, showEditModal: true, errors: updateResponse.errors[0].msg }); // Notify users of errors 
                     }
-                    } />
-                  <button onClick={
-                    (e) => {
-                      e.preventDefault();
-                      let imageFile = document.getElementById("imageFileUpload").files[0];
-                      let formData = new FormData();
-                      formData.append("image", imageFile);
+                  });
+              }}>Save Changes</Button>
 
-                      fetch("/api/tutors/profile-pic", {
-                        method: 'POST',
-                        headers: { "x-auth-token": props.token },
-                        body: formData,
-                      }).then(response => { console.log('response', response.text); return response.json() })
-                        .then(responseJson => {
-                          changeUserImage(responseJson.profilePic); // Tell backend to only return image
-                        });
+            </ThemeProvider>
 
-                    }}>Save</button>
-                  <img id="myPreview" src={props.user.profilePic === undefined ? require("../../images/uploads/default-profile-pic.png")
-                    : require(`../../images/uploads/${props.user.profilePic}`)}></img>
-                </div>
+          </Modal.Footer>
+        </Modal>
+      </>
+    );
 
-                <Form.Label>Email address</Form.Label>
-                <Form.Control type="email" defaultValue={props.user.user.email} />
-                <Form.Group>
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control type="text" defaultValue={props.user.user.name} id="nameInput" />
-                </Form.Group>
-                <Form.Group >
-                  <Form.Label>Bio</Form.Label>
-                  <Form.Control as="textarea" rows="3" defaultValue={props.user.bio} id="bioInput" />
-                </Form.Group>
+  }
 
-                {courses !== undefined ?
-                  <>
-                    <Form.Label>Courses</Form.Label>
-                    <div className="myAddInputRow">
-                      <Form.Control id="courseInput" type="text" placeholder="Add a course" onChange={() => { }} />
-                      <AddBoxIcon fontSize="large" className="editFormAddIcon" onClick={() => {
-                        let updatedCourses = courses.slice();
-                        updatedCourses.push(document.getElementById("courseInput").value);
-                        setCourses(updatedCourses);
-                      }} />
-                    </div>
-                    <div className="removableBoxHolder">
-                      {courses.map((course) => <RemovableBox content={course} list={courses} setList={setCourses} />)}
-                    </div>
-                  </>
-                  : null}
-              </Form>
-            }
+  handleShow = () => {
+    this.setState({ showEditModal: true, user: this.props.user, tabValue: 0, errors: "" }); // The modal needs to always have the most up to date courses and languages on show
+  };
 
-            {tabValue === 1 &&
-              <Form>
-                <Form.Label>Languages</Form.Label>
-                <div className="myAddInputRow">
-                  <Form.Control id="languageInput" type="text" placeholder="Add a language" onChange={() => { }} />
-                  <AddBoxIcon fontSize="large" className="editFormAddIcon" onClick={() => {
-                    let updatedLanguages = languages.slice();
-                    updatedLanguages.push(document.getElementById("languageInput").value);
-                    setLanguages(updatedLanguages);
-                  }} />
-                </div>
+  changeTab = (e, newTabValue) => {
+    this.setState({ ...this.state, tabValue: newTabValue });
+  }
 
-                <div id="languageEditSection" className="removableBoxHolder">
-                  {languages.map((language) => <RemovableBox content={language} list={languages} setList={setLanguages} />)}
-                </div>
-                <Form.Group>
-                  <Form.Label>Location</Form.Label>
-                  <Form.Control type="text" defaultValue={props.user.location} id="locationInput" />
-                </Form.Group>
-                <Form.Label>Social Media</Form.Label>
-                <div className="myAddInputRow">
-                  <LinkedInIcon className="editFormSocialIcon" fontSize="large" />
-                  <Form.Control type="text" defaultValue={props.user.social.linkedin} id="linkedinInput" />
-                </div>
-                <div className="myAddInputRow">
-                  <TwitterIcon className="editFormSocialIcon" fontSize="large" />
-                  <Form.Control type="text" defaultValue={props.user.social.twitter} id="twitterInput" />
-                </div>
-                <div className="myAddInputRow">
-                  <FacebookIcon className="editFormSocialIcon" fontSize="large" />
-                  <Form.Control type="text" defaultValue={props.user.social.facebook} id="facebookInput" />
-                </div>
-                <div className="myAddInputRow">
-                  <InstagramIcon className="editFormSocialIcon" fontSize="large" />
-                  <Form.Control type="text" defaultValue={props.user.social.instagram} id="instagramInput" />
-                </div>
-                <div className="myAddInputRow">
-                  <YouTubeIcon className="editFormSocialIcon" fontSize="large" />
-                  <Form.Control type="text" defaultValue={props.user.social.youtube} id="youtubeInput" />
-                </div>
-              </Form>
-            }
-          </Modal.Body>
-        </div>
+  setCourses = (courses) => {
+    this.setState({ ...this.state, user: { ...this.state.user, courses: courses } });
+  }
 
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close</Button>
-          <Button variant="success" onClick={() => {
-            let editInformation = {
-              // imgPath: "someImagePath.com", // Change this when image upload is fixed
-              email: props.user.user.email,
-              name: document.getElementById("nameInput").value,
-              bio: document.getElementById("bioInput").value,
-              languages: languages,
-              location: document.getElementById("locationInput").value,
-              courses: courses,
-              social: {
-                linkedin: document.getElementById("linkedinInput").value,
-                twitter: document.getElementById("twitterInput").value,
-                facebook: document.getElementById("facebookInput").value,
-                instagram: document.getElementById("instagramInput").value,
-                youtube: document.getElementById("youtubeInput").value,
-              },
-            };
-            updateUser(editInformation); // Update the server with the new user information
-            handleClose();
-          }}>Save Changes</Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+  setLanguages = (languages) => {
+    this.setState({ ...this.state, user: { ...this.state.user, languages: languages } });
+  }
 
-  );
+  updateSocialAccount(event, socialType) {
+    this.setState({
+      ...this.state,
+      user: {
+        ...this.state.user,
+        social: { ...this.state.user.social, [socialType]: event.target.value }
+      }
+    });
+  }
 
 }
 

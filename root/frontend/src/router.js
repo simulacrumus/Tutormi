@@ -10,6 +10,9 @@ import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
 import Flip from "./components/login/Login2"
 import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunctions";
+import { addUser } from "./util/apiCallFunctions";
+
+addUser();
 
 export default class Router extends Component {
 

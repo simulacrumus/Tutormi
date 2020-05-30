@@ -13,6 +13,7 @@ export async function setViewedTutor(id) {
     })
         .then(response => response.json())
         .then(viewedTutor => {
+            viewedTutor.profilePic = viewedTutor.profilePic === undefined ? "default-profile-pic.png" : viewedTutor.profilePic; // Give a default profile pic to viewed tutors without one
             store.dispatch({ type: VIEWED_TUTOR_SET, payload: viewedTutor });
         })
         .then(() => window.location.href = "/viewTutor"); // This should not always relocate, fix it later
