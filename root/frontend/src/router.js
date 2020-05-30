@@ -9,6 +9,9 @@ import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
 import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunctions";
+import { addUser } from "./util/apiCallFunctions";
+
+addUser();
 
 export default class Router extends Component {
 

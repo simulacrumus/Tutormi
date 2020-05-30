@@ -31,14 +31,23 @@
   align-items: center;
 }
 
-#myPreview {
+#profilePictureUploadPreview {
   object-fit: cover;
   height: 60px;
   width: 80px;
 }
 
 .editProfileModal {
-  max-height: 85vh;
-  min-height: 85vh;
-  min-width: 55vw;
+  /* max-height: 85vh;
+  min-height: 85vh; */
+  min-width: 45vw;
+}
+
+.editChips {
+  margin: 4px;
+}
+
+.editFormErrorMessage {
+  color: red;
+  text-align: center;
 }

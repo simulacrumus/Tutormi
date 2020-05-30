@@ -9,7 +9,7 @@ class ProfileNavBar extends Component {
   render() {
     return (
       <Navbar className="customNavBar" variant="dark" expand="lg">
-        <Navbar.Brand href="#home">Tutormi</Navbar.Brand>
+        <Navbar.Brand href="/">Tutormi</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
@@ -24,8 +24,7 @@ class ProfileNavBar extends Component {
           <Navbar.Text>
             Signed in as: <a href="/login" onClick={() => logout()}>{this.props.name}</a>
           </Navbar.Text>
-          <img src={this.props.profilePic === undefined ? require("../../images/uploads/default-profile-pic.png")
-            : require(`../../images/uploads/${this.props.profilePic}`)}></img>
+          <img src={require(`../../images/uploads/${this.props.profilePic}`)}></img>
         </Navbar.Collapse>
       </Navbar>
     );

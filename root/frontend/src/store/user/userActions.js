@@ -113,6 +113,7 @@ export async function logInUser(email, password, userType) {
   // Only update the store if everything was ok
   if (!message) {
     user.user.type = userType;
+    user.profilePic = user.profilePic === undefined ? "default-profile-pic.png" : user.profilePic; // Give a default profile pic to users without one
     store.dispatch({
       type: USER_LOGGED_IN,
       payload: { user: user, token: responseToken.token },
@@ -123,51 +124,40 @@ export async function logInUser(email, password, userType) {
 }
 
 export function logout() {
-    store.dispatch({ type: USER_LOGGED_OUT });
+  store.dispatch({ type: USER_LOGGED_OUT });
 }
 
 export function changeUserImage(profilePic) {
-    store.dispatch({ type: USER_IMAGE_UPDATED, payload: profilePic });
+  store.dispatch({ type: USER_IMAGE_UPDATED, payload: profilePic });
 }
 
 export function cancelAppointment(appointment) {
-    store.dispatch({
-        type: APPOINTMENT_CANCELED,
-        payload: appointment,
-    });
+  store.dispatch({
+    type: APPOINTMENT_CANCELED,
+    payload: appointment,
+  });
 
-    if (isViewedTutorSet() && store.getState().viewedTutor.viewedTutor._id === appointment.tutor.id)
-        cancelViewedTutorAppointment(appointment); // Clear the viewed tutor appointment to keep page responsive
+  if (isViewedTutorSet() && store.getState().viewedTutor.viewedTutor._id === appointment.tutor.id)
+    cancelViewedTutorAppointment(appointment); // Clear the viewed tutor appointment to keep page responsive
 }
 
 export async function updateUser(updateInfo) {
-    await store.dispatch({
-        type: USER_INFO_UPDATED,
-        payload: updateInfo,
-    });
-
-    fetch("/api/tutors", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-auth-token": store.getState().userReducer.token,
-        },
-        body: JSON.stringify(updateInfo),
-    })
-        .then((response) => response.json())
-        .then((updatedUser) => console.log(updatedUser));
+  await store.dispatch({
+    type: USER_INFO_UPDATED,
+    payload: updateInfo,
+  });
 }
 
 export function openAvailabilityHour(availabilityDate) {
-    store.dispatch({
-        type: AVAILABILITY_OPENED,
-        payload: availabilityDate,
-    });
+  store.dispatch({
+    type: AVAILABILITY_OPENED,
+    payload: availabilityDate,
+  });
 }
 
 export function bookAppointment(appointment) {
-    store.dispatch({
-        type: APPOINTMENT_BOOKED,
-        payload: appointment,
-    });
+  store.dispatch({
+    type: APPOINTMENT_BOOKED,
+    payload: appointment,
+  });
 }

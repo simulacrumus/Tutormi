@@ -7,9 +7,7 @@ export default class PersonalSummary extends Component {
   render() {
     return (
       <div className="summarySection">
-        {console.log(this.props.person.imgPath)}
-        <img className="profileImg" src={this.props.person.profilePic === undefined ? require("../../images/uploads/default-profile-pic.png")
-          : require(`../../images/uploads/${this.props.person.profilePic}`)} />
+        <img className="profileImg" src={require(`../../images/uploads/${this.props.person.profilePic}`)} />
         <div className="textContainer">
           <h3>{this.props.person.user.name}</h3>
           <h6>{this.props.person.user.email}</h6>
