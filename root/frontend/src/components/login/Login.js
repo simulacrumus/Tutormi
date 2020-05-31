@@ -1,17 +1,13 @@
 // login.js contains form for the user to login
-import React, { useState } from "react";
+import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button, Form } from "react-bootstrap";
-import { Component } from "react";
-import { connect } from "react-redux";
-import MainNavigation from "../navigation/MainNavigation"
-//import Modal from 'react'
+import { Form, Modal } from "react-bootstrap";
+
+import MainNavigation from "../navigation/MainNavigation";
 import CustomButton from "./CustomButton.js";
 import { logInUser } from "../../store/user/userActions";
-import login from "./Signin";
+
 import "./Login.css";
-
-
 
 const validEmailRegex = RegExp(
   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
@@ -29,6 +25,7 @@ class Login extends Component {
       email: "",
       password: "",
       userType: "",
+      showModal: false,
       errors: {
         email: "",
         password: "",
@@ -102,101 +99,139 @@ class Login extends Component {
         console.error("HANDLE SUBMIT SAYS: invalid Form");
       }
     }
-
   }
-
+  modalFunction(e) {
+    window.addEventListener("load", () => {
+      document.querySelector("#myButton").addEventListener("click", (e) => {
+        this.setState({ ...this.state, showModal: true });
+      });
+    });
+    e.preventDefault();
+  }
   render() {
-   // console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state); //to check the most up to date state
+    // console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state); //to check the most up to date state
     const { errors } = this.state;
+
     return (
-      <div className="parentLoginFormBoxContainer">
-   <MainNavigation />
- 
-        <div className="loginFormBoxContainer">
-          <h1 className="welcomeSign">Sign In</h1>
+      <>
+        <Modal
+          centered="true"
+          show={this.state.showModal}
+          onHide={() => {
+            this.setState({ ...this.state, showModal: false });
+            window.location.href = "/login";
+          }}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Help us reset your password!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+           check your email to reset your account password!
+          </Modal.Body>
+        </Modal>
+        <MainNavigation />
+        <div className="parentLoginFormBoxContainer">
+         
 
-          <Form onSubmit={this.handleSubmit}>
-            <Form.Group controlId="formBasicEmail">
-              <Form.Label>Email address</Form.Label>
-              <Form.Control
-                onBlur={this.handleInputChange}
-                onChange={this.handleInputChange}
-                name="email"
-                placeholder="Enter email"
-              />
-              {errors.email.length > 0 && (
-                <Form.Text className="error">{errors.email}</Form.Text>
-              )}
-              {/* <Form.Text className="text-muted">
-                We'll never share your email with anyone else.
-              </Form.Text> */}
-            </Form.Group>
+          <div className="loginFormBoxContainer">
+            <h3 className="welcomeSign">Sign In</h3>
+            
+            <Form onSubmit={this.handleSubmit}>
+              <Form.Group controlId="formBasicEmail">
+                <Form.Label>Email address</Form.Label>
+                <Form.Control
+                  onBlur={this.handleInputChange}
+                  onChange={this.handleInputChange}
+                  name="email"
+                  placeholder="Enter email"
+                />
+                {errors.email.length > 0 && (
+                  <Form.Text className="error">{errors.email}</Form.Text>
+                )}
+              </Form.Group>
 
-            <Form.Group controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                onBlur={this.handleInputChange}
-                onChange={this.handleInputChange}
-                name="password"
-                type="password"
-                placeholder="Password"
-              />
-              {errors.password.length > 0 && (
-                <Form.Text className="error">{errors.password}</Form.Text>
-              )}
-            </Form.Group>
-            <Form.Group controlId="formBasicCheckbox">
-              <Form.Check
-                name="rememberMe"
-                type="checkbox"
-                label="Remember me"
-              />
-            </Form.Group>
+              <Form.Group controlId="formBasicPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  onBlur={this.handleInputChange}
+                  onChange={this.handleInputChange}
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                />
+                {errors.password.length > 0 && (
+                  <Form.Text className="error">{errors.password}</Form.Text>
+                )}
+              </Form.Group>
+              <Form.Group controlId="formBasicCheckbox">
+                <Form.Check
+                  name="rememberMe"
+                  type="checkbox"
+                  label="Remember me"
+                />
+              </Form.Group>
 
-            <Form.Text id="submittion-error" className="error">
-              {errors.login}
+              <Form.Text id="submittion-error" className="error">
+                {errors.login}
+              </Form.Text>
+
+              <CustomButton
+                name="login"
+                type="submit"
+                onClick={() => {
+                  console.log("random message");
+                  this.setState({ ...this.state, userType: "tutor" });
+                }}
+              >
+                Login as a tutor
+              </CustomButton>
+              <CustomButton
+              type="submit"
+                name="login"
+                onClick={() => {
+                  this.setState({ ...this.state, userType: "tutee" });
+                }}
+              >
+                Login as a tutee
+              </CustomButton>
+            </Form>
+            <Form.Text
+              style={{ alignSelf: "flex-end" }}
+              className="forgot-password"
+            >
+              Forgot{" "}
+              <a
+              href ="/login"
+                id="myButton"
+                onClick={(e) => {
+                  e.preventDefault()
+                  this.setState({ ...this.state, showModal: true });
+                }}
+               
+              >
+                password?
+              </a>
+            </Form.Text>
+            <br />
+            <Form.Text style={{ fontSize: "15px" }}>
+              Not a member yet?
             </Form.Text>
 
             <CustomButton
-              name="login"
+              name="buttonSignUp"
               onClick={() => {
-                console.log("random message");
-                this.setState({ ...this.state, userType: "tutor" });
-              }}
-            >
-              Login as a tutor
-            </CustomButton>
-            <CustomButton
-              name="login"
-              onClick={() => {
-                this.setState({ ...this.state, userType: "tutee" });
-              }}
-            >
-              Login as a tutee
-            </CustomButton>
-          </Form>
-          {/* sign up button must be implemented as a custom button */}
-          <Form.Text
-            style={{ alignSelf: "flex-end" }}
-            className="forgot-password"
-          >
-            Forgot <a href="google.com">password?</a>
-          </Form.Text>
-          <Form.Text>Or</Form.Text>
-          <br />
-          <CustomButton
-            name="buttonSignUp"
-            onClick={() => {
-              //setCount(count + 1);
+                //setCount(count + 1);
                 //  this.props.flip()
-              window.location.href = "/signup";
-            }}
-          >
-            sign up
-          </CustomButton>
-          {/* <p>Join {count} users that already signed up</p> */}
-        </div>
-      </div> // end of "parentLoginFormBoxContainer"
+                window.location.href = "/signup";
+              }}
+            >
+              sign up
+            </CustomButton>
+            {/* <p>Join {count} users that already signed up</p> */}
+          </div>
+        </div>{" "}
+        // end of "parentLoginFormBoxContainer"
+      </>
     );
   }
 }
