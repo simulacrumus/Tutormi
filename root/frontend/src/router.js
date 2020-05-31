@@ -8,7 +8,7 @@ import SearchMain from "./components/SearchMain";
 import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
-import Flip from "./components/login/Login2"
+// import Flip from "./components/login/Login2"
 import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunctions";
 
 export default class Router extends Component {
@@ -22,7 +22,7 @@ export default class Router extends Component {
           <Route path="/login" component={Login} exact />
           <Route path="/signup" component={SignUp} exact />
           {/* flip route */}
-          <Route path="/Flip" component={Flip} exact />
+          {/* <Route path="/Flip" component={Flip} exact /> */}
 
           <Route path="/profile" exact
             render={() => {
