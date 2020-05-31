@@ -34,32 +34,62 @@ const LeftPanelContent = ({
   onAddTutor,
   clearTutors,
 }) => {
-  const [rating, setRating] = useState(null);
+  const [rating, setRating] = useState(1);
   const [searchQuery, setSearchQuery] = useState(null);
   const [languageQuery, setLanguageQuery] = useState(null);
   const [courseQuery, setCourseQuery] = useState(null);
-  const [dateQuery, setDateQuery] = useState(moment(new Date().toString()));
-  const [endQuery, setEndQuery] = useState(dateQuery);
+  const [dateQuery, setDateQuery] = useState(
+    moment(new Date().toString().replace(/:([0-9])+:([0-9])+/, ":00:00"))
+  );
   const [initialDate] = useState(moment(dateQuery));
+  const [startQuery, setStartQuery] = useState(dateQuery);
+  const [endQuery, setEndQuery] = useState(dateQuery);
+  const [initialStart] = useState(moment(startQuery));
   const [initialEnd] = useState(moment(endQuery));
   const classes = useStyles();
 
-  const handleDateChange = (date) => {
+  const handleDateChange = (date, number) => {
+    let calendarDate = date.toString().substring(0, 15);
+    let currentStart = startQuery.toString().substring(15);
+    let currentEnd = endQuery.toString().substring(15);
+    date = calendarDate + currentStart;
     setDateQuery(date);
-    console.log("FORMAT: ", dateQuery.toISOString().substring(0, 23));
+    if (number === 1) {
+      setStartQuery(date);
+    }
+    date = calendarDate + currentEnd;
+    setEndQuery(date);
+  };
+
+  const handleStartChange = (date) => {
+    let calendarDate = dateQuery.toString().substring(0, 15);
+    let userDate = date.toString().substring(15);
+    date = calendarDate + userDate;
+    setStartQuery(date);
+  };
+
+  const handleEndChange = (date, number) => {
+    let calendarDate = dateQuery.toString().substring(0, 15);
+    let userDate = date.toString().substring(15);
+    date = calendarDate + userDate;
+    setEndQuery(date);
+    /*if (number == 1) {
+      setStartQuery("2020-05-17T10:00:00.000Z")
+    setStartQuery(calendarDate + startQuery.toString().substring(15));
+    }*/
   };
 
   useEffect(() => {
     if (
-      rating === null &&
+      rating === 1 &&
       searchQuery === null &&
       languageQuery === null &&
       courseQuery === null &&
-      moment(dateQuery).isSame(initialDate) &&
-      moment(endQuery).isSame(initialEnd)
+      moment(startQuery).isSame(initialStart)
     ) {
       const getTutors = async () => {
         try {
+          tutorList.map((tutor) => clearTutors(tutor));
           const response = await fetch("/api/tutors");
           const data = await response.json();
           data.map((tutor) => onAddTutor(tutor));
@@ -75,20 +105,19 @@ const LeftPanelContent = ({
     rating,
     languageQuery,
     courseQuery,
-    dateQuery,
-    initialDate,
-    endQuery,
-    initialEnd,
+    startQuery,
+    initialStart,
   ]);
 
   useEffect(() => {
     if (
-      rating !== null ||
+      rating !== 1 ||
       searchQuery !== null ||
       languageQuery !== null ||
       courseQuery !== null ||
-      !moment(dateQuery).isSame(initialDate) ||
-      !moment(endQuery).isSame(initialEnd)
+      !moment(startQuery).isSame(initialStart) ||
+      (!moment(startQuery).isSame(initialStart) &&
+        !moment(dateQuery).isSame(initialDate))
     ) {
       const filterState = async () => {
         try {
@@ -101,15 +130,20 @@ const LeftPanelContent = ({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              start: dateQuery.toISOString(),
-              end: endQuery.toISOString(),
+              start: !moment(startQuery).isSame(initialStart) ? startQuery : "",
+              end:
+                !moment(startQuery).isSame(initialStart) &&
+                !moment(endQuery).isSame(initialEnd)
+                  ? endQuery
+                  : "",
               course: courseQuery,
               language: languageQuery,
               rating: rating,
               key: searchQuery,
             }),
           });
-
+          console.log("Start TIME!!: ", startQuery);
+          console.log("END TIME!!: ", endQuery);
           const data = await response.json();
           data.map((tutor) => onAddTutor(tutor));
           console.log("DATA FETCHED!!");
@@ -124,10 +158,8 @@ const LeftPanelContent = ({
     rating,
     languageQuery,
     courseQuery,
-    dateQuery,
-    initialDate,
-    endQuery,
-    initialEnd,
+    startQuery,
+    initialStart,
   ]);
 
   return (
@@ -177,29 +209,38 @@ const LeftPanelContent = ({
           id="date-picker-inline"
           label="Select a date"
           value={dateQuery}
-          onChange={handleDateChange}
+          onChange={(date) => {
+            moment(startQuery).isSame(initialStart)
+              ? handleDateChange(date, 0)
+              : handleDateChange(date, 1);
+          }}
           KeyboardButtonProps={{
             "aria-label": "change date",
           }}
         />
         <KeyboardTimePicker
+          variant="inline"
           margin="normal"
           id="start"
           label="Start Time"
-          value={dateQuery}
-          onChange={handleDateChange}
+          views="hours"
+          value={startQuery}
+          onChange={(date) => {
+            handleStartChange(date);
+          }}
           KeyboardButtonProps={{
             "aria-label": "change time",
           }}
         />
         <KeyboardTimePicker
+          variant="inline"
           margin="normal"
           id="end"
           label="End Time"
+          views="hours"
           value={endQuery}
           onChange={(date) => {
-            setEndQuery(date);
-            console.log("END TIME!!: ", endQuery);
+            handleEndChange(date);
           }}
           KeyboardButtonProps={{
             "aria-label": "change time",
