@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     confirmed: {
         type: Boolean,
         default: false
+    },
+    profile: {
+        type: Boolean,
+        default: false
     }
 
 });

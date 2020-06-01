@@ -43,7 +43,8 @@ router.post(
 
         const {
             email,
-            password
+            password,
+            type
         } = req.body;
 
         try {
@@ -73,15 +74,25 @@ router.post(
                     });
             }
 
-            // if (!user.confirmed) {
-            //     return res
-            //         .status(400)
-            //         .json({
-            //             errors: [{
-            //                 message: 'Please confirm your email first'
-            //             }]
-            //         });
-            // }
+            if (type !== user.type) {
+                return res
+                    .status(400)
+                    .json({
+                        errors: [{
+                            message: `Please login as ${user.type}`
+                        }]
+                    });
+            }
+
+            if (!user.confirmed) {
+                return res
+                    .status(400)
+                    .json({
+                        errors: [{
+                            message: 'Please confirm your email first'
+                        }]
+                    });
+            }
 
             const payload = {
                 user: {
@@ -97,13 +108,14 @@ router.post(
                 (err, token) => {
                     if (err) throw err;
                     res.json({
-                        token
+                        token,
+                        hasProfile: user.profile
                     });
                 }
             );
         } catch (err) {
             console.error(err.message);
-            res.status(500).send('*auth* Server error');
+            res.status(500).send('Server error');
         }
     }
 );
