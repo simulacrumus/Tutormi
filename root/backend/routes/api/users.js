@@ -5,6 +5,7 @@ const {
     checkSchema,
     validationResult
 } = require('express-validator');
+const auth = require('../../middleware/auth');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const secret = config.get('jwtSecret');
@@ -113,7 +114,7 @@ router.post('/', [
     }
 });
 
-// @route   PUT api/users/confirmation/:token
+// @route   GET api/users/confirmation/:token
 // @desc    Confirm user email
 // @access  Public
 router.get('/confirmation/:token', async ({
@@ -142,6 +143,140 @@ router.get('/confirmation/:token', async ({
             msg: 'Token is not valid!'
         });
     }
+});
+
+
+// @route   POST api/users/forgetpswd
+// @desc    Forget password route, takes email and sends a link to that email
+// @access  Public
+router.post('/forgetpswd', [
+    check('email', 'Email cannot be empty').not().isEmpty(),
+    check('email', 'Email address not valid').isEmail()
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        });
+    }
+
+    const {
+        email
+    } = req.body;
+
+    const user = await User.findOne({
+        email
+    })
+
+    if (!user) {
+        return res.status(400).json({
+            message: "User not found"
+        })
+    }
+
+    const payload = {
+        user: {
+            id: user.id
+        }
+    }
+
+    jwt.sign(payload, config.get('jwtSecret'), {
+        expiresIn: '1d'
+    }, (err, token) => {
+        if (err) throw err;
+
+        // create html 
+        const htmloutput = `<h3>Hi, ${user.name}!</h3>
+        <p>Click <a href="http://localhost:5000/api/users/password/${token}" target="_blank" >here</a> to reset your password!</p>`
+
+        // send mail with defined transport object
+        transporter.sendMail({
+            from: '"Tutormi" <info@tutormiproject.com>', // sender address
+            to: `${email}`, // list of receivers
+            subject: "TUTORMI - RESET PASSWORD", // Subject line
+            text: "", // plain text body
+            html: htmloutput, // html body
+        });
+
+        res.json({
+            message: `Please check your email`
+        })
+    })
+});
+
+// @route   GET api/users/password/:token
+// @desc    
+// @access  Public
+router.get('/password/:token', async ({
+    params: {
+        token
+    }
+}, res) => {
+    try {
+        const decoded = jwt.verify(token, secret);
+
+        const user = await User.findById({
+            _id: decoded.user.id
+        })
+
+        if (!user) {
+            return res.status(400).json({
+                message: 'User not found!'
+            });
+        }
+
+        res.json(user);
+    } catch (err) {
+        res.status(401).json({
+            msg: 'Token is not valid!'
+        });
+    }
+});
+
+// @route   POST api/users/forgetpswd
+// @desc    Forget password route, takes email and sends a link to that email
+// @access  Private
+router.post('/changepswd', auth, [
+    check('password1', 'Password cannot be empty').not().isEmpty(),
+    check('password2', 'Password cannot be empty').not().isEmpty()
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        });
+    }
+
+    const {
+        password1,
+        password2
+    } = req.body;
+
+    if (password1 !== password2) {
+        return res.status(400).json({
+            message: 'Passwords do nott match'
+        });
+    }
+
+    try {
+        const user = await User.findOneAndUpdate({
+            _id: req.user.user.id
+        }, {
+            password: password1
+        })
+
+        if (!user) {
+            return res.status(400).json({
+                message: "User not found"
+            })
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.log(err.message);
+        res.status(500).send('Server error!');
+    }
+
 });
 
 
