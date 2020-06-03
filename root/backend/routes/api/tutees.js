@@ -37,7 +37,11 @@ router.get("/me", auth, async (req, res) => {
 // @access  Private
 router.post(
   "/",
-  [auth, [check("languages", "Language is required").not().isEmpty()]],
+  [auth, [
+          check("languages", "Language is required").not().isEmpty(),
+          check('name', 'Name cannot be empty').not().isEmpty(),
+          check('email', 'Email cannot be empty').isEmail()
+         ]],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -81,6 +85,14 @@ router.post(
         user: req.user.id
       });
 
+      let user = await User.findOneAndUpdate({
+        _id: req.user.user.id
+      },{
+        name,
+        email,
+        profile: true
+      });
+
       if (profile) {
         // Update
         profile = await Tutee.findOneAndUpdate({
@@ -88,16 +100,17 @@ router.post(
         }, {
           $set: tuteeProfileFields
         }, {
-          new: true
+          new: true,
+          upsert: true
         });
 
         return res.json(profile);
       }
 
       // Create
-      profile = new Tutee(tuteeProfileFields);
-      await profile.save();
-      res.json(profile);
+      // profile = new Tutee(tuteeProfileFields);
+      // await profile.save();
+      // res.json(profile);
     } catch (err) {
       console.error(err.message);
       res.status(500).send("*tuteee profile* Server Error");
@@ -228,5 +241,74 @@ router.post(
     });
   }
 );
+
+// @route   PUT api/tutees/favorites/:id
+// @desc    Add tutor to favorites list
+// @access  Private
+router.put('/favorites/:id', auth, async (req,res) => {
+  const tutorId = req.params.id;
+  try{
+    const tutee = await Tutee.findOneAndUpdate({
+      user: req.user.user.id
+    },{
+      $addToSet: {
+        favorites: tutorId
+      }
+    })
+
+    if(!tutee){
+      return res.status(400).json({
+        message: "No tutee found"
+      })
+    }
+    const tutor = await Tutor.findOneAndUpdate({
+      _id: tutorId
+    },{
+      $addToSet: {
+        followers: tutee._id
+      }
+    })
+
+    if(!tutor){
+      return res.status(400).json({
+        msg: "Tutor not found"
+      })
+    }
+    return res.json("Added to favorites")
+  }catch(err){
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route   DELETE api/tutees/favorites/:id
+// @desc    Remove tutor from favorites list
+// @access  Private
+router.delete('/favorites/:id', auth, async (req,res) => {
+  const tutorId = req.params.id;
+  try{
+    const tutee = await Tutee.findOneAndUpdate({
+      user: req.user.user.id
+    },{
+      $pull: {
+        favorites: tutorId
+      }
+    })
+
+    const tutor = await Tutor.findOneAndUpdate({
+      _id: tutorId
+    },{
+      $pull: {
+        followers: tutee._id
+      }
+    })
+  return res.json({
+    msg: "Removed from favorites"
+  })
+  }catch(err){
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 module.exports = router;
