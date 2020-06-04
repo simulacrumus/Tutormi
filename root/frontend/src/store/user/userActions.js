@@ -7,13 +7,27 @@ export const USER_LOGGED_IN = "USER_LOGGED_IN";
 export const USER_INFO_UPDATED = "USER_INFO_UPDATED";
 export const USER_IMAGE_UPDATED = "USER_IMAGE_UPDATED";
 export const USER_LOGGED_OUT = "USER_LOGGED_OUT";
-
+export const USER_ADDED_TO_FAVORITES = "USER_ADDED_TO_FAVORITES";
+export const USER_REMOVED_FAVORITE = "USER_REMOVED_FAVORITE";
 // Schedule specific actions
 export const AVAILABILITY_OPENED = "AVAILABILITY_OPENED";
 export const AVAILABILITY_CANCELED = "AVAILABILITY_CANCELED";
 export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
 
+export function addTutorToFavorites(tutor) {
+  store.dispatch({
+    type: USER_ADDED_TO_FAVORITES,
+    payload: tutor
+  });
+}
+
+export function removeTutorFromFavorites(tutorId) {
+  store.dispatch({
+    type: USER_REMOVED_FAVORITE,
+    payload: tutorId
+  });
+}
 
 export async function logInUser(email, password, userType) {
   let authResponse = await fetch("/api/auth", {

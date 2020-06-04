@@ -8,7 +8,7 @@ import ListUpdateArea from './ListUpdateArea';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppBar from '@material-ui/core/AppBar';
-import { ThemeProvider } from "@material-ui/styles";
+import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../styles/materialUiTheme";
 import EditSocialArea from "./EditSocialArea";
 import ChangeProfilePictureArea from "./ChangeProfilePictureArea";
@@ -49,7 +49,6 @@ class EditButton extends Component {
               {this.state.tabValue === 0 &&
                 <Form>
                   <ChangeProfilePictureArea profilePic={this.props.user.profilePic} />
-
                   <Form.Group>
                     <Form.Label>Email address</Form.Label>
                     <Form.Control type="email" value={this.state.user.user.email}

@@ -8,15 +8,13 @@ export const VIEWED_TUTOR_APPOINTMENT_BOOKED = "VIEWED_TUTOR_APPOINTMENT_BOOKED"
 export const VIEWED_TUTOR_APPOINTMENT_CANCELED = "VIEWED_TUTOR_APPOINTMENT_CANCELED";
 
 export async function setViewedTutor(id) {
-    fetch(`/api/tutors/user/${id}`, {
+    let response = await fetch(`/api/tutors/user/${id}`, {
         method: "GET"
-    })
-        .then(response => response.json())
-        .then(viewedTutor => {
-            viewedTutor.profilePic = viewedTutor.profilePic === undefined ? "default-profile-pic.png" : viewedTutor.profilePic; // Give a default profile pic to viewed tutors without one
-            store.dispatch({ type: VIEWED_TUTOR_SET, payload: viewedTutor });
-        })
-        .then(() => window.location.href = "/viewTutor"); // This should not always relocate, fix it later
+    });
+
+    let viewedTutor = await response.json();
+    viewedTutor.profilePic = viewedTutor.profilePic === undefined ? "default-profile-pic.png" : viewedTutor.profilePic; // Give a default profile pic to viewed tutors without one
+    store.dispatch({ type: VIEWED_TUTOR_SET, payload: viewedTutor });
 }
 
 export function clearViewedTutor() {

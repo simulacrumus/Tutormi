@@ -14,7 +14,7 @@ class ScheduleMetrics extends Component {
   render() {
     return (
       <div className="scheduleMetricsContainer">
-        <h4>Your Tutoring Stats</h4>
+        {/* <h4>Your Tutoring Stats</h4> */}
         <p>
           Number of open hours this week:{" "}
           <b>{calcTotalHours(this.props.availableHours, "week")}</b>

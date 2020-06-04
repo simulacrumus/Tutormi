@@ -1,19 +1,19 @@
-.profilePage {
+.dashboardContainer {
   display: flex;
   height: 100vh;
   justify-content: space-evenly;
   margin-top: 10vh;
 }
 
-.tutorProfileContainer, .tutorWeekContainer {
+.weekScheduleContainer, .sidePanelContainer {
   display: flex;
-  height: 93vh;
+  height: 75vh;
 }
 
-.tutorWeekContainer {
+.weekScheduleContainer {
   width: 60vw;
 }
 
-.tutorProfileContainer {
+.sidePanelContainer {
   width: 30vw;
 }
