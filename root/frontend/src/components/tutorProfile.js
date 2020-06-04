@@ -12,7 +12,10 @@ import { Avatar, IconButton, CardMedia } from "@material-ui/core";
 import { Rating } from "@material-ui/lab";
 
 const useStyles = makeStyles(() => ({
-  root: {
+  /*root: {
+    minHeight: 500,
+  },*/
+  paper: {
     padding: "2px 4px",
     marginTop: 5,
     display: "flex",
@@ -49,6 +52,7 @@ const TutorProfile = ({
 }) => {
   const classes = useStyles();
   description = trimBio(description);
+  let paperKey = 0;
 
   return (
     <Card raised>
@@ -66,10 +70,10 @@ const TutorProfile = ({
         <Typography variant="body2" component="p">
           {description}
         </Typography>
-        <Typography variant="h6">Skills</Typography>
+        {/*<Typography className={classes.typography}>Skills</Typography>*/}
         {courses.map((course) => (
-          <Paper elevation="5" className={classes.root}>
-            <Typography className={classes.typography}>
+          <Paper key={++paperKey} elevation={5} className={classes.paper}>
+            <Typography key={id} className={classes.typography}>
               {course.toUpperCase()}
             </Typography>
           </Paper>
