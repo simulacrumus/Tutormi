@@ -10,13 +10,16 @@ import { displayHour12Format } from "../../../util/scheduleFunctions";
 import { saveAppointment } from "../../../util/apiCallFunctions";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { isViewedTutorSet } from "../../../util/authenticationFunctions";
+import AlertSnackbar from "../AlertSnackbar";
+
 
 export default class TuteeOpenTimeSlotPopover extends Component {
 
   state = {
     start: this.props.timeSlot.time.start.hours(),
     end: this.props.timeSlot.time.end.hours() === 0 ? 24 : this.props.timeSlot.time.end.hours(),
-    isSaving: false
+    isSaving: false,
+    showSnackbar: false
   }
 
   render() {
@@ -61,11 +64,12 @@ export default class TuteeOpenTimeSlotPopover extends Component {
                       bookAppointment(bookedAppointment); // Update the user (tutee) state
                       if (isViewedTutorSet())
                         updateViewedTutorSchedule(bookedAppointment); // Update the viewed tutor state if they are currently set
-                      this.setState({ ...this.state, isSaving: false });
+                      this.setState({ ...this.state, isSaving: false, showSnackbar: true });
                     });
                 }
                 }>Book Appointment </button>
-
+              <AlertSnackbar open={this.state.showSnackbar} onClose={() => this.setState({ ...this.state, showSnackbar: false })}
+                snackbarMsg="Appointment Saved" />
             </>
           }
         </Popover.Content>

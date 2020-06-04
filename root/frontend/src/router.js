@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import ProfilePage from "./pages/ProfilePage.js";
-import TuteeDashboardPage from "./pages/TuteeDashboardPage";
+import DashboardPage from "./pages/DashboardPage";
 import ViewTutorPage from "./pages/ViewTutorPage";
+import CreateProfilePage from "./pages/CreateProfilePage";
 import HomePage from "./pages/HomePage";
 import { Route, Switch, Redirect } from "react-router-dom";
 import SearchMain from "./components/SearchMain";
-import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
 import Flip from "./components/login/Login2"
@@ -24,6 +24,8 @@ export default class Router extends Component {
           {/* flip route */}
           <Route path="/Flip" component={Flip} exact />
 
+          <Route path="/createProfile" component={CreateProfilePage} exact />
+
           <Route path="/profile" exact
             render={() => {
               return isLoggedIn() ? <ProfilePage /> : <Redirect to="/login" />;
@@ -31,11 +33,7 @@ export default class Router extends Component {
 
           <Route path="/dashboard" exact
             render={() => {
-              if (!isLoggedIn())
-                return <Redirect to="/login" />;
-              else
-                return isTutee() ? <TuteeDashboardPage /> : <TutorDashboardPage />;
-
+              return isLoggedIn() ? <DashboardPage /> : <Redirect to="/login" />;
             }} />
 
           <Route path="/viewTutor" exact

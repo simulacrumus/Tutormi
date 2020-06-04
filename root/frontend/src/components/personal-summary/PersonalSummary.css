@@ -36,3 +36,36 @@
   transform: scale(1.015);
   transition: all 0.1s ease-in-out;
 }
+
+.nameContainer {
+  display: flex;
+  align-items: center;
+}
+
+.nameContainer h3 {
+  margin-right: 20px;
+}
+
+.personalRatingContainer {
+  margin-top: 10px;
+  background-color: #e6dff5;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.personalRatingContainer div {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.personalRatingContainer label {
+  margin-right: 5px;
+}
+
+.totalRatingContainer {
+  display: flex;
+}

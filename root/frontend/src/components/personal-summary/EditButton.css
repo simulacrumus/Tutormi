@@ -15,6 +15,10 @@
   color: #826ab3;
 }
 
+.imageUpdateAreaContainer {
+  margin-bottom: 20px;
+}
+
 .myAddInputRow {
   display: flex;
   align-items: center;
@@ -27,19 +31,20 @@
 
 .imageUploadContainer {
   display: flex;
-  justify-content: space-evenly;
   align-items: center;
 }
 
 #profilePictureUploadPreview {
   object-fit: cover;
-  height: 60px;
-  width: 80px;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .editProfileModal {
-  /* max-height: 85vh;
-  min-height: 85vh; */
   min-width: 45vw;
 }
 

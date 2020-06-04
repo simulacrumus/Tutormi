@@ -2,7 +2,7 @@ import moment from 'moment';
 import {
     USER_LOGGED_IN, USER_INFO_UPDATED, AVAILABILITY_OPENED,
     AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT,
-    USER_IMAGE_UPDATED
+    USER_IMAGE_UPDATED, USER_ADDED_TO_FAVORITES, USER_REMOVED_FAVORITE
 } from './userActions';
 import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
 
@@ -38,6 +38,16 @@ export default function userReducer(state = initialState, action) {
                     social: action.payload.social
                 }
             };
+
+        case USER_ADDED_TO_FAVORITES:
+            let favoritesList = state.user.following.slice();
+            favoritesList.push(action.payload);
+            return { ...state, user: { ...state.user, following: favoritesList } };
+
+        case USER_REMOVED_FAVORITE:
+            let favoritesListDel = state.user.following.slice();
+            favoritesListDel = favoritesListDel.filter((tutor) => tutor.user._id !== action.payload);
+            return { ...state, user: { ...state.user, following: favoritesListDel } };
 
         case AVAILABILITY_OPENED:
             copiedAvailableHours.push(action.payload);

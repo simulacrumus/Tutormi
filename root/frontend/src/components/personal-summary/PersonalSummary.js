@@ -2,14 +2,20 @@ import React, { Component } from "react";
 import "./PersonalSummary.css";
 import { SocialIcon } from "react-social-icons";
 import EditButton from "./EditButton.js";
+import Rating from '@material-ui/lab/Rating';
+import TuteeOpinionArea from "./TuteeOpinionArea";
 
 export default class PersonalSummary extends Component {
+
   render() {
     return (
       <div className="summarySection">
         <img className="profileImg" src={require(`../../images/uploads/${this.props.person.profilePic}`)} />
         <div className="textContainer">
-          <h3>{this.props.person.user.name}</h3>
+          <dv className="nameContainer">
+            <h3>{this.props.person.user.name}</h3>
+            {!this.props.isUser && <Rating value={this.props.person.rating} readOnly />}
+          </dv>
           <h6>{this.props.person.user.email}</h6>
           <p>{this.props.person.bio}</p>
           <p>
@@ -27,14 +33,19 @@ export default class PersonalSummary extends Component {
           </p>
         </div>
         <div className="socialArea">{this.createSocialArea()}</div>
-        <div className="editContainer">
-          {this.props.isUser ? <EditButton className="editIcon" /> : ""}
-        </div>
+
+        {this.props.isUser && <div className="editContainer">
+          <EditButton className="editIcon" />
+        </div>}
+
+        {!this.props.isUser && <TuteeOpinionArea />}
       </div>
     );
   }
 
   createSocialArea() {
+    if (this.props.person.social === null)
+      return;
     let socialAccounts = Object.values(this.props.person.social); // Change color later
     // Had to add 'https://' to the start of the links given in the backend examples. Will probably remove later
     return socialAccounts.map((socialAccount) => (

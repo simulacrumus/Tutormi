@@ -82,7 +82,8 @@ const TutorProfile = ({
           color="primary"
           size="medium"
           onClick={() => {
-            setViewedTutor(id);
+            setViewedTutor(id)
+              .then(() => window.location.href = "/viewTutor");
           }}
         >
           Profile
