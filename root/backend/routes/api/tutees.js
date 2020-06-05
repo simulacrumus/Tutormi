@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const auth = require("../../middleware/auth");
 const Tutee = require("../../models/tutee.model");
+const Tutor = require("../../models/tutor.model");
 const User = require("../../models/user.model");
 const {
   check,
@@ -16,8 +17,19 @@ router.get("/me", auth, async (req, res) => {
   try {
     const tutee = await
     Tutee.findOne({
-      user: req.user.user.id,
-    }).populate('user', ['name', 'email', 'date']).populate('appointments');
+        user: req.user.user.id,
+      })
+      .populate('user', ['name', 'email', 'date'])
+      .populate('appointments')
+      .populate({
+        path: 'favorites',
+        select: ['-social', '-bookingRange', '-followers', '-rating', '-languages', '-blockedTutees', '-blockedBy', '-active', '-bio', '-location', '-ratings', '-date'],
+        populate: {
+          path: 'user',
+          select: 'name',
+          model: User
+        }
+      })
 
     if (!tutee) {
       return res.status(400).json({
@@ -38,10 +50,10 @@ router.get("/me", auth, async (req, res) => {
 router.post(
   "/",
   [auth, [
-          check("languages", "Language is required").not().isEmpty(),
-          check('name', 'Name cannot be empty').not().isEmpty(),
-          check('email', 'Email cannot be empty').isEmail()
-         ]],
+    check("languages", "Language is required").not().isEmpty(),
+    check('name', 'Name cannot be empty').not().isEmpty(),
+    check('email', 'Email cannot be empty').isEmail()
+  ]],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -87,7 +99,7 @@ router.post(
 
       let user = await User.findOneAndUpdate({
         _id: req.user.user.id
-      },{
+      }, {
         name,
         email,
         profile: true
@@ -245,37 +257,37 @@ router.post(
 // @route   PUT api/tutees/favorites/:id
 // @desc    Add tutor to favorites list
 // @access  Private
-router.put('/favorites/:id', auth, async (req,res) => {
+router.put('/favorites/:id', auth, async (req, res) => {
   const tutorId = req.params.id;
-  try{
+  try {
     const tutee = await Tutee.findOneAndUpdate({
       user: req.user.user.id
-    },{
+    }, {
       $addToSet: {
         favorites: tutorId
       }
     })
 
-    if(!tutee){
+    if (!tutee) {
       return res.status(400).json({
         message: "No tutee found"
       })
     }
     const tutor = await Tutor.findOneAndUpdate({
       _id: tutorId
-    },{
+    }, {
       $addToSet: {
         followers: tutee._id
       }
     })
 
-    if(!tutor){
+    if (!tutor) {
       return res.status(400).json({
         msg: "Tutor not found"
       })
     }
     return res.json("Added to favorites")
-  }catch(err){
+  } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
@@ -284,12 +296,12 @@ router.put('/favorites/:id', auth, async (req,res) => {
 // @route   DELETE api/tutees/favorites/:id
 // @desc    Remove tutor from favorites list
 // @access  Private
-router.delete('/favorites/:id', auth, async (req,res) => {
+router.delete('/favorites/:id', auth, async (req, res) => {
   const tutorId = req.params.id;
-  try{
+  try {
     const tutee = await Tutee.findOneAndUpdate({
       user: req.user.user.id
-    },{
+    }, {
       $pull: {
         favorites: tutorId
       }
@@ -297,15 +309,15 @@ router.delete('/favorites/:id', auth, async (req,res) => {
 
     const tutor = await Tutor.findOneAndUpdate({
       _id: tutorId
-    },{
+    }, {
       $pull: {
         followers: tutee._id
       }
     })
-  return res.json({
-    msg: "Removed from favorites"
-  })
-  }catch(err){
+    return res.json({
+      msg: "Removed from favorites"
+    })
+  } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
