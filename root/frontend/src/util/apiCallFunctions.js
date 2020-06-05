@@ -93,3 +93,25 @@ export async function createAccount(name, email, password, type) {
   let message = "";
   return (message = authResponse.msg);
 }
+
+export async function addToFavoritesList(tutorId) {
+  let response = await fetch(`api/tutees/favorites/${tutorId}`, {
+    method: "PUT",
+    headers: {
+      "x-auth-token": store.getState().user.token,
+    },
+  });
+  response = await response.json();
+  console.log(response);
+}
+
+export async function removeFromFavorites(tutorId) {
+  let response = await fetch(`favorites/${tutorId}`, {
+    method: "DELETE",
+    headers: {
+      "x-auth-token": store.getState().user.token,
+    },
+  });
+  response = await response.json();
+  console.log(response);
+}

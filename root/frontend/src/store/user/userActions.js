@@ -38,11 +38,14 @@ export async function logInUser(email, password, userType) {
     body: JSON.stringify({
       email: email,
       password: password,
+      type: userType
     }),
   });
 
+
   let user = "";
   const responseToken = await authResponse.json();
+  console.log("token", responseToken);
   // Can check and deal with the authorization response here
   if (userType === "tutor") {
     let userResponse = await fetch("/api/tutors/me", {

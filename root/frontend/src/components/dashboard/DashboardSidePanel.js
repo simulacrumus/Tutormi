@@ -14,10 +14,11 @@ import moment from "moment";
 import ScheduleMetrics from "./ScheduleMetrics.js";
 import { isTutee } from "../../util/authenticationFunctions";
 import ShowChartIcon from '@material-ui/icons/ShowChart';
+import DoneIcon from '@material-ui/icons/Done';
 
 class DashboardSidePanel extends Component {
 
-  state = { tabValue: 0 }
+  state = { tabValue: 0 };
 
   render() {
     return (
@@ -31,6 +32,7 @@ class DashboardSidePanel extends Component {
                 ? <Tab label="Favorites" icon={<FavoriteIcon />} />
                 : <Tab label="Metrics" icon={<ShowChartIcon />} />}
               <Tab label="Upcoming" icon={<TodayIcon />} />
+              <Tab label="Previous" icon={<DoneIcon />} />
             </Tabs>
           </AppBar>
         </ThemeProvider>
@@ -41,10 +43,24 @@ class DashboardSidePanel extends Component {
           {(this.state.tabValue === 0 && !isTutee()) && <ScheduleMetrics />}
 
           {this.state.tabValue === 1 && this.displayUpcoming()}
+
+          {this.state.tabValue === 2 && this.displayPastAppointments()}
         </div>
 
       </div>
     );
+  }
+
+  displayAppointments(isBefore) {
+    let appointments = this.props.appointments.slice();
+    let pastAppointments = [];
+    appointments.sort((apt1, apt2) => moment(apt1.time.start).diff(moment(apt2.time.start)));
+    for (let i = 0; i < appointments.length; i++) {
+      let timeCondition = isBefore ? moment(appointments[i].time.end).isBefore(moment()) : moment(appointments[i].time.end).isAfter(moment());
+      if (timeCondition)
+        pastAppointments.push(<AppointmentView appointment={appointments[i]} />);
+    }
+    return pastAppointments.length === 0 ? <p>{`No ${isBefore ? "previous" : "upcoming"} appointments`}</p> : pastAppointments;
   }
 
   displayUpcoming() {
@@ -59,17 +75,31 @@ class DashboardSidePanel extends Component {
     return upcomingAppointments;
   }
 
+  displayPastAppointments() {
+    if (this.props.appointments.length === 0)
+      return <p>{"No previous appointments"}</p>
+
+    let appointments = this.props.appointments.slice();
+    let pastAppointments = [];
+    appointments.sort((apt1, apt2) => moment(apt1.time.start).diff(moment(apt2.time.start)));
+    for (let i = 0; i < appointments.length; i++) {
+      if (moment(appointments[i].time.end).isBefore(moment())) {
+        pastAppointments.push(<AppointmentView appointment={appointments[i]} />);
+      }
+    }
+
+    return pastAppointments;
+  }
+
   displayTutors() {
     // Tutee has no favorites
     if (this.props.favoriteTutors.length === 0) {
       return (
         <div className="tutorRowContainer">
           <p>
-            You don't have any tutors in your favorites list yet, try{" "}
-            <a href="/search">searching</a> for one.
+            You don't have any tutors in your favorites list yet, try <a href="/search">searching</a> for one.
           </p>
-        </div>
-      );
+        </div>);
     } else {
       // If the tutee has favorites display them
       let tutors = [];
@@ -79,9 +109,7 @@ class DashboardSidePanel extends Component {
           tutors.push(<div className="tutorRowContainer">{tutorRow}</div>);
           tutorRow = [];
         }
-        tutorRow[index] = (
-          <TutorView tutor={this.props.favoriteTutors[index]} />
-        );
+        tutorRow[index] = (<TutorView tutor={this.props.favoriteTutors[index]} />);
       }
       tutors.push(<div className="tutorRowContainer">{tutorRow}</div>);
       return tutors;
@@ -92,7 +120,7 @@ class DashboardSidePanel extends Component {
 function mapStateToProps(state) {
   return {
     appointments: state.user.user.appointments,
-    favoriteTutors: state.user.user.following,
+    favoriteTutors: state.user.user.favorites,
   };
 }
 
