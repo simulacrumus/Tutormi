@@ -84,15 +84,15 @@ router.post(
                     });
             }
 
-            if (!user.confirmed) {
-                return res
-                    .status(400)
-                    .json({
-                        errors: [{
-                            message: 'Please confirm your email first'
-                        }]
-                    });
-            }
+            // if (!user.confirmed) {
+            //     return res
+            //         .status(400)
+            //         .json({
+            //             errors: [{
+            //                 message: 'Please confirm your email first'
+            //             }]
+            //         });
+            // }
 
             const payload = {
                 user: {
@@ -103,8 +103,8 @@ router.post(
             jwt.sign(
                 payload,
                 config.get('jwtSecret'), {
-                    expiresIn: 180000000
-                },
+                expiresIn: 180000000
+            },
                 (err, token) => {
                     if (err) throw err;
                     res.json({

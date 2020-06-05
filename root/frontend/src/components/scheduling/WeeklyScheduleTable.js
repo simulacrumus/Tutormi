@@ -91,12 +91,12 @@ class WeeklyScheduleTable extends Component {
     findTimeSlot(day, hour, slots) {
         for (let i = 0; i < slots.length; i++) {
             if (slots[i].time.end.hours() === 0) {
-                if (fallsOnSameDay(this.props.weekStart.clone().add(day, "day"), moment(slots[i].time.start))
+                if (!(slots[i].time.start.isBefore(moment())) && fallsOnSameDay(this.props.weekStart.clone().add(day, "day"), moment(slots[i].time.start))
                     && hour >= slots[i].time.start.hours() && hour < 24) {
                     return slots[i];
                 }
             } else {
-                if (fallsOnSameDay(this.props.weekStart.clone().add(day, "day"), moment(slots[i].time.start))
+                if (!(slots[i].time.start.isBefore(moment())) && fallsOnSameDay(this.props.weekStart.clone().add(day, "day"), moment(slots[i].time.start))
                     && hour >= slots[i].time.start.hours() && hour < slots[i].time.end.hours()) {
                     return slots[i];
                 }
