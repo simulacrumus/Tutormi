@@ -258,21 +258,11 @@ router.post(
 // @desc    Add tutor to favorites list
 // @access  Private
 router.put('/favorites/:id', auth, async (req, res) => {
-  const tutorId = req.params.id;
-  try {
-    const tutee = await Tutee.findOneAndUpdate({
-      user: req.user.user.id
-    }, {
-      $addToSet: {
-        favorites: tutorId
-      }
-    })
 
-    if (!tutee) {
-      return res.status(400).json({
-        message: "No tutee found"
-      })
-    }
+  const tutorId = req.params.id;
+
+  try {
+
     const tutor = await Tutor.findOneAndUpdate({
       _id: tutorId
     }, {
@@ -283,7 +273,21 @@ router.put('/favorites/:id', auth, async (req, res) => {
 
     if (!tutor) {
       return res.status(400).json({
-        msg: "Tutor not found"
+        message: "There's no tutor with this id"
+      })
+    }
+
+    const tutee = await Tutee.findOneAndUpdate({
+      user: req.user.user.id
+    }, {
+      $addToSet: {
+        favorites: tutorId
+      }
+    })
+
+    if (!tutee) {
+      return res.status(400).json({
+        msg: "There's no tutee with this id"
       })
     }
     return res.json("Added to favorites")
@@ -297,7 +301,9 @@ router.put('/favorites/:id', auth, async (req, res) => {
 // @desc    Remove tutor from favorites list
 // @access  Private
 router.delete('/favorites/:id', auth, async (req, res) => {
+
   const tutorId = req.params.id;
+
   try {
     const tutee = await Tutee.findOneAndUpdate({
       user: req.user.user.id
@@ -307,6 +313,12 @@ router.delete('/favorites/:id', auth, async (req, res) => {
       }
     })
 
+    if (!tutee) {
+      return res.status(400).json({
+        message: "There's no tutee with this id"
+      })
+    }
+
     const tutor = await Tutor.findOneAndUpdate({
       _id: tutorId
     }, {
@@ -314,6 +326,13 @@ router.delete('/favorites/:id', auth, async (req, res) => {
         followers: tutee._id
       }
     })
+
+    if (!tutor) {
+      return res.status(400).json({
+        message: "There's no tutor with this id"
+      })
+    }
+
     return res.json({
       msg: "Removed from favorites"
     })

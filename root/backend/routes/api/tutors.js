@@ -25,7 +25,7 @@ router.get('/me', auth, async (req, res) => {
                 user: req.user.user.id
             })
             .populate('user', ['name', 'email', 'date', 'type'])
-            .populate('appointments');
+            .populate('appointments')
 
         if (!tutor) {
             return res.status(400).json({
@@ -115,7 +115,11 @@ router.get('/', async (req, res) => {
     try {
         const tutors = await Tutor.find()
             .populate('user', ['name', 'email', 'type'])
-            .populate('appointments');;
+            .populate('appointments', '-date', null, {
+                sort: {
+                    'start': -1
+                }
+            })
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -273,89 +277,6 @@ router.post('/search', auth, async (req, res) => {
     }
 });
 
-// @route    PUT api/tutors/block/:id
-// @desc     Block tutor using their user id
-// @access   Private
-router.put('/block/:id', auth, async (req, res) => {
-    try {
-
-        let tutor = await Tutor.findById(req.params.id);
-
-        if (!tutor) {
-            return res.status(400).json({
-                message: 'Tutor not found'
-            })
-        }
-
-        await Tutor.findOneAndUpdate({
-            _id: req.params.id
-        }, {
-            $addToSet: {
-                blockedBy: req.user.user.id
-            }
-        });
-
-        await Tutee.findOneAndUpdate({
-            user: req.user.user.id
-        }, {
-            $addToSet: {
-                blockedUsers: tutor.user.id
-            }
-        });
-
-        tutor = await Tutor.findById(req.params.id);
-
-        return res.json(tutor);
-    } catch (err) {
-        console.error(err.message);
-        return res.status(500).json({
-            msg: 'Server error'
-        });
-    }
-});
-
-
-// @route    PUT api/tutors/unblock.:id
-// @desc     Unblock tutor using their user id
-// @access   Private
-router.put('/unblock/:id', auth, async (req, res) => {
-    try {
-
-        let tutor = await Tutor.findById(req.params.id);
-
-        if (!tutor) {
-            return res.status(400).json({
-                message: 'Tutor not found'
-            })
-        }
-
-        await Tutor.findOneAndUpdate({
-            _id: req.params.id
-        }, {
-            $pull: {
-                blockedBy: req.user.user.id
-            }
-        });
-
-        await Tutee.findOneAndUpdate({
-            user: req.user.user.id
-        }, {
-            $pull: {
-                blockedUsers: tutor.user.id
-            }
-        });
-
-        tutor = await Tutor.findById(req.params.id);
-
-        return res.json(tutor);
-    } catch (err) {
-        console.error(err.message);
-        return res.status(500).json({
-            msg: 'Server error'
-        });
-    }
-});
-
 // @route    POST api/tutors/schedule
 // @desc     Update available hours
 // @access   Private
@@ -371,7 +292,8 @@ router.post('/schedule', auth, async (req, res) => {
             user: req.user.user.id
         }, {
             $set: {
-                availableHours: hours.map((hour) => new Date(hour))
+                availableHours: hours.map((hour) => new Date(hour)),
+                $sort: -1
             }
         });
 
@@ -426,13 +348,23 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
     }
 
     try {
+
+        let tutor = await Tutor.findOne({
+            user: req.user.user.id
+        })
+
+        fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
+            if (err) throw err;
+            console.log('Previous profile picture removed');
+        });
+
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
             profilePic: req.file.filename
         });
 
-        const tutor = await Tutor.findOne({
+        tutor = await Tutor.findOne({
             user: req.user.user.id
         });
 
@@ -454,13 +386,23 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
     }
 
     try {
+
+        let tutor = await Tutor.findOne({
+            user: req.user.user.id
+        })
+
+        fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
+            if (err) throw err;
+            console.log('Previous cover picture removed');
+        });
+
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
             cover: req.file.filename
         });
 
-        const tutor = await Tutor.findOne({
+        tutor = await Tutor.findOne({
             user: req.user.user.id
         });
 
