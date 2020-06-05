@@ -141,7 +141,10 @@ router.post('/', [auth, [
                 }
             },
             $addToSet: {
-                appointments: appointment._id
+                appointments: appointment._id,
+                $sort: {
+                    start: -1
+                }
             }
         })
 
@@ -149,7 +152,10 @@ router.post('/', [auth, [
             _id: tuteeid
         }, {
             $addToSet: {
-                appointments: appointment._id
+                appointments: appointment._id,
+                $sort: {
+                    start: -1
+                }
             }
         })
 
@@ -298,7 +304,8 @@ router.delete('/:id', auth, async (req, res) => {
             _id: appointment.tutor.id
         }, {
             $addToSet: {
-                availableHours: appointmentHours
+                availableHours: appointmentHours,
+                $sort: -1
             },
             $pull: {
                 appointments: req.params.id
