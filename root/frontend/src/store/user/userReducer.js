@@ -40,9 +40,9 @@ export default function userReducer(state = initialState, action) {
             };
 
         case USER_ADDED_TO_FAVORITES:
-            let favoritesList = state.user.following.slice();
+            let favoritesList = state.user.favorites.slice();
             favoritesList.push(action.payload);
-            return { ...state, user: { ...state.user, following: favoritesList } };
+            return { ...state, user: { ...state.user, favorites: favoritesList } };
 
         case USER_REMOVED_FAVORITE:
             let favoritesListDel = state.user.following.slice();
