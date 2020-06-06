@@ -44,78 +44,11 @@ router.get("/me", auth, async (req, res) => {
   }
 });
 
-// @route   GET api/tutees
+// @route   POST api/tutees/
 // @desc    Create or update user's tutee profile
 // @access  Private
 router.post(
   "/",
-  [auth, [
-    check("languages", "Language is required").not().isEmpty()
-  ]],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        errors: errors.array()
-      });
-    }
-
-    const {
-      bio,
-      languages,
-      location,
-      linkedin,
-      twitter,
-      facebook,
-      instagram
-    } = req.body;
-
-    // Build tutee profile object
-    const tuteeProfileFields = {};
-    tuteeProfileFields.user = req.user.user.id;
-    if (bio) tuteeProfileFields.bio = bio;
-    if (languages) {
-      tuteeProfileFields.languages = Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim())
-    }
-
-    if (location) tuteeProfileFields.location = location;
-
-    //Build social object
-    tuteeProfileFields.social = {};
-    if (linkedin) tuteeProfileFields.social.linkedin = linkedin;
-    if (twitter) tuteeProfileFields.social.twitter = twitter;
-    if (facebook) tuteeProfileFields.social.facebook = facebook;
-    if (instagram) tuteeProfileFields.social.instagram = instagram;
-
-    try {
-
-      // Update
-      const tutee = await Tutee.findOneAndUpdate({
-          user: req.user.user.id
-        }, {
-          $set: tuteeProfileFields
-        }, {
-          new: true,
-          upsert: true
-        })
-        .populate('user', ['name', 'email', 'type'])
-        .populate('appointments');
-
-      return res.json(tutee);
-
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("*tuteee profile* Server Error");
-    }
-  }
-);
-
-
-// @route   GET api/tutees/update
-// @desc    Update user's tutee profile
-// @access  Private
-router.post(
-  "/update",
   auth, [
     check("languages", "Language is required").not().isEmpty(),
     check('name', 'Name cannot be empty').not().isEmpty()
@@ -146,17 +79,26 @@ router.post(
 
     try {
 
-      const user = await User.findOneAndUpdate({
+      query = {
+        profile: true
+      }
+      if (name) {
+        query.name = name;
+      }
+      //change user name and profile fields
+      await User.findOneAndUpdate({
         _id: req.user.user.id
       }, {
-        name,
-        profile: true
-      });
+        query
+      })
 
       const tutee = await Tutee.findOneAndUpdate({
-          user: user.id
+          user: req.user.user.id
         }, {
           $set: tuteeProfileFields
+        }, {
+          new: true,
+          upsert: true
         })
         .populate('user', ['name', 'email', 'type'])
         .populate('appointments');
