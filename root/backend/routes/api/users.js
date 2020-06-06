@@ -92,7 +92,7 @@ router.post('/', [
 
             // create html 
             const htmloutput = `<h3>Hi, ${name}! Welcome to Tutormi</h3>
-            <p>Click <a href="http://localhost:5000/api/users/confirmation/${token}" target="_blank" >here</a> to confirm your email!</p>`
+            <p>Click <a href="http://localhost:3000/emailConfirmation?token=${token}" target="_blank" >here</a> to confirm your email!</p>`
 
             // send mail with defined transport object
             transporter.sendMail({

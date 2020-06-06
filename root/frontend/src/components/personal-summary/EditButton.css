@@ -56,3 +56,8 @@
   color: red;
   text-align: center;
 }
+
+.imageUploadButtons {
+  display: flex;
+  flex-direction: column;
+}

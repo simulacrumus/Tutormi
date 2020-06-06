@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import ProfileNavBar from "../components/logged-in-nav-bar/ProfileNavBar.js";
-import WeeklySchedule from "../components/scheduling/WeeklySchedule.js";
+import ProfileNavBar from "../../components/logged-in-nav-bar/ProfileNavBar.js";
+import WeeklySchedule from "../../components/scheduling/WeeklySchedule.js";
 import "./DashboardPage.css";
-import DashboardSidePanel from "../components/dashboard/DashboardSidePanel";
-import { clearViewedTutor } from "../store/viewed-tutor/viewedTutorActions";
+import DashboardSidePanel from "../../components/dashboard/DashboardSidePanel";
+import { clearViewedTutor } from "../../store/viewed-tutor/viewedTutorActions";
 
 export default class DashboardPage extends Component {
 

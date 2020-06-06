@@ -8,10 +8,12 @@ import TuteeOpinionArea from "./TuteeOpinionArea";
 export default class PersonalSummary extends Component {
 
   render() {
+    let width = this.props.isUser ? "summaryBigWidth" : "summarySmallWidth";
+    let height = this.props.isUser ? "summaryBigHeight" : "summarySmallHeight";
     return (
       <div className="summarySection">
-        <img className="profileImg" src={require(`../../images/uploads/${this.props.person.profilePic}`)} />
-        <div className="textContainer">
+        <img className={`profileImg ${width} ${height}`} src={require(`../../images/uploads/${this.props.person.profilePic}`)} />
+        <div className={`textContainer ${width}`}>
           <dv className="nameContainer">
             <h3>{this.props.person.user.name}</h3>
             {!this.props.isUser && <Rating value={this.props.person.rating} readOnly />}
@@ -32,7 +34,7 @@ export default class PersonalSummary extends Component {
             Location: {this.props.person.location}
           </p>
         </div>
-        <div className="socialArea">{this.createSocialArea()}</div>
+        <div className={`socialArea ${width}`}>{this.createSocialArea()}</div>
 
         {this.props.isUser && <div className="editContainer">
           <EditButton className="editIcon" />
@@ -44,7 +46,7 @@ export default class PersonalSummary extends Component {
   }
 
   createSocialArea() {
-    if (this.props.person.social === null)
+    if (this.props.person.social === null || this.props.person.social === undefined)
       return;
     let socialAccounts = Object.values(this.props.person.social); // Change color later
     // Had to add 'https://' to the start of the links given in the backend examples. Will probably remove later

@@ -24,7 +24,7 @@ class ProfileNavBar extends Component {
           <Navbar.Text>
             Signed in as: <a href="/login" onClick={() => logout()}>{this.props.name}</a>
           </Navbar.Text>
-          {/* <img src={require(`../../images/uploads/${this.props.profilePic}`)}></img> */}
+          <img src={require(`../../images/uploads/${this.props.profilePic}`)}></img>
         </Navbar.Collapse>
       </Navbar>
     );

@@ -84,15 +84,15 @@ router.post(
                     });
             }
 
-            // if (!user.confirmed) {
-            //     return res
-            //         .status(400)
-            //         .json({
-            //             errors: [{
-            //                 message: 'Please confirm your email first'
-            //             }]
-            //         });
-            // }
+            if (!user.confirmed) {
+                return res
+                    .status(400)
+                    .json({
+                        errors: [{
+                            message: 'Please confirm your email first'
+                        }]
+                    });
+            }
 
             const payload = {
                 user: {

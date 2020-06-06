@@ -17,15 +17,15 @@ class ScheduleMetrics extends Component {
         <h4>Your Tutoring Stats</h4>
         <p>
           Number of booked appointment hours this week:
-          <b>{calcTotalHours(convertAppointmentsListToSingleHours(this.props.appointments), "week")}</b>
+          <b>{` ${calcTotalHours(convertAppointmentsListToSingleHours(this.props.appointments), "week")}`}</b>
         </p>
         <p>
           Number of booked appointment hours this month:
-          <b>{calcTotalHours(convertAppointmentsListToSingleHours(this.props.appointments), "month")}</b>
+          <b>{` ${calcTotalHours(convertAppointmentsListToSingleHours(this.props.appointments), "month")}`}</b>
         </p>
         <p>
           Number of booked appointment hours (all time):
-          <b>{convertAppointmentsListToSingleHours(this.props.appointments).length}</b>
+          <b>{` ${convertAppointmentsListToSingleHours(this.props.appointments).length}`}</b>
         </p>
         <Line width="400" height="250" data={this.createChartData()} />
       </div>

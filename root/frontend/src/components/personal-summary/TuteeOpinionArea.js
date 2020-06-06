@@ -6,13 +6,13 @@ import customTheme from "../../styles/materialUiTheme";
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { connect } from "react-redux";
 import { addTutorToFavorites, removeTutorFromFavorites } from "../../store/user/userActions";
-import { addToFavoritesList, removeFromFavorites } from "../../util/apiCallFunctions";
+import { updateTuteeFavorites } from "../../util/apiCallFunctions";
 
 class TuteeOpinionArea extends Component {
 
     render() {
         return (
-            <div className="personalRatingContainer">
+            <div className="personalRatingContainer summarySmallWidth">
                 <div>
                     <label >Your Rating:</label>
                     <Rating value={this.props.viewedTutor.rating} onChange={(event, newValue) => {
@@ -22,15 +22,15 @@ class TuteeOpinionArea extends Component {
                 <ThemeProvider theme={customTheme}>
                     <Button color="primary" variant="contained" startIcon={<FavoriteIcon />}
                         onClick={() => {
-                            if (this.props.tutee.favorites.some((tutor) => tutor.user._id === this.props.viewedTutor.user._id)) {
-                                removeFromFavorites(this.props.viewedTutor.user._id);
-                                removeTutorFromFavorites(this.props.viewedTutor.user._id);
+                            if (this.props.tutee.favorites.some((tutor) => tutor._id === this.props.viewedTutor._id)) {
+                                updateTuteeFavorites(this.props.viewedTutor._id, false);
+                                removeTutorFromFavorites(this.props.viewedTutor._id);
                             } else {
-                                addToFavoritesList(this.props.viewedTutor._id);
+                                updateTuteeFavorites(this.props.viewedTutor._id, true);
                                 addTutorToFavorites(this.props.viewedTutor);
                             }
                         }}>
-                        {!this.props.tutee.favorites.some((tutor) => tutor.user._id === this.props.viewedTutor.user._id)
+                        {!this.props.tutee.favorites.some((tutor) => tutor._id === this.props.viewedTutor._id)
                             ? "Add to favorites" : "Remove from favorites"}
                     </Button>
                 </ThemeProvider>

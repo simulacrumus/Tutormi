@@ -17,7 +17,7 @@ export default class ChangeProfilePictureArea extends Component {
                 <Form.Label>Profile Picture</Form.Label>
 
                 <div className="imageUploadContainer">
-                    <div className="colFlex">
+                    <div className="imageUploadButtons">
                         <input type="file" id="changeProfilePictureUpload" hidden accept="image/*"
                             onChange={e => document.getElementById("profilePictureUploadPreview").src = URL.createObjectURL(e.target.files[0])} />
                         <label htmlFor="changeProfilePictureUpload">

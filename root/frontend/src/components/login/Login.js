@@ -6,6 +6,7 @@ import { Form, Modal } from "react-bootstrap";
 import MainNavigation from "../navigation/MainNavigation";
 import CustomButton from "./CustomButton.js";
 import { logInUser } from "../../store/user/userActions";
+import { isProfileSetUp } from "../../util/authenticationFunctions";
 
 import "./Login.css";
 
@@ -90,7 +91,10 @@ class Login extends Component {
       );
       console.log("value of LOGIN returned is: ", login);
       if (!login) {
-        window.location.href = "/profile";
+        if (isProfileSetUp()) // User who has created their account previously should be sent to profile
+          window.location.href = "/profile";
+        else  // redirect tutor to create account page
+          window.location.href = "/createProfile";
       } else {
         document.getElementById("submittion-error").innerHTML = login;
         // await this.setState({ ...this.state, errors: { login: login } }, () => {
@@ -126,16 +130,16 @@ class Login extends Component {
             <Modal.Title>Help us reset your password!</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-           check your email to reset your account password!
+            check your email to reset your account password!
           </Modal.Body>
         </Modal>
         <MainNavigation />
         <div className="parentLoginFormBoxContainer">
-         
+
 
           <div className="loginFormBoxContainer">
             <h3 className="welcomeSign">Sign In</h3>
-            
+
             <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formBasicEmail">
                 <Form.Label>Email address</Form.Label>
@@ -186,7 +190,7 @@ class Login extends Component {
                 Login as a tutor
               </CustomButton>
               <CustomButton
-              type="submit"
+                type="submit"
                 name="login"
                 onClick={() => {
                   this.setState({ ...this.state, userType: "tutee" });
@@ -201,13 +205,13 @@ class Login extends Component {
             >
               Forgot{" "}
               <a
-              href ="/login"
+                href="/login"
                 id="myButton"
                 onClick={(e) => {
                   e.preventDefault()
                   this.setState({ ...this.state, showModal: true });
                 }}
-               
+
               >
                 password?
               </a>
@@ -230,7 +234,7 @@ class Login extends Component {
             {/* <p>Join {count} users that already signed up</p> */}
           </div>
         </div>{" "}
-        // end of "parentLoginFormBoxContainer"
+      // end of "parentLoginFormBoxContainer"
       </>
     );
   }

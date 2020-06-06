@@ -42,9 +42,9 @@ class DashboardSidePanel extends Component {
 
           {(this.state.tabValue === 0 && !isTutee()) && <ScheduleMetrics />}
 
-          {this.state.tabValue === 1 && this.displayUpcoming()}
+          {this.state.tabValue === 1 && this.displayAppointments(false)}
 
-          {this.state.tabValue === 2 && this.displayPastAppointments()}
+          {this.state.tabValue === 2 && this.displayAppointments(true)}
         </div>
 
       </div>
@@ -53,42 +53,14 @@ class DashboardSidePanel extends Component {
 
   displayAppointments(isBefore) {
     let appointments = this.props.appointments.slice();
-    let pastAppointments = [];
+    let filteredAppointments = [];
     appointments.sort((apt1, apt2) => moment(apt1.time.start).diff(moment(apt2.time.start)));
     for (let i = 0; i < appointments.length; i++) {
       let timeCondition = isBefore ? moment(appointments[i].time.end).isBefore(moment()) : moment(appointments[i].time.end).isAfter(moment());
       if (timeCondition)
-        pastAppointments.push(<AppointmentView appointment={appointments[i]} />);
+        filteredAppointments.push(<AppointmentView appointment={appointments[i]} />);
     }
-    return pastAppointments.length === 0 ? <p>{`No ${isBefore ? "previous" : "upcoming"} appointments`}</p> : pastAppointments;
-  }
-
-  displayUpcoming() {
-    if (this.props.appointments.length === 0)
-      return <p>{"No upcoming appointments"}</p>
-
-    let appointments = this.props.appointments.slice();
-    let upcomingAppointments = [];
-    appointments.sort((apt1, apt2) => moment(apt1.time.start).diff(moment(apt2.time.start)));
-    for (let i = 0; i < appointments.length; i++)
-      upcomingAppointments.push(<AppointmentView appointment={appointments[i]} />);
-    return upcomingAppointments;
-  }
-
-  displayPastAppointments() {
-    if (this.props.appointments.length === 0)
-      return <p>{"No previous appointments"}</p>
-
-    let appointments = this.props.appointments.slice();
-    let pastAppointments = [];
-    appointments.sort((apt1, apt2) => moment(apt1.time.start).diff(moment(apt2.time.start)));
-    for (let i = 0; i < appointments.length; i++) {
-      if (moment(appointments[i].time.end).isBefore(moment())) {
-        pastAppointments.push(<AppointmentView appointment={appointments[i]} />);
-      }
-    }
-
-    return pastAppointments;
+    return filteredAppointments.length === 0 ? <p>{`No ${isBefore ? "previous" : "upcoming"} appointments`}</p> : filteredAppointments;
   }
 
   displayTutors() {
