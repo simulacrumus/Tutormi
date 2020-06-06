@@ -100,7 +100,6 @@ class EditButton extends Component {
               <Button color="primary" variant="contained" onClick={() => {
                 this.setState({ ...this.state, isSaving: true })
                 let editInformation = {
-                  email: this.state.user.user.email,
                   name: this.state.user.user.name,
                   bio: this.state.user.bio,
                   languages: this.state.user.languages,
@@ -108,7 +107,7 @@ class EditButton extends Component {
                   courses: this.state.user.courses,
                   social: this.state.user.social
                 };
-                updateUserInformation(editInformation)  // Update the server with the new user information
+                updateUserInformation(editInformation, this.state.user.user.type)  // Update the server with the new user information
                   .then((updateResponse) => {
                     if (updateResponse.errors === undefined) { // No errors occurred when updating
                       updateUser(editInformation);

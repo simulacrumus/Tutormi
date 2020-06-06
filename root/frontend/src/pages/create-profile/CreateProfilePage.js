@@ -8,7 +8,7 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../styles/materialUiTheme";
 import EditSocialArea from "../../components/personal-summary/EditSocialArea";
 import ChangeProfilePictureArea from "../../components/personal-summary/ChangeProfilePictureArea";
-import { updateUserInformation } from "../../util/apiCallFunctions";
+import { createUserProfile } from "../../util/apiCallFunctions";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
 import NonUserNavBar from "../../components/logged-in-nav-bar/NonUserNavBar";
@@ -88,7 +88,7 @@ class CreateProfilePage extends Component {
                                             onChange={(e) => this.setState({ ...this.state, bio: e.target.value })} />
                                     </Form.Group>
 
-                                    {this.props.user.type === "tutor" &&
+                                    {this.props.type === "tutor" &&
                                         <ListUpdateArea list={this.state.courses} label="Courses*" type="course" setList={this.setCourses} />}
 
                                     <ListUpdateArea list={this.state.languages} label="Languages*" type="language" setList={this.setLanguages} />
@@ -117,18 +117,16 @@ class CreateProfilePage extends Component {
     createProfile = () => {
         this.setState({ ...this.state, isSaving: true })
         let editInformation = {
-            email: this.props.user.email,
-            name: "New user",
             bio: this.state.bio,
             languages: this.state.languages,
             location: this.state.location,
             courses: this.state.courses,
             social: this.state.social
         };
-        updateUserInformation(editInformation)  // Update the server with the new user information
+        createUserProfile(editInformation, this.props.type)  // Update the server with the new user information
             .then((updateResponse) => {
                 if (updateResponse.errors === undefined) { // No errors occurred when updating
-                    logIn(this.props.token, this.props.user.type)
+                    logIn(this.props.token, this.props.type)
                         .then((user) => window.location.href = "/profile");
                 } else {
                     this.setState({ ...this.state, isSaving: false, errors: updateResponse.errors[0].msg }); // Notify users of errors 
@@ -165,7 +163,7 @@ class CreateProfilePage extends Component {
 
 function mapStateToProps(state) {
     return {
-        user: state.user.user,
+        type: state.user.user.user.type,
         token: state.user.token
     };
 }
