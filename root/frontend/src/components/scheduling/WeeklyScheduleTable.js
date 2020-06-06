@@ -73,7 +73,7 @@ class WeeklyScheduleTable extends Component {
                         row[day] = <OpenTimeSlot timeSlot={availableHourSlot} displayRange={this.props.hourRange} />;
 
                 } else { // No available hours or appointments to display for this hour
-                    if (this.props.weekStart.clone().add(day, "day").isBefore(moment()))  // The past is highlighted visually and cannot be interacted with
+                    if (this.props.weekStart.clone().add(day, "day").hours(hour).isBefore(moment()))  // The past is highlighted visually and cannot be interacted with
                         row[day] = <td className="pastSlot"></td>;
                     else  // Tutor's can interact with empty cells and open them, tutees cannot
                         row[day] = isTutee() ? <td></td> : <TutorOpenableTimeSlot date={this.props.weekStart.clone().add(day, "days").add(hour, "hours")} />;

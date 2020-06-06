@@ -7,13 +7,13 @@
 
 .weekScheduleContainer, .sidePanelContainer {
   display: flex;
-  height: 75vh;
+  height: 85vh;
 }
 
 .weekScheduleContainer {
-  width: 60vw;
+  width: 57vw;
 }
 
 .sidePanelContainer {
-  width: 30vw;
+  width: 32vw;
 }

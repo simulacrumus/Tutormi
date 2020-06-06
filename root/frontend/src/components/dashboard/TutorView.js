@@ -10,7 +10,7 @@ export default class TutorView extends Component {
   render() {
     return (
       <div tabIndex="0" className="tutorView" onClick={() => setViewedTutor(this.props.tutor._id)}>
-        <img src={require(`../../images/uploads/${this.props.tutor.profilePic}`)} />
+        <img src={require("../../images/uploads/default-profile-pic.png")} />
         <h6>
           {this.props.tutor.user.name}
         </h6>

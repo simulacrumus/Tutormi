@@ -1,9 +1,0 @@
-.flex {
-    display: flex;
-    align-items: center;
-}
-
-.colFlex {
-    display: flex;
-    flex-direction: column;
-}

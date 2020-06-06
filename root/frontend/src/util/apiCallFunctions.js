@@ -1,4 +1,5 @@
 import { store } from "../store/configureStore";
+import { USER_LOGGED_IN } from "../store/user/userActions";
 
 export async function saveAppointment(appointment) {
   let response = await fetch("api/appointments", {
@@ -94,24 +95,34 @@ export async function createAccount(name, email, password, type) {
   return (message = authResponse.msg);
 }
 
-export async function addToFavoritesList(tutorId) {
+export async function updateTuteeFavorites(tutorId, shouldAdd) {
   let response = await fetch(`api/tutees/favorites/${tutorId}`, {
-    method: "PUT",
+    method: (shouldAdd ? "PUT" : "DELETE"),
     headers: {
       "x-auth-token": store.getState().user.token,
     },
   });
   response = await response.json();
-  console.log(response);
+  return response;
 }
 
-export async function removeFromFavorites(tutorId) {
-  let response = await fetch(`favorites/${tutorId}`, {
-    method: "DELETE",
-    headers: {
-      "x-auth-token": store.getState().user.token,
-    },
+export async function logIn(token, userType) {
+  let apiRoute = userType === "tutor" ? "/api/tutors/me" : "/api/tutees/me";
+
+  // Can check and deal with the authorization response here
+  let userResponse = await fetch(apiRoute, {
+    method: "GET",
+    headers: { "x-auth-token": token },
   });
-  response = await response.json();
-  console.log(response);
+
+  let user = await userResponse.json();
+
+  user.user.type = userType;
+  user.profilePic = user.profilePic === undefined ? "default-profile-pic.png" : user.profilePic; // Give a default profile pic to users without one
+  store.dispatch({
+    type: USER_LOGGED_IN,
+    payload: { user: user, token: token },
+  });
+
+  return user;
 }

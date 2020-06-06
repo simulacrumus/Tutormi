@@ -115,6 +115,7 @@ class EditButton extends Component {
                       this.setState({ ...this.state, isSaving: false, showEditModal: false }); // Close the modal 
                     } else {
                       this.setState({ ...this.state, isSaving: false, showEditModal: true, errors: updateResponse.errors[0].msg }); // Notify users of errors 
+                      setTimeout(() => this.setState({ ...this.state, isSaving: false, errors: null }), 2000); // Stop showing error after 2 seconds
                     }
                   });
               }}>Save Changes</Button>

@@ -3,12 +3,12 @@ import ReactDOM from "react-dom";
 import { PersistGate } from "redux-persist/lib/integration/react";
 import { Provider } from "react-redux";
 import { store, persistor } from "./store/configureStore";
-import "./index.css";
+
 import * as serviceWorker from "./serviceWorker";
 import "bootstrap/dist/css/bootstrap.css"; // Bootstrap styles
 import { BrowserRouter } from "react-router-dom";
 import Router from "./router";
-import "./styles/common.css";
+import "./index.css";
 
 ReactDOM.render(
   <Provider store={store}>

@@ -33,7 +33,7 @@ class WeeklySchedule extends Component {
     chosenDay: moment(),
     isSaving: false,
     showSnackbar: false,
-    hourRange: [8, 20] // Use user values later
+    hourRange: [this.props.minRange, this.props.maxRange]
   };
 
   render() {
@@ -101,12 +101,10 @@ class WeeklySchedule extends Component {
 
 function mapStateToProps(state) {
   return {
-    // minRange: state.user.user.bookingRange.minimum,
-    // maxRange: state.user.user.bookingRange.maximum,
+    minRange: state.user.user.bookingRange.minimum,
+    maxRange: state.user.user.bookingRange.maximum,
     userAvailableHours: state.user.user.availableHours,
   };
 }
 
 export default connect(mapStateToProps)(WeeklySchedule);
-
-

@@ -7,22 +7,34 @@
   border-radius: 5px;
 }
 
+.summaryBigWidth {
+  width: 25vw;
+}
+
+.summaryBigHeight {
+  height: 30vh;
+}
+
+.summarySmallWidth {
+  width: 25vw;
+}
+
+.summarySmallHeight {
+  height: 20vh;
+}
+
 .profileImg {
   object-fit: cover;
-  height: 200px;
-  width: 400px;
   margin-bottom: 30px;
 }
 
 .textContainer {
   display: flex;
   flex-direction: column;
-  width: 400px;
   margin-bottom: 5px;
 }
 
 .socialArea {
-  width: 400px;
   display: flex;
   justify-content: space-evenly;
   margin-bottom: 15px;
@@ -52,7 +64,6 @@
   align-self: flex-start;
   display: flex;
   flex-direction: column;
-  width: 400px;
   padding: 20px;
   border-radius: 10px;
 }
