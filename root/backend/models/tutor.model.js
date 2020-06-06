@@ -22,20 +22,16 @@ const TutorSchema = new mongoose.Schema({
         ref: 'tutee'
     }],
     profilePic: {
-        type: String
+        type: String,
+        default: 'default-profile-pic.png'
     },
     coverPic: {
-        type: String
+        type: String,
+        default: 'default-cover-pic.png'
     },
     ratings: [{
-        tutee: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
-        },
-        value: {
-            type: Number,
-            default: 0.0
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'tutee'
     }],
     rating: {
         type: Number,
