@@ -112,7 +112,7 @@ router.post('/', [
 
     } catch (err) {
         console.log(err.message);
-        res.status(500).send('*users* Server error!');
+        res.status(500).send('Server error!');
     }
 });
 
@@ -134,7 +134,7 @@ router.get('/confirmation/:token', async ({
         });
 
         if (!user) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: 'User not found!'
             });
         }
@@ -323,15 +323,18 @@ router.post('/changeemail', auth, [
     }
 
     const {
-        email
+        email,
+        password
     } = req.body;
 
     try {
         const user = await User.findById(req.user.user.id)
 
-        if (!user) {
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
             return res.status(400).json({
-                message: "User not found"
+                message: 'Invalid credentials'
             })
         }
 
@@ -368,6 +371,56 @@ router.post('/changeemail', auth, [
 
             res.json({
                 message: `Email updated, please check your inbox`
+            })
+        })
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Server error!');
+    }
+});
+
+// @route   POST api/users/resendconfirmation
+// @desc    Resend confirmation email for user
+// @access  Private
+router.post('/resendconfirmation', auth, async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.user.user.id)
+
+        if (user.confirmed) {
+            return res.status(400).json({
+                message: 'Email already confirmed'
+            })
+        }
+
+        const payload = {
+            user: {
+                id: user.id
+            }
+        }
+
+        jwt.sign(payload, config.get('jwtSecret'), {
+            expiresIn: '1d'
+        }, (err, token) => {
+            if (err) throw err;
+
+            // create html 
+            const htmloutput = `<h3>Hi, ${user.name}! Welcome to Tutormi</h3>
+                <p>Click <a href="http://localhost:5000/api/users/confirmation/${token}" target="_blank" >here</a> to confirm your email!</p>`
+
+            // send mail with defined transport object
+            transporter.sendMail({
+                from: '"Tutormi" <info@tutormiproject.com>', // sender address
+                to: `${user.email}`, // list of receivers
+                subject: "TUTORMI - CONFIRM EMAIL", // Subject line
+                text: "", // plain text body
+                html: htmloutput, // html body
+            });
+
+            res.json({
+                message: `Confirmation email sent, please check your inbox`
             })
         })
 

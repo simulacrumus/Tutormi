@@ -12,6 +12,7 @@ const {
     validationResult
 } = require('express-validator');
 const Tutor = require('../../models/tutor.model');
+const Rating = require('../../models/rating.model');
 const Tutee = require('../../models/tutee.model');
 const User = require('../../models/user.model');
 const Appointment = require('../../models/appointment.model');
@@ -50,9 +51,64 @@ router.post(
     auth,
     [
         check('courses', 'Course cannot be empty').not().isEmpty(),
+        check('languages', 'Languages cannot be empty').not().isEmpty()
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                errors: errors.array()
+            });
+        }
+        const {
+            bio,
+            courses,
+            languages,
+            social,
+            location
+        } = req.body;
+
+        const tutorProfileFields = {
+            user: req.user.user.id,
+            location,
+            bio,
+            social,
+            languages: Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim()),
+            courses: Array.isArray(courses) ? courses : courses.split(',').map((course) => course.trim())
+        };
+
+        try {
+            // Using upsert option (creates new doc if no match is found):
+            const tutor = await Tutor.findOneAndUpdate({
+                    user: req.user.user.id
+                }, {
+                    $set: tutorProfileFields
+                }, {
+                    new: true,
+                    upsert: true
+                })
+                .populate('user', ['name', 'email', 'type'])
+                .populate('appointments');
+
+            res.json(tutor);
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).send('Server Error');
+        }
+    }
+);
+
+
+// @route    POST api/tutors/update
+// @desc     Create or update tutor profile
+// @access   Private
+router.post(
+    '/update',
+    auth,
+    [
+        check('courses', 'Course cannot be empty').not().isEmpty(),
         check('languages', 'Languages cannot be empty').not().isEmpty(),
-        check('name', 'Name cannot be empty').not().isEmpty(),
-        check('email', 'Email cannot be empty').isEmail()
+        check('name', 'Name cannot be empty').not().isEmpty()
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -67,8 +123,7 @@ router.post(
             languages,
             social,
             location,
-            name,
-            email
+            name
         } = req.body;
 
         const tutorProfileFields = {
@@ -81,25 +136,21 @@ router.post(
         };
 
         try {
-
-            //change user name and email
+            //change user name
             const user = await User.findOneAndUpdate({
-                user: req.user.user.id
+                _id: req.user.user.id
             }, {
                 name,
-                email,
                 profile: true
             })
-
             // Using upsert option (creates new doc if no match is found):
             const tutor = await Tutor.findOneAndUpdate({
-                user: req.user.user.id
-            }, {
-                $set: tutorProfileFields
-            }, {
-                new: true,
-                upsert: true
-            }).populate('user', ['name', 'email', 'type']);
+                    user: req.user.user.id
+                }, {
+                    $set: tutorProfileFields
+                })
+                .populate('user', ['name', 'email', 'type'])
+                .populate('appointments');
             res.json(tutor);
         } catch (err) {
             console.error(err.message);

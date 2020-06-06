@@ -40,13 +40,8 @@ const TuteeSchema = new mongoose.Schema({
     type: String
   },
   ratings: [{
-    tutor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user"
-    },
-    rate: {
-      type: Number
-    }
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "tutor"
   }],
   social: {
     linkedin: {

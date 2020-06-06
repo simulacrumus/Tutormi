@@ -33,7 +33,7 @@ router.get("/me", auth, async (req, res) => {
 
     if (!tutee) {
       return res.status(400).json({
-        msg: "Whoops! There is no tutee profile for this user",
+        msg: "There is no tutee profile for this user",
       });
     }
 
@@ -50,9 +50,7 @@ router.get("/me", auth, async (req, res) => {
 router.post(
   "/",
   [auth, [
-    check("languages", "Language is required").not().isEmpty(),
-    check('name', 'Name cannot be empty').not().isEmpty(),
-    check('email', 'Email cannot be empty').isEmail()
+    check("languages", "Language is required").not().isEmpty()
   ]],
   async (req, res) => {
     const errors = validationResult(req);
@@ -69,7 +67,7 @@ router.post(
       linkedin,
       twitter,
       facebook,
-      instagram,
+      instagram
     } = req.body;
 
     // Build tutee profile object
@@ -77,11 +75,8 @@ router.post(
     tuteeProfileFields.user = req.user.user.id;
     if (bio) tuteeProfileFields.bio = bio;
     if (languages) {
-      tuteeProfileFields.languages = languages
-        .split(",")
-        .map((languages) => languages.trim());
+      tuteeProfileFields.languages = Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim())
     }
-    console.log(tuteeProfileFields.languages);
 
     if (location) tuteeProfileFields.location = location;
 
@@ -93,39 +88,84 @@ router.post(
     if (instagram) tuteeProfileFields.social.instagram = instagram;
 
     try {
-      let profile = await Tutee.findOne({
-        user: req.user.id
-      });
 
-      let user = await User.findOneAndUpdate({
-        _id: req.user.user.id
-      }, {
-        name,
-        email,
-        profile: true
-      });
-
-      if (profile) {
-        // Update
-        profile = await Tutee.findOneAndUpdate({
-          user: req.user.id
+      // Update
+      const tutee = await Tutee.findOneAndUpdate({
+          user: req.user.user.id
         }, {
           $set: tuteeProfileFields
         }, {
           new: true,
           upsert: true
-        });
+        })
+        .populate('user', ['name', 'email', 'type'])
+        .populate('appointments');
 
-        return res.json(profile);
-      }
+      return res.json(tutee);
 
-      // Create
-      // profile = new Tutee(tuteeProfileFields);
-      // await profile.save();
-      // res.json(profile);
     } catch (err) {
       console.error(err.message);
       res.status(500).send("*tuteee profile* Server Error");
+    }
+  }
+);
+
+
+// @route   GET api/tutees/update
+// @desc    Update user's tutee profile
+// @access  Private
+router.post(
+  "/update",
+  auth, [
+    check("languages", "Language is required").not().isEmpty(),
+    check('name', 'Name cannot be empty').not().isEmpty()
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array()
+      });
+    }
+
+    const {
+      bio,
+      languages,
+      social,
+      location,
+      name
+    } = req.body;
+
+    const tuteeProfileFields = {
+      user: req.user.user.id,
+      location,
+      bio,
+      social,
+      languages: Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim()),
+    };
+
+    try {
+
+      const user = await User.findOneAndUpdate({
+        _id: req.user.user.id
+      }, {
+        name,
+        profile: true
+      });
+
+      const tutee = await Tutee.findOneAndUpdate({
+          user: user.id
+        }, {
+          $set: tuteeProfileFields
+        })
+        .populate('user', ['name', 'email', 'type'])
+        .populate('appointments');
+
+      return res.json(tutee);
+
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
     }
   }
 );
