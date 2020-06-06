@@ -51,8 +51,25 @@ export async function uploadProfilePicture(imageFile) {
   return uploadResponse.profilePic;
 }
 
-export async function updateUserInformation(updateInfo) {
-  let updateResponse = await fetch("/api/tutors", {
+export async function createUserProfile(profileInfo, userType) {
+  let apiRoute = userType = "tutor" ? "/api/tutors" : "/api/tutees";
+  let createResponse = await fetch(apiRoute, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": store.getState().user.token,
+    },
+    body: JSON.stringify(profileInfo),
+  });
+
+  createResponse = await createResponse.json();
+
+  return createResponse;
+}
+
+export async function updateUserInformation(updateInfo, userType) {
+  let apiRoute = userType === "tutor" ? "/api/tutors/update" : "/api/tutees/update";
+  let updateResponse = await fetch(apiRoute, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
