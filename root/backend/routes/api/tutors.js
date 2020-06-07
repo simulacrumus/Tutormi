@@ -80,17 +80,14 @@ router.post(
         try {
 
             query = {}
-            query.profile = true;
-
+            query.profile = true
             if (name) {
                 query.name = name;
             }
             //change user name and profile fields
             await User.findOneAndUpdate({
                 _id: req.user.user.id
-            },
-                query
-            )
+            }, query)
 
             // Using upsert option (creates new doc if no match is found):
             const tutor = await Tutor.findOneAndUpdate({
@@ -262,11 +259,11 @@ router.post('/search', auth, async (req, res) => {
         }
 
         query.blockedUsers = {
-            $nin: req.user.user.id
+            $nin: [req.user.user.id]
         }
 
         query.blockedBy = {
-            $nin: req.user.user.id
+            $nin: [req.user.user.id]
         }
 
         const tutors = await Tutor.find(query)
