@@ -13,6 +13,7 @@
   margin: 0;
   padding: 0;
   display: inline;
+  font-size: large;
 }
 
 .navigation-link a {
@@ -27,9 +28,17 @@
 .navigation-link a:active,
 .navigation-link a.active {
   text-decoration:none;
-  background: #9b97d1;
-  border-color: #292929;
-  color: #292929;
+  font-size: x-large;
+  transition-duration: 0.3s;
+  
+  color:#ffff;
+  background:
+     linear-gradient(
+       to right,
+       #6c63e9 0%,
+       #6c63e9 5px,
+       transparent
+     );
 }
 
 .navigation-link button {
@@ -49,6 +58,7 @@
 .navigation-link button:active {
   background: #292929;
   color: white;
+  
 }
 
 @media (min-width: 768px) {

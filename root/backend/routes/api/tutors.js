@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const imagesPath = require('../../../frontend/src/images/uploads/imagesPath')
 const multer = require('multer');
 const auth = require('../../middleware/auth');
 const {
@@ -12,6 +10,7 @@ const {
     validationResult
 } = require('express-validator');
 const Tutor = require('../../models/tutor.model');
+const Rating = require('../../models/rating.model');
 const Tutee = require('../../models/tutee.model');
 const User = require('../../models/user.model');
 const Appointment = require('../../models/appointment.model');
@@ -22,10 +21,10 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-            user: req.user.user.id
-        })
+                user: req.user.user.id
+            })
             .populate('user', ['name', 'email', 'date', 'type'])
-            .populate('appointments');
+            .populate('appointments')
 
         if (!tutor) {
             return res.status(400).json({
@@ -42,7 +41,8 @@ router.get('/me', auth, async (req, res) => {
     }
 });
 
-// @route    POST api/tutors
+
+// @route    POST api/tutors/
 // @desc     Create or update tutor profile
 // @access   Private
 router.post(
@@ -50,9 +50,7 @@ router.post(
     auth,
     [
         check('courses', 'Course cannot be empty').not().isEmpty(),
-        check('languages', 'Languages cannot be empty').not().isEmpty(),
-        check('name', 'Name cannot be empty').not().isEmpty(),
-        check('email', 'Email cannot be empty').isEmail()
+        check('languages', 'Languages cannot be empty').not().isEmpty()
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -67,31 +65,44 @@ router.post(
             languages,
             social,
             location,
-            name,
-            email
+            name
         } = req.body;
 
         const tutorProfileFields = {
             user: req.user.user.id,
             location,
             bio,
-            name,
-            email,
             social,
             languages: Array.isArray(languages) ? languages : languages.split(',').map((language) => language.trim()),
             courses: Array.isArray(courses) ? courses : courses.split(',').map((course) => course.trim())
         };
 
         try {
+
+            query = {
+                profile: true
+            }
+            if (name) {
+                query.name = name;
+            }
+            //change user name and profile fields
+            await User.findOneAndUpdate({
+                _id: req.user.user.id
+            }, {
+                query
+            })
+
             // Using upsert option (creates new doc if no match is found):
-            let tutor = await Tutor.findOneAndUpdate({
-                user: req.user.user.id
-            }, {
-                $set: tutorProfileFields
-            }, {
-                new: true,
-                upsert: true
-            }).populate('user', ['name', 'email', 'type']);
+            const tutor = await Tutor.findOneAndUpdate({
+                    user: req.user.user.id
+                }, {
+                    $set: tutorProfileFields
+                }, {
+                    new: true,
+                    upsert: true
+                })
+                .populate('user', ['name', 'email', 'type'])
+                .populate('appointments');
             res.json(tutor);
         } catch (err) {
             console.error(err.message);
@@ -107,7 +118,11 @@ router.get('/', async (req, res) => {
     try {
         const tutors = await Tutor.find()
             .populate('user', ['name', 'email', 'type'])
-            .populate('appointments');;
+            .populate('appointments', '-date', null, {
+                sort: {
+                    'start': -1
+                }
+            })
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -125,8 +140,8 @@ router.get('/user/:id', async ({
 }, res) => {
     try {
         const tutor = await Tutor.findOne({
-            _id: id
-        })
+                _id: id
+            })
             .populate('user', ['name', 'email', 'type'])
             .populate('appointments');
 
@@ -160,7 +175,7 @@ router.delete('/', auth, async (req, res) => {
         });
 
         if (!tutor || !user) {
-            res.json({
+            return res.json({
                 msg: 'Tutor not found'
             });
         }
@@ -180,13 +195,14 @@ router.delete('/', auth, async (req, res) => {
 router.post('/search', auth, async (req, res) => {
     const {
         start,
+        end,
         course,
         language,
         rating,
-        key
+        name
     } = req.body;
 
-    let end = req.body.end;
+    //let end = req.body.end;
     let query = {};
 
     let appointmentHours = new Array();
@@ -206,35 +222,19 @@ router.post('/search', auth, async (req, res) => {
     }
 
     try {
-        if (key) {
+        if (name) {
             const users = await User.find({
-                $or: [{
-                    name: {
-                        $regex: key
-                    }
-                },
-                {
-                    email: {
-                        $regex: key
-                    }
+                name: {
+                    $regex: name
                 }
-                ]
             }).select({
                 _id: 1
             });
             const usersIDs = users.map((user) => user._id);
             query = {
-                $or: [{
-                    user: {
-                        $in: usersIDs
-                    }
-                },
-                {
-                    location: {
-                        $regex: key
-                    }
+                user: {
+                    $in: usersIDs
                 }
-                ]
             };
         }
 
@@ -271,7 +271,7 @@ router.post('/search', auth, async (req, res) => {
 
         const tutors = await Tutor.find(query)
             .select('courses languages rating bio location')
-            .populate('user', '-_id -password -type -date -__v -email');
+            .populate('user', '-_id -password -type -date -__v -email -confirmed -profile');
 
         res.json(tutors);
     } catch (err) {
@@ -280,90 +280,7 @@ router.post('/search', auth, async (req, res) => {
     }
 });
 
-// @route    PUT api/tutors/block/:id
-// @desc     Block tutor using their user id
-// @access   Private
-router.put('/block/:id', auth, async (req, res) => {
-    try {
-
-        let tutor = await Tutor.findById(req.params.id);
-
-        if (!tutor) {
-            res.status(400).json({
-                message: 'Tutor not found'
-            })
-        }
-
-        await Tutor.findOneAndUpdate({
-            _id: req.params.id
-        }, {
-            $addToSet: {
-                blockedBy: req.user.user.id
-            }
-        });
-
-        await Tutee.findOneAndUpdate({
-            user: req.user.user.id
-        }, {
-            $addToSet: {
-                blockedUsers: tutor.user.id
-            }
-        });
-
-        tutor = await Tutor.findById(req.params.id);
-
-        return res.json(tutor);
-    } catch (err) {
-        console.error(err.message);
-        return res.status(500).json({
-            msg: 'Server error'
-        });
-    }
-});
-
-
-// @route    PUT api/tutors/unblock.:id
-// @desc     Unblock tutor using their user id
-// @access   Private
-router.put('/unblock/:id', auth, async (req, res) => {
-    try {
-
-        let tutor = await Tutor.findById(req.params.id);
-
-        if (!tutor) {
-            res.status(400).json({
-                message: 'Tutor not found'
-            })
-        }
-
-        await Tutor.findOneAndUpdate({
-            _id: req.params.id
-        }, {
-            $pull: {
-                blockedBy: req.user.user.id
-            }
-        });
-
-        await Tutee.findOneAndUpdate({
-            user: req.user.user.id
-        }, {
-            $pull: {
-                blockedUsers: tutor.user.id
-            }
-        });
-
-        tutor = await Tutor.findById(req.params.id);
-
-        return res.json(tutor);
-    } catch (err) {
-        console.error(err.message);
-        return res.status(500).json({
-            msg: 'Server error'
-        });
-    }
-});
-
-// @route    POST api/tutors/availibility
+// @route    POST api/tutors/schedule
 // @desc     Update available hours
 // @access   Private
 router.post('/schedule', auth, async (req, res) => {
@@ -378,7 +295,8 @@ router.post('/schedule', auth, async (req, res) => {
             user: req.user.user.id
         }, {
             $set: {
-                availableHours: hours.map((hour) => new Date(hour))
+                availableHours: hours.map((hour) => new Date(hour)),
+                $sort: -1
             }
         });
 
@@ -427,20 +345,29 @@ const upload = multer({
 // @access   Private
 router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
     if (req.file == undefined) {
-        res.status(400).json({
+        return res.status(400).json({
             message: 'Please provide an image file with 2MB max size'
         });
     }
 
     try {
+
+        let tutor = await Tutor.findOne({
+            user: req.user.user.id
+        })
+
+        fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
+            if (err) throw err;
+            console.log('Previous profile picture removed');
+        });
+
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            profilePic: `${req.file.filename}`
-            // profilePic: `http://localhost:3000/public/uploads/tutors/${req.file.filename}`
+            profilePic: req.file.filename
         });
 
-        const tutor = await Tutor.findOne({
+        tutor = await Tutor.findOne({
             user: req.user.user.id
         });
 
@@ -462,13 +389,23 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
     }
 
     try {
+
+        let tutor = await Tutor.findOne({
+            user: req.user.user.id
+        })
+
+        fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
+            if (err) throw err;
+            console.log('Previous cover picture removed');
+        });
+
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
             cover: req.file.filename
         });
 
-        const tutor = await Tutor.findOne({
+        tutor = await Tutor.findOne({
             user: req.user.user.id
         });
 

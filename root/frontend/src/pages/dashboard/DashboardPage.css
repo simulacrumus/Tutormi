@@ -1,0 +1,19 @@
+.dashboardContainer {
+  display: flex;
+  height: 100vh;
+  justify-content: space-evenly;
+  margin-top: 10vh;
+}
+
+.weekScheduleContainer, .sidePanelContainer {
+  display: flex;
+  height: 85vh;
+}
+
+.weekScheduleContainer {
+  width: 57vw;
+}
+
+.sidePanelContainer {
+  width: 32vw;
+}

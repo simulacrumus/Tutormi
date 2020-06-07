@@ -8,7 +8,7 @@ import ListUpdateArea from './ListUpdateArea';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppBar from '@material-ui/core/AppBar';
-import { ThemeProvider } from "@material-ui/styles";
+import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../styles/materialUiTheme";
 import EditSocialArea from "./EditSocialArea";
 import ChangeProfilePictureArea from "./ChangeProfilePictureArea";
@@ -49,7 +49,6 @@ class EditButton extends Component {
               {this.state.tabValue === 0 &&
                 <Form>
                   <ChangeProfilePictureArea profilePic={this.props.user.profilePic} />
-
                   <Form.Group>
                     <Form.Label>Email address</Form.Label>
                     <Form.Control type="email" value={this.state.user.user.email}
@@ -101,7 +100,6 @@ class EditButton extends Component {
               <Button color="primary" variant="contained" onClick={() => {
                 this.setState({ ...this.state, isSaving: true })
                 let editInformation = {
-                  email: this.state.user.user.email,
                   name: this.state.user.user.name,
                   bio: this.state.user.bio,
                   languages: this.state.user.languages,
@@ -109,13 +107,14 @@ class EditButton extends Component {
                   courses: this.state.user.courses,
                   social: this.state.user.social
                 };
-                updateUserInformation(editInformation)  // Update the server with the new user information
+                updateUserInformation(editInformation, this.state.user.user.type)  // Update the server with the new user information
                   .then((updateResponse) => {
                     if (updateResponse.errors === undefined) { // No errors occurred when updating
                       updateUser(editInformation);
                       this.setState({ ...this.state, isSaving: false, showEditModal: false }); // Close the modal 
                     } else {
                       this.setState({ ...this.state, isSaving: false, showEditModal: true, errors: updateResponse.errors[0].msg }); // Notify users of errors 
+                      setTimeout(() => this.setState({ ...this.state, isSaving: false, errors: null }), 2000); // Stop showing error after 2 seconds
                     }
                   });
               }}>Save Changes</Button>

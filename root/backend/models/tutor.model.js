@@ -19,23 +19,19 @@ const TutorSchema = new mongoose.Schema({
     }],
     followers: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'tutee'
     }],
     profilePic: {
-        type: String
+        type: String,
+        default: 'default-profile-pic.png'
     },
     coverPic: {
-        type: String
+        type: String,
+        default: 'default-cover-pic.png'
     },
     ratings: [{
-        tutee: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
-        },
-        value: {
-            type: Number,
-            default: 0.0
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'tutee'
     }],
     rating: {
         type: Number,
@@ -45,13 +41,13 @@ const TutorSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
-    blockedUsers: [{
+    blockedTutees: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'tutee'
     }],
     blockedBy: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'tutee'
     }],
     availableHours: {
         type: [Date]
@@ -91,6 +87,10 @@ const TutorSchema = new mongoose.Schema({
             default: 20
         }
     },
+    active: {
+        type: Boolean,
+        default: true
+    },
     date: {
         type: Date,
         default: Date.now
@@ -102,5 +102,19 @@ TutorSchema.index({
     user: 1,
     rating: 1
 });
+
+TutorSchema.post('find', (result) => {
+    // if (err) {
+    //     console.log(err)
+    // }
+    // let totalRate = 0;
+    // let numberOfRates;
+    // document.ratings.forEach(rate => {
+    //     rate.value += totalRate;
+    //     numberOfRates++;
+    // })
+    // console.log('Rating' + (totalRate / numberOfRates))
+    console.log(result)
+})
 
 module.exports = Tutor = mongoose.model('tutor', TutorSchema);

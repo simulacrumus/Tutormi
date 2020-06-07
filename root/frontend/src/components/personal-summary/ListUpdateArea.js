@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import AddBoxIcon from '@material-ui/icons/AddBox';
-import { ThemeProvider } from "@material-ui/styles";
+import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../styles/materialUiTheme";
 import Chip from '@material-ui/core/Chip';
 import Form from 'react-bootstrap/Form';
@@ -17,7 +17,7 @@ export default class ListUpdateArea extends Component {
             let updatedList = this.props.list.slice();
             let newValue = document.getElementById(`${this.props.type}Input`).value.trim();
 
-            if (!this.props.list.includes(newValue)) { // Only add unique values
+            if (!this.props.list.includes(newValue) && newValue !== "") { // Only add non empty unique values
               updatedList.push(newValue);
               this.props.setList(updatedList);
             }

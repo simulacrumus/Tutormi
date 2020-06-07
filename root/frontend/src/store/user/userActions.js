@@ -4,16 +4,31 @@ import { isViewedTutorSet } from "../../util/authenticationFunctions";
 
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
+export const USER_WITHOUT_PROFILE_LOGGED_IN = "USER_WITHOUT_PROFILE_LOGGED_IN";
 export const USER_INFO_UPDATED = "USER_INFO_UPDATED";
 export const USER_IMAGE_UPDATED = "USER_IMAGE_UPDATED";
 export const USER_LOGGED_OUT = "USER_LOGGED_OUT";
-
+export const USER_ADDED_TO_FAVORITES = "USER_ADDED_TO_FAVORITES";
+export const USER_REMOVED_FAVORITE = "USER_REMOVED_FAVORITE";
 // Schedule specific actions
 export const AVAILABILITY_OPENED = "AVAILABILITY_OPENED";
 export const AVAILABILITY_CANCELED = "AVAILABILITY_CANCELED";
 export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
 
+export function addTutorToFavorites(tutor) {
+  store.dispatch({
+    type: USER_ADDED_TO_FAVORITES,
+    payload: tutor
+  });
+}
+
+export function removeTutorFromFavorites(tutorId) {
+  store.dispatch({
+    type: USER_REMOVED_FAVORITE,
+    payload: tutorId
+  });
+}
 
 export async function logInUser(email, password, userType) {
   let authResponse = await fetch("/api/auth", {
@@ -24,38 +39,32 @@ export async function logInUser(email, password, userType) {
     body: JSON.stringify({
       email: email,
       password: password,
+      type: userType
     }),
   });
 
-  let user = "";
+  const status = authResponse.status;
   const responseToken = await authResponse.json();
-  // Can check and deal with the authorization response here
-  if (userType === "tutor") {
-    let userResponse = await fetch("/api/tutors/me", {
-      method: "GET",
-      headers: { "x-auth-token": responseToken.token },
+
+  if (status === 200 && !responseToken.hasProfile) { // User needs to create a profile
+    await store.dispatch({
+      type: USER_WITHOUT_PROFILE_LOGGED_IN,
+      payload: { type: userType, token: responseToken.token }
     });
-
-    user = await userResponse.json();
-
-    console.log(typeof user);
-    console.log(user);
-  } else {
-    let userResponse = await fetch("/api/tutees/me", {
-      method: "GET",
-      headers: { "x-auth-token": responseToken.token },
-    });
-
-    user = await userResponse.json();
-    console.log(typeof user);
-    console.log(user);
+    return false;
   }
 
-  let message = "";
-  message = user.msg;
-  console.log("message is type of", typeof message);
+  let apiRoute = userType === "tutor" ? "/api/tutors/me" : "/api/tutees/me";
 
-  // Only update the store if everything was ok
+  // Can check and deal with the authorization response here
+  let userResponse = await fetch(apiRoute, {
+    method: "GET",
+    headers: { "x-auth-token": responseToken.token },
+  });
+
+  let user = await userResponse.json();
+  let message = user.msg;
+
   if (!message) {
     user.user.type = userType;
     user.profilePic = user.profilePic === undefined ? "default-profile-pic.png" : user.profilePic; // Give a default profile pic to users without one

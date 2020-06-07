@@ -13,17 +13,17 @@ const TuteeSchema = new mongoose.Schema({
     type: String,
     max: 25
   },
-  following: [{
+  favorites: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user"
+    ref: "tutor"
   }],
-  blockedUsers: [{
+  blockedTutors: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user"
+    ref: "tutor"
   }],
   blockedBy: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user"
+    ref: "tutor"
   }],
   appointments: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -33,14 +33,15 @@ const TuteeSchema = new mongoose.Schema({
     type: [String],
     max: 20
   },
+  profilePic: {
+    type: String
+  },
+  coverPic: {
+    type: String
+  },
   ratings: [{
-    tutor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user"
-    },
-    rate: {
-      type: Number
-    }
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "tutor"
   }],
   social: {
     linkedin: {
@@ -73,6 +74,10 @@ const TuteeSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
+  },
+  active: {
+    type: Boolean,
+    default: true
   }
 });
 

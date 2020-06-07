@@ -1,15 +1,17 @@
 import React, { Component } from "react";
-import ProfilePage from "./pages/ProfilePage.js";
-import TuteeDashboardPage from "./pages/TuteeDashboardPage";
-import ViewTutorPage from "./pages/ViewTutorPage";
-import HomePage from "./pages/HomePage";
 import { Route, Switch, Redirect } from "react-router-dom";
+// Page components
+import ProfilePage from "./pages/profile/ProfilePage.js";
+import DashboardPage from "./pages/dashboard/DashboardPage";
+import ViewTutorPage from "./pages/view-tutor/ViewTutorPage";
+import HomePage from "./pages/home/HomePage";
+import CreateProfilePage from "./pages/create-profile/CreateProfilePage";
+import EmailConfirmationPage from "./pages/create-profile/EmailConfirmationPage";
 import SearchMain from "./components/SearchMain";
-import TutorDashboardPage from "./pages/TutorDashboardPage.js";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
-import Flip from "./components/login/Login2"
-import { isLoggedIn, isTutee, isViewedTutorSet } from "./util/authenticationFunctions";
+// import Flip from "./components/login/Login2"
+import { isLoggedIn, isTutee, isViewedTutorSet, isProfileSetUp } from "./util/authenticationFunctions";
 
 export default class Router extends Component {
 
@@ -21,30 +23,42 @@ export default class Router extends Component {
 
           <Route path="/login" component={Login} exact />
           <Route path="/signup" component={SignUp} exact />
+
+          <Route path="/emailConfirmation" component={EmailConfirmationPage} exact />
           {/* flip route */}
-          <Route path="/Flip" component={Flip} exact />
+          {/* <Route path="/Flip" component={Flip} exact /> */}
+
+          <Route path="/createProfile" exact render={() => {
+            if (isLoggedIn())
+              return !isProfileSetUp() ? <CreateProfilePage /> : <Redirect to="/profile" />;
+            else
+              return <Redirect to="/login" />;
+          }} />
 
           <Route path="/profile" exact
             render={() => {
-              return isLoggedIn() ? <ProfilePage /> : <Redirect to="/login" />;
+              if (isLoggedIn())
+                return isProfileSetUp() ? <ProfilePage /> : <Redirect to="/createProfile" />;
+              else
+                return <Redirect to="/login" />;
             }} />
 
           <Route path="/dashboard" exact
             render={() => {
-              if (!isLoggedIn())
-                return <Redirect to="/login" />;
+              if (isLoggedIn())
+                return isProfileSetUp() ? <DashboardPage /> : <Redirect to="/createProfile" />;
               else
-                return isTutee() ? <TuteeDashboardPage /> : <TutorDashboardPage />;
-
+                return <Redirect to="/login" />;
             }} />
 
           <Route path="/viewTutor" exact
             render={() => {
               if (!isLoggedIn())
                 return <Redirect to="/login" />;
-              else
+              else if (isProfileSetUp())
                 return isViewedTutorSet() ? <ViewTutorPage /> : <Redirect to="/profile" />;
-
+              else
+                return <Redirect to="/createProfile" />;
             }} />/>
 
           <Route
@@ -52,9 +66,10 @@ export default class Router extends Component {
             render={() => {
               if (!isLoggedIn())
                 return <Redirect to="/login" />;
-              else
+              else if (isProfileSetUp())
                 return isTutee() ? <SearchMain /> : <Redirect to="/profile" />;
-
+              else
+                return <Redirect to="/createProfile" />;
             }} />
 
           <Route path="*" render={() => <h1>404 Page Not Found!</h1>} />{" "}
