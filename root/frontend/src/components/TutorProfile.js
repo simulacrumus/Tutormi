@@ -12,9 +12,11 @@ import { Avatar, IconButton, CardMedia } from "@material-ui/core";
 import { Rating } from "@material-ui/lab";
 
 const useStyles = makeStyles(() => ({
-  /*root: {
-    minHeight: 500,
-  },*/
+
+  root: {
+    minHeight: 350,
+  },
+
   paper: {
     padding: "2px 4px",
     marginTop: 5,
@@ -35,8 +37,8 @@ const useStyles = makeStyles(() => ({
 
 const trimBio = (description) => {
   const bio =
-    description !== null && description !== undefined && description.length > 100
-      ? description.substring(0, 100) + "..."
+    description !== null && description !== undefined && description.length > 85
+      ? description.substring(0, 85) + "..."
       : description;
   return bio;
 };
@@ -55,7 +57,7 @@ const TutorProfile = ({
   let paperKey = 0;
 
   return (
-    <Card raised>
+    <Card className={classes.root} raised>
       <CardHeader
         avatar={<Avatar src={avatarSrc} />}
         action={
@@ -68,9 +70,10 @@ const TutorProfile = ({
       <CardMedia style={{ height: "150px" }} image={imgSrc} />
       <CardContent>
         <Typography variant="body2" component="p">
-          {description}
+
+          {trimBio(description)}
         </Typography>
-        {/*<Typography className={classes.typography}>Skills</Typography>*/}
+        {/*<Typography className={classes.typography}>Skills</Typography>
         {courses.map((course) => (
           <Paper key={++paperKey} elevation={5} className={classes.paper}>
             <Typography key={id} className={classes.typography}>
@@ -78,6 +81,7 @@ const TutorProfile = ({
             </Typography>
           </Paper>
         ))}
+        */}
       </CardContent>
       <CardActions>
         <Button
