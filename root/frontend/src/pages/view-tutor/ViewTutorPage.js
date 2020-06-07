@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import ProfileNavBar from "../../components/logged-in-nav-bar/ProfileNavBar.js";
-import PersonalSummary from "../../components/personal-summary/PersonalSummary.js";
+import PersonalSummary from "../../components/profile/PersonalSummary.js";
 import "./ViewTutorPage.css";
 import { connect } from "react-redux";
 import WeeklySchedule from "../../components/scheduling/WeeklySchedule.js";

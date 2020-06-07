@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import { ThemeProvider } from "@material-ui/core/styles";
-import customTheme from "../../styles/materialUiTheme";
+import customTheme from "../../../styles/materialUiTheme";
 import Chip from '@material-ui/core/Chip';
 import Form from 'react-bootstrap/Form';
 

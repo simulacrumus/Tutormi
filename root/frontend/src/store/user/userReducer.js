@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {
-    USER_LOGGED_IN, USER_INFO_UPDATED, AVAILABILITY_OPENED,
+    USER_LOGGED_IN, USER_INFO_UPDATED, AVAILABILITY_OPENED, TOKEN_ACQUIRED, USER_RATED_TUTOR,
     AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT,
     USER_IMAGE_UPDATED, USER_ADDED_TO_FAVORITES, USER_REMOVED_FAVORITE, USER_WITHOUT_PROFILE_LOGGED_IN
 } from './userActions';
@@ -10,7 +10,7 @@ const initialState = {
     user: null, // User who is currently logged into the app
     token: null, // Token used to make API calls
     isLoggedIn: false, // Whether the user is logged in or not
-    hasSetupUpProfile: false
+    hasSetupUpProfile: false // Whether the user has created their profile before or not
 }
 
 export default function userReducer(state = initialState, action) {
@@ -23,17 +23,21 @@ export default function userReducer(state = initialState, action) {
     }
 
     switch (action.type) {
+
+        case TOKEN_ACQUIRED:
+            return { ...state, token: action.payload.token };
+
         case USER_LOGGED_IN:
             return {
+                ...state,
                 user: action.payload.user,
-                token: action.payload.token,
                 isLoggedIn: true,
                 hasSetupUpProfile: true
-            }
+            };
 
         case USER_WITHOUT_PROFILE_LOGGED_IN:
             return {
-                token: action.payload.token,
+                ...state,
                 isLoggedIn: true,
                 user: { user: { type: action.payload.type } }
             }
@@ -51,6 +55,11 @@ export default function userReducer(state = initialState, action) {
                     social: action.payload.social
                 }
             };
+
+        case USER_RATED_TUTOR:
+            let copiedRatings = state.user.ratings.slice();
+            copiedRatings.push(action.payload.rating);
+            return { ...state, user: { ...state.user, rating: copiedRatings } };
 
         case USER_ADDED_TO_FAVORITES:
             let favoritesList = state.user.favorites.slice();

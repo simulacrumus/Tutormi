@@ -116,6 +116,7 @@ class SingUp extends Component {
     }
   }
   render() {
+
     const { errors } = this.state;
     //  console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state);
     return (
