@@ -5,8 +5,8 @@ import Button from '@material-ui/core/Button';
 import customTheme from "../../styles/materialUiTheme";
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { connect } from "react-redux";
-import { addTutorToFavorites, removeTutorFromFavorites } from "../../store/user/userActions";
-import { updateTuteeFavorites } from "../../util/apiCallFunctions";
+import { addTutorToFavorites, removeTutorFromFavorites, addRatingToTutor } from "../../store/user/userActions";
+import { updateTuteeFavorites, addRating } from "../../util/apiCallFunctions";
 
 class TuteeOpinionArea extends Component {
 
@@ -15,8 +15,8 @@ class TuteeOpinionArea extends Component {
             <div className="personalRatingContainer summarySmallWidth">
                 <div>
                     <label >Your Rating:</label>
-                    <Rating value={this.props.viewedTutor.rating} onChange={(event, newValue) => {
-                        // Add code when route is done
+                    <Rating value={0} onChange={(event, newValue) => {
+                        addRating(this.props.viewedTutor._id, newValue);
                     }} />
                 </div>
                 <ThemeProvider theme={customTheme}>

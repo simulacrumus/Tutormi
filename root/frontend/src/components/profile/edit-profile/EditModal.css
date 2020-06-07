@@ -45,7 +45,7 @@
 }
 
 .editProfileModal {
-  min-width: 45vw;
+  min-width: 50vw;
 }
 
 .editChips {
@@ -60,4 +60,17 @@
 .imageUploadButtons {
   display: flex;
   flex-direction: column;
+}
+
+.deleteConfirm {
+  display: flex;
+  justify-content: space-between;
+}
+
+#editProfileSaveBtn {
+  margin-right: 10px;
+}
+
+.editProfileLoadingContainer {
+  margin-top: 15px;
 }

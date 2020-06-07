@@ -3,18 +3,19 @@ import './CreateProfilePage.css';
 import Form from 'react-bootstrap/Form';
 import { connect } from "react-redux";
 import { logIn } from "../../util/apiCallFunctions";
-import ListUpdateArea from '../../components/personal-summary/ListUpdateArea';
+import ListUpdateArea from '../../components/profile/edit-profile/ListUpdateArea';
 import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../styles/materialUiTheme";
-import EditSocialArea from "../../components/personal-summary/EditSocialArea";
-import ChangeProfilePictureArea from "../../components/personal-summary/ChangeProfilePictureArea";
-import { createUserProfile } from "../../util/apiCallFunctions";
+import EditSocialArea from "../../components/profile/edit-profile/EditSocialArea";
+import ChangeProfilePictureArea from "../../components/profile/edit-profile/ChangeProfilePictureArea";
+import { updateUserInformation } from "../../util/apiCallFunctions";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
 import NonUserNavBar from "../../components/logged-in-nav-bar/NonUserNavBar";
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
+import { userWithProfileLoggedIn } from "../../store/user/userActions";
 
 class CreateProfilePage extends Component {
 
@@ -22,7 +23,7 @@ class CreateProfilePage extends Component {
         super(props);
         this.state = {
             profilePic: null,
-            bio: null,
+            bio: "",
             courses: [],
             languages: [],
             location: null,
@@ -123,11 +124,14 @@ class CreateProfilePage extends Component {
             courses: this.state.courses,
             social: this.state.social
         };
-        createUserProfile(editInformation, this.props.type)  // Update the server with the new user information
+        updateUserInformation(editInformation, this.props.type)  // Update the server with the new user information
             .then((updateResponse) => {
                 if (updateResponse.errors === undefined) { // No errors occurred when updating
                     logIn(this.props.token, this.props.type)
-                        .then((user) => window.location.href = "/profile");
+                        .then((user) => {
+                            userWithProfileLoggedIn(user); // Update global state
+                            window.location.href = "/profile";
+                        });
                 } else {
                     this.setState({ ...this.state, isSaving: false, errors: updateResponse.errors[0].msg }); // Notify users of errors 
                     setTimeout(() => this.setState({ ...this.state, isSaving: false, errors: null }), 2000); // Stop showing error after 2 seconds

@@ -16,20 +16,20 @@ const {
 router.get("/me", auth, async (req, res) => {
   try {
     const tutee = await
-    Tutee.findOne({
+      Tutee.findOne({
         user: req.user.user.id,
       })
-      .populate('user', ['name', 'email', 'date'])
-      .populate('appointments')
-      .populate({
-        path: 'favorites',
-        select: ['-social', '-bookingRange', '-followers', '-rating', '-languages', '-blockedTutees', '-blockedBy', '-active', '-bio', '-location', '-ratings', '-date'],
-        populate: {
-          path: 'user',
-          select: 'name',
-          model: User
-        }
-      })
+        .populate('user', ['name', 'email', 'date'])
+        .populate('appointments')
+        .populate({
+          path: 'favorites',
+          select: ['-social', '-bookingRange', '-followers', '-rating', '-languages', '-blockedTutees', '-blockedBy', '-active', '-bio', '-location', '-ratings', '-date'],
+          populate: {
+            path: 'user',
+            select: 'name',
+            model: User
+          }
+        })
 
     if (!tutee) {
       return res.status(400).json({
@@ -50,9 +50,8 @@ router.get("/me", auth, async (req, res) => {
 router.post(
   "/",
   auth, [
-    check("languages", "Language is required").not().isEmpty(),
-    check('name', 'Name cannot be empty').not().isEmpty()
-  ],
+  check("languages", "Language is required").not().isEmpty(),
+],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -79,27 +78,27 @@ router.post(
 
     try {
 
-      query = {
-        profile: true
-      }
+      query = {}
+      query.profile = true;
+
       if (name) {
         query.name = name;
       }
       //change user name and profile fields
       await User.findOneAndUpdate({
         _id: req.user.user.id
-      }, {
+      },
         query
-      })
+      )
 
       const tutee = await Tutee.findOneAndUpdate({
-          user: req.user.user.id
-        }, {
-          $set: tuteeProfileFields
-        }, {
-          new: true,
-          upsert: true
-        })
+        user: req.user.user.id
+      }, {
+        $set: tuteeProfileFields
+      }, {
+        new: true,
+        upsert: true
+      })
         .populate('user', ['name', 'email', 'type'])
         .populate('appointments');
 

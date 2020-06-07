@@ -21,8 +21,8 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-                user: req.user.user.id
-            })
+            user: req.user.user.id
+        })
             .populate('user', ['name', 'email', 'date', 'type'])
             .populate('appointments')
 
@@ -79,28 +79,28 @@ router.post(
 
         try {
 
-            query = {
-                profile: true
-            }
+            query = {}
+            query.profile = true;
+
             if (name) {
                 query.name = name;
             }
             //change user name and profile fields
             await User.findOneAndUpdate({
                 _id: req.user.user.id
-            }, {
+            },
                 query
-            })
+            )
 
             // Using upsert option (creates new doc if no match is found):
             const tutor = await Tutor.findOneAndUpdate({
-                    user: req.user.user.id
-                }, {
-                    $set: tutorProfileFields
-                }, {
-                    new: true,
-                    upsert: true
-                })
+                user: req.user.user.id
+            }, {
+                $set: tutorProfileFields
+            }, {
+                new: true,
+                upsert: true
+            })
                 .populate('user', ['name', 'email', 'type'])
                 .populate('appointments');
             res.json(tutor);
@@ -140,8 +140,8 @@ router.get('/user/:id', async ({
 }, res) => {
     try {
         const tutor = await Tutor.findOne({
-                _id: id
-            })
+            _id: id
+        })
             .populate('user', ['name', 'email', 'type'])
             .populate('appointments');
 

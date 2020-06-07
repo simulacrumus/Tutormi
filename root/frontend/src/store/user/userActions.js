@@ -1,20 +1,30 @@
 import { store } from "../configureStore";
 import { cancelViewedTutorAppointment } from "../viewed-tutor/viewedTutorActions";
 import { isViewedTutorSet } from "../../util/authenticationFunctions";
+import { logIn } from "../../util/apiCallFunctions";
 
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
 export const USER_WITHOUT_PROFILE_LOGGED_IN = "USER_WITHOUT_PROFILE_LOGGED_IN";
+export const TOKEN_ACQUIRED = "TOKEN_ACQUIRED";
 export const USER_INFO_UPDATED = "USER_INFO_UPDATED";
 export const USER_IMAGE_UPDATED = "USER_IMAGE_UPDATED";
 export const USER_LOGGED_OUT = "USER_LOGGED_OUT";
 export const USER_ADDED_TO_FAVORITES = "USER_ADDED_TO_FAVORITES";
 export const USER_REMOVED_FAVORITE = "USER_REMOVED_FAVORITE";
+export const USER_RATED_TUTOR = "USER_RATED_TUTOR";
 // Schedule specific actions
 export const AVAILABILITY_OPENED = "AVAILABILITY_OPENED";
 export const AVAILABILITY_CANCELED = "AVAILABILITY_CANCELED";
 export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
+
+export function addRatingToTutor(rating) {
+  store.dispatch({
+    type: USER_RATED_TUTOR,
+    payload: { rating: rating }
+  })
+}
 
 export function addTutorToFavorites(tutor) {
   store.dispatch({
@@ -30,51 +40,25 @@ export function removeTutorFromFavorites(tutorId) {
   });
 }
 
-export async function logInUser(email, password, userType) {
-  let authResponse = await fetch("/api/auth", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password,
-      type: userType
-    }),
+export function userWithProfileLoggedIn(user) {
+  store.dispatch({
+    type: USER_LOGGED_IN,
+    payload: { user: user },
   });
+}
 
-  const status = authResponse.status;
-  const responseToken = await authResponse.json();
-
-  if (status === 200 && !responseToken.hasProfile) { // User needs to create a profile
-    await store.dispatch({
-      type: USER_WITHOUT_PROFILE_LOGGED_IN,
-      payload: { type: userType, token: responseToken.token }
-    });
-    return false;
-  }
-
-  let apiRoute = userType === "tutor" ? "/api/tutors/me" : "/api/tutees/me";
-
-  // Can check and deal with the authorization response here
-  let userResponse = await fetch(apiRoute, {
-    method: "GET",
-    headers: { "x-auth-token": responseToken.token },
+export function userWithoutProfileLoggedIn(userType) {
+  store.dispatch({
+    type: USER_WITHOUT_PROFILE_LOGGED_IN,
+    payload: { type: userType }
   });
+}
 
-  let user = await userResponse.json();
-  let message = user.msg;
-
-  if (!message) {
-    user.user.type = userType;
-    user.profilePic = user.profilePic === undefined ? "default-profile-pic.png" : user.profilePic; // Give a default profile pic to users without one
-    store.dispatch({
-      type: USER_LOGGED_IN,
-      payload: { user: user, token: responseToken.token },
-    });
-    return false;
-  }
-  return message;
+export function addToken(token) {
+  store.dispatch({
+    type: TOKEN_ACQUIRED,
+    payload: { token: token }
+  });
 }
 
 export function logout() {

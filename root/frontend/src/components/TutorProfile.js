@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 
 const trimBio = (description) => {
   const bio =
-    description.length > 100
+    description !== null && description !== undefined && description.length > 100
       ? description.substring(0, 100) + "..."
       : description;
   return bio;

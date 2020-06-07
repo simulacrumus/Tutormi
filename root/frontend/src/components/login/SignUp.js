@@ -109,7 +109,7 @@ class SingUp extends Component {
     }
   }
   render() {
-    
+
     const { errors } = this.state;
     //  console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state);
     return (
@@ -186,21 +186,21 @@ class SingUp extends Component {
               {errors.login}
             </Form.Text>
             <div>
-            <CustomButton
-              name="login"
-              onClick={() => {
-                this.setState({ ...this.state, userType: "tutor" });
-              }}
-            >
-              Signup as a tutor
+              <CustomButton
+                name="login"
+                onClick={() => {
+                  this.setState({ ...this.state, userType: "tutor" });
+                }}
+              >
+                Signup as a tutor
             </CustomButton>
-            <CustomButton
-              name="login"
-              onClick={() => {
-                this.setState({ ...this.state, userType: "tutee" });
-              }}
-            >
-              Signup as a tutee
+              <CustomButton
+                name="login"
+                onClick={() => {
+                  this.setState({ ...this.state, userType: "tutee" });
+                }}
+              >
+                Signup as a tutee
             </CustomButton>
             </div>
             <br />
