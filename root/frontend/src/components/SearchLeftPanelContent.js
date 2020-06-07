@@ -14,14 +14,18 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import Typography from "@material-ui/core/Typography";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     padding: "2px 4px",
     marginTop: 10,
     display: "flex",
-    alignItems: "center",
-    minWidth: 250,
+    maxWidth: 200,
   },
   input: {
     flex: 1,
@@ -30,6 +34,22 @@ const useStyles = makeStyles(() => ({
   buttonColor: {
     fontWeight: "bold",
     fontFamily: "Arial",
+    marginBottom: 10,
+  },
+  faqRoot: {
+    width: "100%",
+    marginBottom: 10,
+  },
+  heading: {
+    fontFamily: "Arial",
+    fontSize: theme.typography.pxToRem(14),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+  expansion: {
+    display: "flex",
+    justifyContent: "center",
+    flexFlow: "column wrap",
+    alignItems: "left",
   },
 }));
 
@@ -41,7 +61,7 @@ const LeftPanelContent = ({
 }) => {
   const classes = useStyles();
   const [rating, setRating] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(null);
+  const [nameQuery, setNameQuery] = useState(null);
   const [languageQuery, setLanguageQuery] = useState(null);
   const [courseQuery, setCourseQuery] = useState(null);
   const [dateQuery, setDateQuery] = useState(
@@ -77,20 +97,10 @@ const LeftPanelContent = ({
     let userDate = date.toString().substring(15);
     date = calendarDate + userDate;
     setEndQuery(date);
-    /*if (number == 1) {
-      setStartQuery("2020-05-17T10:00:00.000Z")
-    setStartQuery(calendarDate + startQuery.toString().substring(15));
-    }*/
   };
 
   useEffect(() => {
-    if (
-      rating === 1 &&
-      searchQuery === null &&
-      languageQuery === null &&
-      courseQuery === null &&
-      btnClicked === false
-    ) {
+    if (courseQuery === null && btnClicked === false) {
       const getTutors = async () => {
         try {
           tutorList.map((tutor) => clearTutors(tutor));
@@ -104,12 +114,12 @@ const LeftPanelContent = ({
       };
       getTutors();
     }
-  }, [searchQuery, rating, languageQuery, courseQuery, btnClicked]);
+  }, [courseQuery, btnClicked]);
 
   useEffect(() => {
     if (
       rating !== 1 ||
-      searchQuery !== null ||
+      nameQuery !== null ||
       languageQuery !== null ||
       courseQuery !== null ||
       btnClicked !== false
@@ -117,7 +127,7 @@ const LeftPanelContent = ({
       const filterState = async () => {
         try {
           tutorList.map((tutor) => clearTutors(tutor));
-
+          console.log(token);
           const response = await fetch("/api/tutors/search", {
             method: "POST",
             headers: {
@@ -134,7 +144,7 @@ const LeftPanelContent = ({
               course: courseQuery,
               language: languageQuery,
               rating: rating,
-              key: searchQuery,
+              name: nameQuery,
             }),
           });
           const data = await response.json();
@@ -146,37 +156,11 @@ const LeftPanelContent = ({
       };
       filterState();
     }
-  }, [searchQuery, rating, languageQuery, courseQuery, btnClicked]);
+  }, [nameQuery, rating, languageQuery, courseQuery, btnClicked]);
 
   return (
     <>
-      <Rating
-        name="rating"
-        value={rating}
-        onChange={(event, newRating) => {
-          setRating(newRating);
-        }}
-      />
-      <Paper component="form" className={classes.root}>
-        <InputBase
-          className={classes.input}
-          placeholder="Search"
-          onChange={(event) => {
-            setSearchQuery(event.target.value);
-          }}
-        />
-      </Paper>
-
-      {/*<Paper component="form" className={classes.root}>
-        <InputBase
-          className={classes.input}
-          placeholder="Search for a language"
-          onChange={(event) => {
-            setLanguageQuery(event.target.value);
-          }}
-        />
-      </Paper>
-
+      {/*Course Search*/}
       <Paper component="form" className={classes.root}>
         <InputBase
           className={classes.input}
@@ -186,7 +170,8 @@ const LeftPanelContent = ({
           }}
         />
       </Paper>
-        */}
+
+      {/*Date Search*/}
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
           disableToolbar
@@ -232,6 +217,47 @@ const LeftPanelContent = ({
           }}
         />
       </MuiPickersUtilsProvider>
+
+      {/*Advanced Search*/}
+      <ExpansionPanel className={classes.faqRoot}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+        >
+          <Typography className={classes.heading}>Advanced Search</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails className={classes.expansion}>
+          <Rating
+            name="rating"
+            value={rating}
+            onChange={(event, newRating) => {
+              setRating(newRating);
+            }}
+          />
+
+          <Paper component="form" className={classes.root}>
+            <InputBase
+              className={classes.input}
+              placeholder="Search by tutor"
+              onChange={(event) => {
+                setNameQuery(event.target.value);
+              }}
+            />
+          </Paper>
+
+          <Paper component="form" className={classes.root}>
+            <InputBase
+              className={classes.input}
+              placeholder="Search by language"
+              onChange={(event) => {
+                setLanguageQuery(event.target.value);
+              }}
+            />
+          </Paper>
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+
+      {/*Submission*/}
       <Button
         size="small"
         variant="outlined"
