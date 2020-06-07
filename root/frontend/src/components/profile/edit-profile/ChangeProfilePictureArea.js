@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import './EditButton.css';
 import Button from '@material-ui/core/Button';
 import Form from 'react-bootstrap/Form';
-import { changeUserImage } from "../../store/user/userActions";
-import { uploadProfilePicture } from "../../util/apiCallFunctions";
+import { changeUserImage } from "../../../store/user/userActions";
+import { uploadProfilePicture } from "../../../util/apiCallFunctions";
 import { ThemeProvider } from "@material-ui/core/styles";
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
-import customTheme from "../../styles/materialUiTheme";
+import customTheme from "../../../styles/materialUiTheme";
 
 export default class ChangeProfilePictureArea extends Component {
 
@@ -36,7 +35,7 @@ export default class ChangeProfilePictureArea extends Component {
                                 }}>Save</Button>
                         </ThemeProvider>
                     </div>
-                    <img id="profilePictureUploadPreview" src={require(`../../images/uploads/${this.props.profilePic}`)} />
+                    <img id="profilePictureUploadPreview" src={require(`../../../images/uploads/${this.props.profilePic}`)} />
 
                     <div /> {/* Added a DOM element to center the image*/}
                 </div>

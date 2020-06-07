@@ -5,7 +5,7 @@ import { Form, Modal } from "react-bootstrap";
 
 import MainNavigation from "../navigation/MainNavigation";
 import CustomButton from "./CustomButton.js";
-import { logInUser } from "../../store/user/userActions";
+import { authenticateAndLoginUser } from "../../util/apiCallFunctions";
 import { isProfileSetUp } from "../../util/authenticationFunctions";
 
 import "./Login.css";
@@ -84,7 +84,7 @@ class Login extends Component {
       this.state.password
     ) {
       console.info("HANDLE SUBMIT SAYS: Valid Form");
-      let login = await logInUser(
+      let login = await authenticateAndLoginUser(
         this.state.email,
         this.state.password,
         this.state.userType

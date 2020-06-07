@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './CreateProfilePage.css';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import NonUserNavBar from "../../components/logged-in-nav-bar/NonUserNavBar";
+import LoggedOutNavBar from "../../components/logged-in-nav-bar/LoggedOutNavBar";
 import { store } from "../../store/configureStore";
 import { USER_WITHOUT_PROFILE_LOGGED_IN } from "../../store/user/userActions";
 import Button from '@material-ui/core/Button';
@@ -13,7 +13,7 @@ export default class EmailConfirmationPage extends Component {
     render() {
         return (
             <>
-                <NonUserNavBar />
+                <LoggedOutNavBar />
                 <div className="pageContainer">
                     <div className="createProfileContainer">
                         {this.state.status === 200 &&

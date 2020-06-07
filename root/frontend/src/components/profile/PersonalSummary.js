@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "./PersonalSummary.css";
 import { SocialIcon } from "react-social-icons";
-import EditButton from "./EditButton.js";
+import EditModal from "./edit-profile/EditModal";
 import Rating from '@material-ui/lab/Rating';
 import TuteeOpinionArea from "./TuteeOpinionArea";
 
@@ -37,7 +37,7 @@ export default class PersonalSummary extends Component {
         <div className={`socialArea ${width}`}>{this.createSocialArea()}</div>
 
         {this.props.isUser && <div className="editContainer">
-          <EditButton className="editIcon" />
+          <EditModal className="editIcon" />
         </div>}
 
         {!this.props.isUser && <TuteeOpinionArea />}
@@ -49,6 +49,7 @@ export default class PersonalSummary extends Component {
     if (this.props.person.social === null || this.props.person.social === undefined)
       return;
     let socialAccounts = Object.values(this.props.person.social); // Change color later
+    socialAccounts = socialAccounts.filter((socialAccount) => socialAccount !== null);
     // Had to add 'https://' to the start of the links given in the backend examples. Will probably remove later
     return socialAccounts.map((socialAccount) => (
       <SocialIcon

@@ -24,11 +24,13 @@ class SingUp extends Component {
       email: "",
       password: "",
       userType: "",
+      password2: "",
       showModal: false,
       errors: {
         email: "",
         password: "",
         login: "",
+        password2: "",
       },
     };
 
@@ -63,7 +65,12 @@ class SingUp extends Component {
           errors.password = "password can be maximum 30 characters";
         }
         break;
-
+      case "password2":
+          errors.password2 =
+            this.state.password == this.state.password2
+              ? ""
+              : "passwords do not match!";
+        break;
       default:
         break;
     }
@@ -109,7 +116,7 @@ class SingUp extends Component {
     }
   }
   render() {
-    
+
     const { errors } = this.state;
     //  console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state);
     return (
@@ -135,7 +142,9 @@ class SingUp extends Component {
           onSubmit={this.handleSubmit}
         >
           <div className="loginFormBoxContainer">
-            <h3 className="welcomeSign" style={{ textAlign: "center" }}>Sign Up</h3>
+            <h3 className="welcomeSign" style={{ textAlign: "center" }}>
+              Sign Up
+            </h3>
 
             <div className="form-group">
               <label> Name</label>
@@ -182,29 +191,43 @@ class SingUp extends Component {
                 <Form.Text className="error">{errors.password}</Form.Text>
               )}
             </div>
+            <div className="form-group">
+              <input
+                onBlur={this.handleInputChange}
+                onChange={this.handleInputChange}
+                name="password2"
+                id="password2"
+                type="password"
+                className="form-control"
+                placeholder="repeat your password"
+              />
+              {errors.password2.length > 0 && (
+                <Form.Text className="error">{errors.password2}</Form.Text>
+              )}
+            </div>
             <Form.Text id="submittion-error" className="error">
               {errors.login}
             </Form.Text>
             <div>
-            <CustomButton
-              name="login"
-              onClick={() => {
-                this.setState({ ...this.state, userType: "tutor" });
-              }}
-            >
-              Signup as a tutor
-            </CustomButton>
-            <CustomButton
-              name="login"
-              onClick={() => {
-                this.setState({ ...this.state, userType: "tutee" });
-              }}
-            >
-              Signup as a tutee
-            </CustomButton>
+              <CustomButton
+                name="login"
+                onClick={() => {
+                  this.setState({ ...this.state, userType: "tutor" });
+                }}
+              >
+                Signup as a tutor
+              </CustomButton>
+              <CustomButton
+                name="login"
+                onClick={() => {
+                  this.setState({ ...this.state, userType: "tutee" });
+                }}
+              >
+                Signup as a tutee
+              </CustomButton>
             </div>
             <br />
-            <p className="forgot-password text-right">
+            <p>
               Already registered <a href="/Login">sign in?</a>
               {/* props.flip() */}
             </p>
