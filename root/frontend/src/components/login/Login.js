@@ -5,7 +5,10 @@ import { Form, Modal } from "react-bootstrap";
 
 import MainNavigation from "../navigation/MainNavigation";
 import CustomButton from "./CustomButton.js";
-import { authenticateAndLoginUser } from "../../util/apiCallFunctions";
+import {
+  authenticateAndLoginUser,
+  changeForgottenPassword,
+} from "../../util/apiCallFunctions";
 import { isProfileSetUp } from "../../util/authenticationFunctions";
 
 import "./Login.css";
@@ -72,8 +75,25 @@ class Login extends Component {
     });
   }
 
+  async forgotPassword(event) {
+    event.preventDefault();
+    let emailSent="";
+    if (validateForm(this.state.errors) && this.state.email) {
+      emailSent = await changeForgottenPassword(this.state.email);
+    }
+    if (!emailSent) {
+        //this.setState({ ...this.state, showModal: true });
+      
+    } else {
+      document.getElementById("submittion-error").innerHTML = emailSent;
+      // await this.setState({ ...this.state, errors: { login: login } }, () => {
+      //   console.log(errors);
+      // });
+      console.error("HANDLE SUBMIT SAYS: invalid Form");
+    }
+  }
+
   async handleSubmit(event) {
-    let errors = this.state.errors;
     console.log(
       "Handle Submit says: this is a user type: " + this.state.userType
     );
@@ -91,10 +111,11 @@ class Login extends Component {
       );
       console.log("value of LOGIN returned is: ", login);
       if (!login) {
-        if (isProfileSetUp()) // User who has created their account previously should be sent to profile
+        if (isProfileSetUp())
+          // User who has created their account previously should be sent to profile
           window.location.href = "/profile";
-        else  // redirect tutor to create account page
-          window.location.href = "/createProfile";
+        // redirect tutor to create account page
+        else window.location.href = "/createProfile";
       } else {
         document.getElementById("submittion-error").innerHTML = login;
         // await this.setState({ ...this.state, errors: { login: login } }, () => {
@@ -104,20 +125,33 @@ class Login extends Component {
       }
     }
   }
-  modalFunction(e) {
-    window.addEventListener("load", () => {
-      document.querySelector("#myButton").addEventListener("click", (e) => {
-        this.setState({ ...this.state, showModal: true });
-      });
-    });
-    e.preventDefault();
-  }
+  // *************************************************************************************************************8
   render() {
     // console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state); //to check the most up to date state
     const { errors } = this.state;
 
     return (
       <>
+
+<Modal
+          centered="true"
+          show={this.state.showModal}
+          onHide={() => {
+            this.setState({ ...this.state, showModal: false });
+            window.location.href = "/login";
+          }}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Forgot your password? We got you!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+           All done! check your email.
+          </Modal.Body>
+        </Modal>
+        <MainNavigation />
+
+{/* **************************************************************************************** */}
+
         <Modal
           centered="true"
           show={this.state.showModal}
@@ -127,16 +161,43 @@ class Login extends Component {
           }}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Help us reset your password!</Modal.Title>
+            <Modal.Title>Forgot your password? We got you!</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            check your email to reset your account password!
+            <Form onSubmit={this.forgotPassword}>
+              <Form.Group controlId="formBasicEmail">
+                <Form.Control
+                  onBlur={this.handleInputChange}
+                  onChange={this.handleInputChange}
+                  name="email"
+                  placeholder="Enter your email"
+                />
+                {errors.email.length > 0 && (
+                  <Form.Text className="error">{errors.email}</Form.Text>
+                )}
+              </Form.Group>
+              <Form.Text id="submittion-error" className="error">
+                {errors.login}
+              </Form.Text>
+              <div style={{ textAlign: "center", alignItems: "right" }}>
+                <CustomButton
+                  name="login"
+                  type="submit"
+                  onClick={() => {
+                    console.log("random message");
+                    this.setState({ ...this.state, email: this.state.email });
+                  }}
+                >
+                  reset password
+                </CustomButton>
+              </div>
+            </Form>
           </Modal.Body>
         </Modal>
         <MainNavigation />
+
+        {/* ************************************************************************************ */}
         <div className="parentLoginFormBoxContainer">
-
-
           <div className="loginFormBoxContainer">
             <h3 className="welcomeSign">Sign In</h3>
 
@@ -208,10 +269,9 @@ class Login extends Component {
                 href="/login"
                 id="myButton"
                 onClick={(e) => {
-                  e.preventDefault()
+                  e.preventDefault();
                   this.setState({ ...this.state, showModal: true });
                 }}
-
               >
                 password?
               </a>
@@ -233,8 +293,7 @@ class Login extends Component {
             </CustomButton>
             {/* <p>Join {count} users that already signed up</p> */}
           </div>
-        </div>{" "}
-      // end of "parentLoginFormBoxContainer"
+        </div>
       </>
     );
   }
