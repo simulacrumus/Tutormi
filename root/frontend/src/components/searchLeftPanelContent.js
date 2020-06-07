@@ -6,6 +6,7 @@ import Paper from "@material-ui/core/Paper";
 import InputBase from "@material-ui/core/InputBase";
 import { Rating } from "@material-ui/lab";
 import { addTutor, deleteTutor } from "../store/tutorSearchList";
+import Button from "@material-ui/core/Button";
 import "date-fns";
 import DateFnsUtils from "@date-io/date-fns";
 import {
@@ -26,6 +27,10 @@ const useStyles = makeStyles(() => ({
     flex: 1,
     alignItems: "center",
   },
+  buttonColor: {
+    fontWeight: "bold",
+    fontFamily: "Arial",
+  },
 }));
 
 const LeftPanelContent = ({
@@ -34,6 +39,7 @@ const LeftPanelContent = ({
   onAddTutor,
   clearTutors,
 }) => {
+  const classes = useStyles();
   const [rating, setRating] = useState(1);
   const [searchQuery, setSearchQuery] = useState(null);
   const [languageQuery, setLanguageQuery] = useState(null);
@@ -46,17 +52,15 @@ const LeftPanelContent = ({
   const [endQuery, setEndQuery] = useState(dateQuery);
   const [initialStart] = useState(moment(startQuery));
   const [initialEnd] = useState(moment(endQuery));
-  const classes = useStyles();
+  const [btnClicked, setBtnValue] = useState(false);
 
-  const handleDateChange = (date, number) => {
+  const handleDateChange = (date) => {
     let calendarDate = date.toString().substring(0, 15);
     let currentStart = startQuery.toString().substring(15);
     let currentEnd = endQuery.toString().substring(15);
     date = calendarDate + currentStart;
     setDateQuery(date);
-    if (number === 1) {
-      setStartQuery(date);
-    }
+    setStartQuery(date);
     date = calendarDate + currentEnd;
     setEndQuery(date);
   };
@@ -68,7 +72,7 @@ const LeftPanelContent = ({
     setStartQuery(date);
   };
 
-  const handleEndChange = (date, number) => {
+  const handleEndChange = (date) => {
     let calendarDate = dateQuery.toString().substring(0, 15);
     let userDate = date.toString().substring(15);
     date = calendarDate + userDate;
@@ -85,7 +89,7 @@ const LeftPanelContent = ({
       searchQuery === null &&
       languageQuery === null &&
       courseQuery === null &&
-      moment(startQuery).isSame(initialStart)
+      btnClicked === false
     ) {
       const getTutors = async () => {
         try {
@@ -100,14 +104,7 @@ const LeftPanelContent = ({
       };
       getTutors();
     }
-  }, [
-    searchQuery,
-    rating,
-    languageQuery,
-    courseQuery,
-    startQuery,
-    initialStart,
-  ]);
+  }, [searchQuery, rating, languageQuery, courseQuery, btnClicked]);
 
   useEffect(() => {
     if (
@@ -115,9 +112,7 @@ const LeftPanelContent = ({
       searchQuery !== null ||
       languageQuery !== null ||
       courseQuery !== null ||
-      !moment(startQuery).isSame(initialStart) ||
-      (!moment(startQuery).isSame(initialStart) &&
-        !moment(dateQuery).isSame(initialDate))
+      btnClicked !== false
     ) {
       const filterState = async () => {
         try {
@@ -142,25 +137,16 @@ const LeftPanelContent = ({
               key: searchQuery,
             }),
           });
-          console.log("Start TIME!!: ", startQuery);
-          console.log("END TIME!!: ", endQuery);
           const data = await response.json();
           data.map((tutor) => onAddTutor(tutor));
-          console.log("DATA FETCHED!!");
+          setBtnValue(false);
         } catch (error) {
           console.log("Error!!", error);
         }
       };
       filterState();
     }
-  }, [
-    searchQuery,
-    rating,
-    languageQuery,
-    courseQuery,
-    startQuery,
-    initialStart,
-  ]);
+  }, [searchQuery, rating, languageQuery, courseQuery, btnClicked]);
 
   return (
     <>
@@ -174,14 +160,14 @@ const LeftPanelContent = ({
       <Paper component="form" className={classes.root}>
         <InputBase
           className={classes.input}
-          placeholder="Search Tutors"
+          placeholder="Search"
           onChange={(event) => {
             setSearchQuery(event.target.value);
           }}
         />
       </Paper>
 
-      <Paper component="form" className={classes.root}>
+      {/*<Paper component="form" className={classes.root}>
         <InputBase
           className={classes.input}
           placeholder="Search for a language"
@@ -200,6 +186,7 @@ const LeftPanelContent = ({
           }}
         />
       </Paper>
+        */}
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
           disableToolbar
@@ -210,9 +197,7 @@ const LeftPanelContent = ({
           label="Select a date"
           value={dateQuery}
           onChange={(date) => {
-            moment(startQuery).isSame(initialStart)
-              ? handleDateChange(date, 0)
-              : handleDateChange(date, 1);
+            handleDateChange(date);
           }}
           KeyboardButtonProps={{
             "aria-label": "change date",
@@ -247,6 +232,15 @@ const LeftPanelContent = ({
           }}
         />
       </MuiPickersUtilsProvider>
+      <Button
+        size="small"
+        variant="outlined"
+        color="secondary"
+        className={classes.buttonColor}
+        onClick={() => setBtnValue(true)}
+      >
+        Search
+      </Button>
     </>
   );
 };
