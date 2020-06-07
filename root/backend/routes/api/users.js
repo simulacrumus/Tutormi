@@ -152,7 +152,6 @@ router.get('/confirmation/:token', async ({
 // @desc    Forget password route, takes email and sends a link to that email
 // @access  Public
 router.post('/forgetpswd', [
-    check('email', 'Email cannot be empty').not().isEmpty(),
     check('email', 'Email address not valid').isEmail()
 ], async (req, res) => {
 
@@ -434,6 +433,10 @@ router.post('/resendconfirmation', auth, async (req, res) => {
 // @desc     Block user using their id (tutor or tutee id)
 // @access   Private
 router.put('/block/:id', auth, async (req, res) => {
+    const {
+        id
+    } = req.params.id
+
     if (!id) {
         return res.status(400).json({
             message: "Please provide a valid id"
@@ -512,6 +515,10 @@ router.put('/block/:id', auth, async (req, res) => {
 // @desc     Unlock user using their id (tutor or tutee id)
 // @access   Private
 router.delete('/block/:id', auth, async (req, res) => {
+    const {
+        id
+    } = req.params.id
+
     if (!id) {
         return res.status(400).json({
             message: "Please provide a valid id"

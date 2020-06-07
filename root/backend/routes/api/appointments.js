@@ -177,7 +177,7 @@ router.post('/', [auth, [
             to: `${tutor1.user.email}, ${tutee1.user.email}`, // list of receivers
             subject: "TUTORMI - NEW APPOINTMENT", // Subject line
             text: "", // plain text body
-            html: htmloutput, // html body
+            html: htmloutput // html body
         });
 
         console.log("Message sent: %s", info.messageId);

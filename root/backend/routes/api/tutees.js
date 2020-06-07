@@ -79,18 +79,15 @@ router.post(
 
     try {
 
-      query = {
-        profile: true
-      }
+      query = {}
+      query.profile = true
       if (name) {
         query.name = name;
       }
       //change user name and profile fields
       await User.findOneAndUpdate({
         _id: req.user.user.id
-      }, {
-        query
-      })
+      }, query)
 
       const tutee = await Tutee.findOneAndUpdate({
           user: req.user.user.id

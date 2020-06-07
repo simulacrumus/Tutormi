@@ -29,8 +29,8 @@ router.get('/', async (req, res) => {
 router.post(
     '/', auth,
     [
-        check('tutorId', 'Tutor ID is required').isEmail(),
-        check('rate', 'Rate value is required').exists()
+        check('tutorId', 'Tutor ID is required').not().isEmpty(),
+        check('rate', 'Rate value is required').not().isEmpty()
     ],
     async (req, res) => {
         const errors = validationResult(req);

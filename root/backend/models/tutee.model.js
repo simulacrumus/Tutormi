@@ -34,10 +34,12 @@ const TuteeSchema = new mongoose.Schema({
     max: 20
   },
   profilePic: {
-    type: String
+    type: String,
+    default: 'default-profile-pic.png'
   },
   coverPic: {
-    type: String
+    type: String,
+    default: 'default-cover-pic.png'
   },
   ratings: [{
     type: mongoose.Schema.Types.ObjectId,
