@@ -21,10 +21,11 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-            user: req.user.user.id
-        })
+                user: req.user.user.id
+            })
             .populate('user', ['name', 'email', 'date', 'type'])
             .populate('appointments')
+            .populate('ratings')
 
         if (!tutor) {
             return res.status(400).json({
@@ -91,15 +92,16 @@ router.post(
 
             // Using upsert option (creates new doc if no match is found):
             const tutor = await Tutor.findOneAndUpdate({
-                user: req.user.user.id
-            }, {
-                $set: tutorProfileFields
-            }, {
-                new: true,
-                upsert: true
-            })
+                    user: req.user.user.id
+                }, {
+                    $set: tutorProfileFields
+                }, {
+                    new: true,
+                    upsert: true
+                })
                 .populate('user', ['name', 'email', 'type'])
-                .populate('appointments');
+                .populate('appointments')
+                .populate('ratings');
             res.json(tutor);
         } catch (err) {
             console.error(err.message);
@@ -120,6 +122,7 @@ router.get('/', async (req, res) => {
                     'start': -1
                 }
             })
+            .populate('ratings')
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -137,10 +140,11 @@ router.get('/user/:id', async ({
 }, res) => {
     try {
         const tutor = await Tutor.findOne({
-            _id: id
-        })
+                _id: id
+            })
             .populate('user', ['name', 'email', 'type'])
-            .populate('appointments');
+            .populate('appointments')
+            .populate('ratings');
 
         if (!tutor)
             return res.status(400).json({
@@ -190,7 +194,7 @@ router.delete('/', auth, async (req, res) => {
 // @desc     Get all tutors matching search criteria
 // @access   Public
 router.post('/search', auth, async (req, res) => {
-    const {
+    let {
         start,
         end,
         course,
