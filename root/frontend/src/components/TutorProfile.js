@@ -5,7 +5,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core";
-import { setViewedTutor } from "../store/viewed-tutor/viewedTutorActions";
+import { getAndSetViewedTutor } from "../util/apiCallFunctions";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { Avatar, IconButton, CardMedia } from "@material-ui/core";
@@ -90,7 +90,7 @@ const TutorProfile = ({
           color="primary"
           size="medium"
           onClick={() => {
-            setViewedTutor(id)
+            getAndSetViewedTutor(id)
               .then(() => window.location.href = "/viewTutor");
           }}
         >

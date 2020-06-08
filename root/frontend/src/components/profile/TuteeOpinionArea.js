@@ -15,9 +15,7 @@ class TuteeOpinionArea extends Component {
             <div className="personalRatingContainer summarySmallWidth">
                 <div>
                     <label >Your Rating:</label>
-                    <Rating value={0} onChange={(event, newValue) => {
-                        addRating(this.props.viewedTutor._id, newValue);
-                    }} />
+                    <Rating value={this.getTuteeRating()} onChange={(event, newValue) => this.handleRate(newValue)} />
                 </div>
                 <ThemeProvider theme={customTheme}>
                     <Button color="primary" variant="contained" startIcon={<FavoriteIcon />}
@@ -36,6 +34,24 @@ class TuteeOpinionArea extends Component {
                 </ThemeProvider>
             </div>
         );
+    }
+
+    getTuteeRating = () => {
+        // let givenRating = this.props.tutee.ratings.filter((rating) => this.props.viewedTutor._id === rating.tutor.id);
+        // return givenRating === undefined ? 0 : givenRating;
+        return 0;
+    }
+
+    handleRate = (newValue) => {
+        addRating(this.props.viewedTutor._id, newValue)
+            .then((response) => {
+                addRatingToTutor({
+                    tutee: { id: this.props.tutee._id, name: this.props.tutee.user.name },
+                    tutor: { id: this.props.viewedTutor._id, name: this.props.viewedTutor.user.name },
+                    rate: newValue,
+                    date: new Date()
+                });
+            });
     }
 
 }

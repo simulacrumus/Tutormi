@@ -18,3 +18,11 @@ export const store = createStore(
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 export const persistor = persistStore(store);
+
+// Helper function that reduces the amount of code that needs to be written when updating the store
+export function updateStore(type, payload) {
+  store.dispatch({
+    type: type,
+    payload: payload
+  });
+}

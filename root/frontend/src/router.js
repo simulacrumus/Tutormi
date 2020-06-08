@@ -21,8 +21,19 @@ export default class Router extends Component {
         <Switch>
           <Route path="/" component={HomePage} exact />
 
-          <Route path="/login" component={Login} exact />
-          <Route path="/signup" component={SignUp} exact />
+          <Route path="/login" render={() => {
+            if (isLoggedIn())
+              return !isProfileSetUp() ? <Redirect to="/createProfile" /> : <Redirect to="/profile" />;
+            else
+              return <Login />;
+          }} />
+
+          <Route path="/signup" exact render={() => {
+            if (isLoggedIn())
+              return !isProfileSetUp() ? <Redirect to="/createProfile" /> : <Redirect to="/profile" />;
+            else
+              return <SignUp />;
+          }} />
 
           <Route path="/emailConfirmation" component={EmailConfirmationPage} exact />
           {/* flip route */}
