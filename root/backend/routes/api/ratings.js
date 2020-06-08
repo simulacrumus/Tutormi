@@ -156,7 +156,7 @@ router.delete('/:id', auth, async (req, res) => {
 
         const rating = await Rating.findOneAndDelete({
             _id: req.params.id
-        })
+        }).select('tutor.id rate _id')
 
         if (!rating) {
             return res.status(400).json({
@@ -178,9 +178,12 @@ router.delete('/:id', auth, async (req, res) => {
 
         let numOfRates = Array.from(tutor.ratings).length - 1;
         let totalRate = 0;
-        Array.from(tutor.ratings).forEach(rating => totalRate += rating.rate)
-        totalRate - rating.rate
+        Array.from(tutor.ratings).forEach(rate => totalRate += rate.rate)
 
+        totalRate -= rating.rate;
+        const ratingValue = isNaN(totalRate / numOfRates) ? 1 : (totalRate / numOfRates) < 1 ? 1 : (totalRate / numOfRates)
+
+        console.log(ratingValue);
         await Tutor.findOneAndUpdate({
             _id: tutor.id
         }, {
@@ -188,12 +191,13 @@ router.delete('/:id', auth, async (req, res) => {
                 ratings: rating.id
             },
             $set: {
-                rating: (totalRate / numOfRates)
+                rating: ratingValue
             }
         })
 
         res.json({
-            message: 'Rating deleted'
+            rating,
+            average: ratingValue
         });
     } catch (err) {
         console.error(err.message);
