@@ -82,18 +82,6 @@ export function combineSingleSlots(openHours) {
   }
 }
 
-export function calcTotalHours(hours, timePeriod) {
-  let start = moment().startOf(timePeriod);
-  let end = moment().endOf(timePeriod);
-  return hours.filter((hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end)).length;
-}
-
-export function calcTotalHoursPerMonth(hours, numberOfMonthsBack) {
-  let start = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").startOf("month");
-  let end = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").endOf("month");
-  return hours.filter((hour) => moment(hour).isAfter(start) && moment(hour).isBefore(end)).length;
-}
-
 export function fallsOnSameDay(date1, date2) {
   return (date1.year() === date2.year()
     && date1.month() === date2.month()
@@ -102,4 +90,33 @@ export function fallsOnSameDay(date1, date2) {
 
 export function displayHour12Format(hour) {
   return moment().set("minute", 0).set("hour", hour).format("hh:mm A");
+}
+
+export function appointmentLengthInHours(appointment) {
+  let difference = moment.duration(moment(appointment.time.end).diff(moment(appointment.time.start)));
+  return difference.asHours();
+}
+
+export function filterAppointmentsByTime(appointments, start, end) {
+  return appointments.filter((appointment) => moment(appointment.time.start).isBefore(end) && moment(appointment.time.end).isAfter(start));
+}
+
+export function sumAllAppointmentHours(appointments) {
+  return appointments.reduce((total, currentAppointment) => total + appointmentLengthInHours(currentAppointment), 0);
+}
+
+export function calcTotalAppointmentHours(appointments, timePeriod) {
+  let start = moment().startOf(timePeriod);
+  let end = moment().endOf(timePeriod);
+  return sumAllAppointmentHours(filterAppointmentsByTime(appointments, start, end));
+}
+
+export function calcTotalAppointmentHoursPerMonth(appointments, numberOfMonthsBack) {
+  let start = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").startOf("month");
+  let end = moment().clone().startOf("month").subtract(numberOfMonthsBack, "month").endOf("month");
+  return sumAllAppointmentHours(filterAppointmentsByTime(appointments, start, end));
+}
+
+export function calcAverageAppointmentLength(appointments) {
+  return sumAllAppointmentHours(appointments) / appointments.length;
 }

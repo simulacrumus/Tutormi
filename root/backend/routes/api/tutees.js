@@ -16,20 +16,21 @@ const {
 router.get("/me", auth, async (req, res) => {
   try {
     const tutee = await
-    Tutee.findOne({
+      Tutee.findOne({
         user: req.user.user.id,
       })
-      .populate('user', ['name', 'email', 'date'])
-      .populate('appointments')
-      .populate({
-        path: 'favorites',
-        select: ['-social', '-bookingRange', '-followers', '-rating', '-languages', '-blockedTutees', '-blockedBy', '-active', '-bio', '-location', '-ratings', '-date'],
-        populate: {
-          path: 'user',
-          select: 'name',
-          model: User
-        }
-      })
+        .populate('user', ['name', 'email', 'date'])
+        .populate('appointments')
+        .populate({
+          path: 'favorites',
+          select: ['-social', '-bookingRange', '-followers', '-rating', '-languages', '-blockedTutees', '-blockedBy', '-active', '-bio', '-location', '-ratings', '-date'],
+          populate: {
+            path: 'user',
+            select: 'name',
+            model: User
+          }
+        })
+        .populate('ratings')
 
     if (!tutee) {
       return res.status(400).json({
@@ -50,8 +51,8 @@ router.get("/me", auth, async (req, res) => {
 router.post(
   "/",
   auth, [
-    check("languages", "Language is required").not().isEmpty(),
-  ],
+  check("languages", "Language is required").not().isEmpty(),
+],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -89,13 +90,13 @@ router.post(
       }, query)
 
       const tutee = await Tutee.findOneAndUpdate({
-          user: req.user.user.id
-        }, {
-          $set: tuteeProfileFields
-        }, {
-          new: true,
-          upsert: true
-        })
+        user: req.user.user.id
+      }, {
+        $set: tuteeProfileFields
+      }, {
+        new: true,
+        upsert: true
+      })
         .populate('user', ['name', 'email', 'type'])
         .populate('appointments')
         .populate('ratings');
@@ -128,8 +129,8 @@ router.get("/", async (req, res) => {
 router.get("/user/:id", async (req, res) => {
   try {
     const profile = await Tutee.findOne({
-        _id: req.params.id,
-      })
+      _id: req.params.id,
+    })
       .populate("user", ["name", "email"])
       .populate('appointments')
       .populate('ratings');

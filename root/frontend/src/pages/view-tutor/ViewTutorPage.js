@@ -3,20 +3,27 @@ import PersonalSummary from "../../components/profile/PersonalSummary.js";
 import "./ViewTutorPage.css";
 import { connect } from "react-redux";
 import WeeklySchedule from "../../components/scheduling/WeeklySchedule.js";
+import OpinionArea from "../../components/profile/OpinionArea";
 
 class ViewTutorPage extends Component {
+
   render() {
     return (
       <div className="profilePage">
-        <div className="tutorWeekContainer">
-          <WeeklySchedule />
+        <div>
+          <div className="tutorWeekContainer">
+            <WeeklySchedule />
+          </div>
+          <div className="tutorProfileContainer">
+            <OpinionArea />
+            <PersonalSummary person={this.props.viewedTutor} isUser={false} />
+          </div>
         </div>
-        <div className="tutorProfileContainer">
-          <PersonalSummary person={this.props.viewedTutor} isUser={false} />
-        </div>
+
       </div>
     );
   }
+
 }
 
 function mapStateToProps(state) {

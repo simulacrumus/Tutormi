@@ -42,7 +42,7 @@ export default class ChangeEmailSection extends Component {
         updateEmail(this.state.newEmail, this.state.password)
             .then((response) => {
                 if (response.errors === undefined) { // No errors occurred when updating
-                    // Do something later
+                    this.props.setErrorMessage(response.message); // Not sure what to do
                 } else {
                     this.props.setErrorMessage(response.errors[0].msg); // Notify users of errors 
                 }

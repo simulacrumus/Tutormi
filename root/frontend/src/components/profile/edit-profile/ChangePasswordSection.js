@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Form from 'react-bootstrap/Form';
-import { updateUser, logout } from "../../../store/user/userActions";
+import { logout } from "../../../store/user/userActions";
 import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../../styles/materialUiTheme";
 import { changePassword } from "../../../util/apiCallFunctions";
@@ -46,7 +46,8 @@ export default class ChangePasswordSection extends Component {
             changePassword(this.state.currentPassword, this.state.newPassword)
                 .then((response) => {
                     if (response.errors === undefined) { // No errors occurred when updating
-                        // Do something later
+                        this.props.setErrorMessage("Password updated successfully logging out..."); // Not sure what to do
+                        setTimeout(() => window.location.href = "/logout", 2000);
                     } else {
                         this.props.setErrorMessage(response.errors[0].msg); // Notify users of errors 
                     }

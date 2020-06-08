@@ -2,7 +2,10 @@ import moment from 'moment';
 import {
     USER_LOGGED_IN, USER_INFO_UPDATED, AVAILABILITY_OPENED, TOKEN_ACQUIRED, USER_RATED_TUTOR,
     AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT,
-    USER_IMAGE_UPDATED, USER_ADDED_TO_FAVORITES, USER_REMOVED_FAVORITE, USER_WITHOUT_PROFILE_LOGGED_IN
+    USER_IMAGE_UPDATED, USER_ADDED_TO_FAVORITES, USER_REMOVED_FAVORITE, USER_WITHOUT_PROFILE_LOGGED_IN,
+    USER_REMOVED_RATING,
+    USER_BLOCKED_SOMEONE,
+    USER_UNBLOCKED_SOMEONE
 } from './userActions';
 import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
 
@@ -16,8 +19,10 @@ const initialState = {
 export default function userReducer(state = initialState, action) {
     let copiedAvailableHours;
     let copiedNewAppointments;
+    let copiedRatings;
 
     if (state.isLoggedIn && state.hasSetupUpProfile) {
+        copiedRatings = state.user.user.type === "tutee" ? state.user.ratings.slice() : undefined;
         copiedAvailableHours = state.user.user.type === "tutor" ? state.user.availableHours.slice() : undefined;
         copiedNewAppointments = state.user.appointments.slice();
     }
@@ -56,9 +61,25 @@ export default function userReducer(state = initialState, action) {
                 }
             };
 
+        case USER_BLOCKED_SOMEONE:
+            let blockedListName = state.user.user.type === "tutor" ? "blockedTutees" : "blockedTutors";
+            let copiedBlockedList = state.user[blockedListName].slice();
+            copiedBlockedList.push(action.payload);
+            return { ...state, user: { ...state.user, [blockedListName]: copiedBlockedList } };
+
+        case USER_UNBLOCKED_SOMEONE:
+            let blockedListName2 = state.user.user.type === "tutor" ? "blockedTutees" : "blockedTutors";
+            let copiedBlockedList2 = state.user[blockedListName2].slice();
+            copiedBlockedList2 = copiedBlockedList2.filter(blockedId => blockedId !== action.payload);
+            return { ...state, user: { ...state.user, [blockedListName2]: copiedBlockedList2 } };
+
         case USER_RATED_TUTOR:
-            let copiedRatings = state.user.ratings.slice();
-            copiedRatings.push(action.payload.rating);
+            copiedRatings = copiedRatings.filter((rating) => action.payload.tutor.id !== rating.tutor.id);
+            copiedRatings.push(action.payload);
+            return { ...state, user: { ...state.user, ratings: copiedRatings } };
+
+        case USER_REMOVED_RATING:
+            copiedRatings = copiedRatings.filter((rating) => action.payload.tutor.id !== rating.tutor.id);
             return { ...state, user: { ...state.user, ratings: copiedRatings } };
 
         case USER_ADDED_TO_FAVORITES:

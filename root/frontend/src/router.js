@@ -4,14 +4,18 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import ProfilePage from "./pages/profile/ProfilePage.js";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import ViewTutorPage from "./pages/view-tutor/ViewTutorPage";
+import ViewTuteePage from "./pages/view-tutee/ViewTuteePage";
 import HomePage from "./pages/home/HomePage";
+import LogoutPage from "./pages/logout/LogoutPage";
 import CreateProfilePage from "./pages/create-profile/CreateProfilePage";
 import EmailConfirmationPage from "./pages/create-profile/EmailConfirmationPage";
 import SearchMain from "./components/SearchMain";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
 
-import { isLoggedIn, isTutee, isViewedTutorSet, isProfileSetUp } from "./util/authenticationFunctions";
+import {
+  isLoggedIn, isTutee, isViewedTutorSet, isProfileSetUp, isViewedTuteeSet
+} from "./util/authenticationFunctions";
 
 export default class Router extends Component {
 
@@ -20,6 +24,8 @@ export default class Router extends Component {
       <main>
         <Switch>
           <Route path="/" component={HomePage} exact />
+
+          <Route path="/logout" component={LogoutPage} exact />
 
           <Route path="/login" render={() => {
             if (isLoggedIn())
@@ -60,15 +66,24 @@ export default class Router extends Component {
                 return <Redirect to="/login" />;
             }} />
 
+          <Route path="/viewTutee" exact render={() => {
+            if (!isLoggedIn())
+              return <Redirect to="/login" />;
+            else if (isProfileSetUp())
+              return isViewedTuteeSet() ? <ViewTuteePage /> : <Redirect to="/dashboard" />;
+            else
+              return <Redirect to="/createProfile" />;
+          }} />
+
           <Route path="/viewTutor" exact
             render={() => {
               if (!isLoggedIn())
                 return <Redirect to="/login" />;
               else if (isProfileSetUp())
-                return isViewedTutorSet() ? <ViewTutorPage /> : <Redirect to="/profile" />;
+                return isViewedTutorSet() ? <ViewTutorPage /> : <Redirect to="/dashboard" />;
               else
                 return <Redirect to="/createProfile" />;
-            }} />/>
+            }} />
 
           <Route
             path="/search"
