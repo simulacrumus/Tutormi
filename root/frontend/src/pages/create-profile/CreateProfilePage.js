@@ -11,7 +11,6 @@ import ChangeProfilePictureArea from "../../components/profile/edit-profile/Chan
 import { updateUserInformation } from "../../util/apiCallFunctions";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
-import NonUserNavBar from "../../components/logged-in-nav-bar/NonUserNavBar";
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -44,7 +43,6 @@ class CreateProfilePage extends Component {
     render() {
         return (
             <>
-                <NonUserNavBar />
                 <div className="pageContainer">
                     <div className="createProfileContainer">
                         <ThemeProvider theme={customTheme}>

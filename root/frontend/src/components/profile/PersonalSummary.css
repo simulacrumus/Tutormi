@@ -80,3 +80,8 @@
 .totalRatingContainer {
   display: flex;
 }
+
+.ratingContainer {
+  display: flex;
+  align-items: center;
+}

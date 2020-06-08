@@ -7,7 +7,6 @@
 
 .tutorProfileContainer, .tutorWeekContainer {
   display: flex;
-  height: 85vh;
 }
 
 .tutorWeekContainer {

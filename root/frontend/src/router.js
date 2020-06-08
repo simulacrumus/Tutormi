@@ -10,7 +10,7 @@ import EmailConfirmationPage from "./pages/create-profile/EmailConfirmationPage"
 import SearchMain from "./components/SearchMain";
 import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp"
-// import Flip from "./components/login/Login2"
+
 import { isLoggedIn, isTutee, isViewedTutorSet, isProfileSetUp } from "./util/authenticationFunctions";
 
 export default class Router extends Component {
@@ -36,8 +36,6 @@ export default class Router extends Component {
           }} />
 
           <Route path="/emailConfirmation" component={EmailConfirmationPage} exact />
-          {/* flip route */}
-          {/* <Route path="/Flip" component={Flip} exact /> */}
 
           <Route path="/createProfile" exact render={() => {
             if (isLoggedIn())
