@@ -70,27 +70,9 @@ class Login extends Component {
         break;
     }
 
-    this.setState({ errors, [name]: value }, () => {
-      //console.log(errors);
-    });
-  }
-
-  async forgotPassword(event) {
-    event.preventDefault();
-    let emailSent="";
-    if (validateForm(this.state.errors) && this.state.email) {
-      emailSent = await changeForgottenPassword(this.state.email);
-    }
-    if (!emailSent) {
-        //this.setState({ ...this.state, showModal: true });
-      
-    } else {
-      document.getElementById("submittion-error").innerHTML = emailSent;
-      // await this.setState({ ...this.state, errors: { login: login } }, () => {
-      //   console.log(errors);
-      // });
-      console.error("HANDLE SUBMIT SAYS: invalid Form");
-    }
+    // this.setState({ errors, [name]: value }, () => {
+    //   //console.log(errors);
+    // });
   }
 
   async handleSubmit(event) {
@@ -98,6 +80,21 @@ class Login extends Component {
       "Handle Submit says: this is a user type: " + this.state.userType
     );
     event.preventDefault();
+    if (this.state.type == "") {
+      let emailSent = "";
+      if (validateForm(this.state.errors) && this.state.email) {
+        emailSent = await changeForgottenPassword(this.state.email);
+      }
+      if (!emailSent) {
+        this.setState({ ...this.state, showModal: true });
+      } else {
+        document.getElementById("submittion-error").innerHTML = emailSent;
+        // await this.setState({ ...this.state, errors: { login: login } }, () => {
+        //   console.log(errors);
+        // });
+        console.error("HANDLE SUBMIT SAYS: invalid Form");
+      }
+    }
     if (
       validateForm(this.state.errors) &&
       this.state.email &&
@@ -132,8 +129,7 @@ class Login extends Component {
 
     return (
       <>
-
-<Modal
+        <Modal
           centered="true"
           show={this.state.showModal}
           onHide={() => {
@@ -144,13 +140,11 @@ class Login extends Component {
           <Modal.Header closeButton>
             <Modal.Title>Forgot your password? We got you!</Modal.Title>
           </Modal.Header>
-          <Modal.Body>
-           All done! check your email.
-          </Modal.Body>
+          <Modal.Body>All done! check your email.</Modal.Body>
         </Modal>
         <MainNavigation />
 
-{/* **************************************************************************************** */}
+        {/* **************************************************************************************** */}
 
         <Modal
           centered="true"
@@ -164,7 +158,7 @@ class Login extends Component {
             <Modal.Title>Forgot your password? We got you!</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form onSubmit={this.forgotPassword}>
+            <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formBasicEmail">
                 <Form.Control
                   onBlur={this.handleInputChange}
