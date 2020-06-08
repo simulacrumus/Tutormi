@@ -12,7 +12,6 @@ import { Avatar, IconButton, CardMedia } from "@material-ui/core";
 import { Rating } from "@material-ui/lab";
 
 const useStyles = makeStyles(() => ({
-
   root: {
     minHeight: 350,
   },
@@ -37,8 +36,8 @@ const useStyles = makeStyles(() => ({
 
 const trimBio = (description) => {
   const bio =
-    description !== null && description !== undefined && description.length > 85
-      ? description.substring(0, 85) + "..."
+    description !== null && description !== undefined && description.length > 65
+      ? description.substring(0, 65) + "..."
       : description;
   return bio;
 };
@@ -70,7 +69,6 @@ const TutorProfile = ({
       <CardMedia style={{ height: "150px" }} image={imgSrc} />
       <CardContent>
         <Typography variant="body2" component="p">
-
           {trimBio(description)}
         </Typography>
         {/*<Typography className={classes.typography}>Skills</Typography>
@@ -89,6 +87,14 @@ const TutorProfile = ({
           variant="contained"
           color="primary"
           size="medium"
+          style={{
+            marginTop:
+              description !== null &&
+              description !== undefined &&
+              description.length <= 45
+                ? 20
+                : 0,
+          }}
           onClick={() => {
             getAndSetViewedTutor(id)
               .then(() => window.location.href = "/viewTutor");

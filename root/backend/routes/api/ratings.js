@@ -29,8 +29,8 @@ router.get('/', async (req, res) => {
 router.post(
     '/', auth,
     [
-        check('tutorId', 'Tutor ID is required').isEmail(),
-        check('rate', 'Rate value is required').exists()
+        check('tutorId', 'Tutor ID is required').not().isEmpty(),
+        check('rate', 'Rate value is required').not().isEmpty()
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -42,7 +42,8 @@ router.post(
 
         const {
             tutorId,
-            rate
+            rate,
+            currentRatingId
         } = req.body
 
         if (rate < 1 || rate > 5) {
@@ -67,71 +68,72 @@ router.post(
                 user: req.user.user.id
             }).populate('user', 'name')
 
-            const currentRating = await Rating.findOneAndUpdate({
+            if (!tutee) {
+                return res.status(400).json({
+                    message: 'Tutee not found'
+                })
+            }
+
+            const ratingFields = {
                 tutor: {
-                    id: tutor.id
+                    id: tutor.id,
+                    name: tutor.user.name
                 },
                 tutee: {
-                    id: tutee.id
-                }
-            }, {
-                rate: rate
-            })
+                    id: tutee.id,
+                    name: tutee.user.name
+                },
+                rate
+            }
+
+            let currentRating;
+            let rating;
+            if (currentRatingId) {
+                currentRating = await Rating.findByIdAndUpdate(currentRatingId, {
+                    rate
+                }).select('tutor.id -_id')
+                rating = currentRating
+            } else {
+                newRating = Rating(ratingFields)
+                await newRating.save()
+                rating = newRating
+            }
 
             let numOfRates = Array.from(tutor.ratings).length;
             let totalRate = 0;
             Array.from(tutor.ratings).forEach(rating => totalRate += rating.rate)
 
             if (!currentRating) {
-                const newRating = {
-                    tutor: {
-                        id: tutor.id,
-                        name: tutor.user.name
-                    },
-                    tutee: {
-                        id: tutee.id,
-                        name: tutee.user.name
-                    },
-                    rate: rate
-                }
-
-                const rating = Rating(newRating)
-                await rating.save()
-
                 numOfRates++;
                 totalRate += rate;
-
-                await Tutor.findOneAndUpdate({
-                    _id: tutor.id
-                }, {
-                    $addToSet: {
-                        ratings: rating.id
-                    },
-                    $set: {
-                        rating: (totalRate / numOfRates)
-                    }
-                })
-
-                await Tutee.findOneAndUpdate({
-                    _id: tutee.id
-                }, {
-                    $addToSet: {
-                        ratings: rating.id
-                    }
-                })
             } else {
                 totalRate += (rate - currentRating.rate)
-                await Tutor.findOneAndUpdate({
-                    _id: tutor.id
-                }, {
-                    $set: {
-                        rating: (totalRate / numOfRates)
-                    }
-                })
             }
 
+            const ratingValue = isNaN(totalRate / numOfRates) ? rate : (totalRate / numOfRates) < 1 ? 1 : (totalRate / numOfRates)
+
+            await Tutor.findOneAndUpdate({
+                _id: tutor.id
+            }, {
+                $addToSet: {
+                    ratings: rating.id
+                },
+                $set: {
+                    rating: ratingValue
+                }
+            })
+
+            await Tutee.findOneAndUpdate({
+                _id: tutee.id
+            }, {
+                $addToSet: {
+                    ratings: rating.id
+                }
+            })
+
             res.json({
-                message: "Tutor rated!"
+                rating,
+                average: ratingValue
             });
         } catch (err) {
             console.error(err.message);

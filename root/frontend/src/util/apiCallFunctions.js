@@ -69,6 +69,22 @@ export async function updateUserInformation(updateInfo, userType) {
   return updateResponse;
 }
 
+export async function changeForgottenPassword(email) {
+  let authResponse = await fetch("/api/forgetpswd", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email
+    }),
+  });
+
+  authResponse = await authResponse.json();
+
+  return authResponse.errors === undefined ? false : authResponse.errors[0].msg;
+}
+
 export async function createAccount(name, email, password, type) {
   let authResponse = await fetch("/api/users", {
     method: "POST",
