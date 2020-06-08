@@ -120,4 +120,21 @@ router.post(
     }
 );
 
+
+// @route   GET api/auth/expiry
+// @desc    Token expiry route
+// @access  Public
+router.get('/expiry', auth, async (req, res) => {
+    const exp = req.user.exp
+    try {
+        const expiry = exp > Math.floor(Date.now() / 1000)
+        res.json({
+            valid: expiry
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
 module.exports = router;

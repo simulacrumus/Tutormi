@@ -31,7 +31,7 @@ const TutorSchema = new mongoose.Schema({
     },
     ratings: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'tutee'
+        ref: 'rating'
     }],
     rating: {
         type: Number,
