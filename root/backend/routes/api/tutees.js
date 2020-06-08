@@ -30,6 +30,7 @@ router.get("/me", auth, async (req, res) => {
           model: User
         }
       })
+      .populate('ratings')
 
     if (!tutee) {
       return res.status(400).json({
@@ -245,13 +246,7 @@ router.put('/favorites/:id', auth, async (req, res) => {
 
   try {
 
-    const tutor = await Tutor.findOneAndUpdate({
-      _id: tutorId
-    }, {
-      $addToSet: {
-        followers: tutee._id
-      }
-    })
+    const tutor = await Tutor.findById(tutorId)
 
     if (!tutor) {
       return res.status(400).json({
@@ -269,9 +264,18 @@ router.put('/favorites/:id', auth, async (req, res) => {
 
     if (!tutee) {
       return res.status(400).json({
-        msg: "There's no tutee with this id"
+        msg: "Tutee not found"
       })
     }
+
+    await Tutor.findOneAndUpdate({
+      _id: tutorId
+    }, {
+      $addToSet: {
+        followers: tutee._id
+      }
+    })
+
     return res.json("Added to favorites")
   } catch (err) {
     console.error(err.message);
@@ -287,6 +291,15 @@ router.delete('/favorites/:id', auth, async (req, res) => {
   const tutorId = req.params.id;
 
   try {
+
+    const tutor = await Tutor.findById(tutorId)
+
+    if (!tutor) {
+      return res.status(400).json({
+        message: "There's no tutor with this id"
+      })
+    }
+
     const tutee = await Tutee.findOneAndUpdate({
       user: req.user.user.id
     }, {
@@ -297,23 +310,17 @@ router.delete('/favorites/:id', auth, async (req, res) => {
 
     if (!tutee) {
       return res.status(400).json({
-        message: "There's no tutee with this id"
+        message: "Tutee not found"
       })
     }
 
-    const tutor = await Tutor.findOneAndUpdate({
+    await Tutor.findOneAndUpdate({
       _id: tutorId
     }, {
       $pull: {
         followers: tutee._id
       }
     })
-
-    if (!tutor) {
-      return res.status(400).json({
-        message: "There's no tutor with this id"
-      })
-    }
 
     return res.json({
       msg: "Removed from favorites"
