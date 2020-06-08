@@ -163,7 +163,7 @@ export async function logIn(token, userType) {
   return user;
 }
 
-export async function addRating(tutorId, rating) {
+export async function addRating(tutorId, rating, currentRatingId) {
   let response = await fetch("api/ratings", {
     method: "POST",
     headers: {
@@ -173,6 +173,7 @@ export async function addRating(tutorId, rating) {
     body: JSON.stringify({
       tutorId: tutorId,
       rate: rating,
+      currentRatingId: currentRatingId
     })
   });
 

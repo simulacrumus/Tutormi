@@ -9,7 +9,7 @@ const SearchMain = () => {
     <div className="App">
       <Grid container direction="column">
         <Grid item>
-          <Nav />
+          {/* <Nav /> */}
         </Grid>
         <Grid item container>
           <Grid item xs={false} sm={3}>

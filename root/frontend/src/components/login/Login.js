@@ -48,6 +48,7 @@ class Login extends Component {
 
     switch (name) {
       case "email":
+        this.setState({ ...this.state, email: event.target.value });
         errors.email = !this.state.email ? "email can't be empty!" : "";
         if (this.state.email) {
           errors.email = validEmailRegex.test(value)
@@ -59,6 +60,7 @@ class Login extends Component {
         }
         break;
       case "password":
+        this.setState({ ...this.state, password: event.target.value });
         errors.password =
           value.length < 4 ? "password can't be shotrer then 4 characters" : "";
         if (value.length > 30) {
@@ -142,7 +144,7 @@ class Login extends Component {
           </Modal.Header>
           <Modal.Body>All done! check your email.</Modal.Body>
         </Modal>
-        <MainNavigation />
+        {/* <MainNavigation /> */}
 
         {/* **************************************************************************************** */}
 
@@ -188,7 +190,7 @@ class Login extends Component {
             </Form>
           </Modal.Body>
         </Modal>
-        <MainNavigation />
+        {/* <MainNavigation /> */}
 
         {/* ************************************************************************************ */}
         <div className="parentLoginFormBoxContainer">

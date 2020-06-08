@@ -66,10 +66,10 @@ class SingUp extends Component {
         }
         break;
       case "password2":
-          errors.password2 =
-            this.state.password == this.state.password2
-              ? ""
-              : "passwords do not match!";
+        errors.password2 =
+          this.state.password == this.state.password2
+            ? ""
+            : "passwords do not match!";
         break;
       default:
         break;
@@ -136,7 +136,7 @@ class SingUp extends Component {
             your request was accepted, check your emai to confirm your account!
           </Modal.Body>
         </Modal>
-        <MainNavigation />
+        {/* <MainNavigation /> */}
         <form
           className="parentLoginFormBoxContainer"
           onSubmit={this.handleSubmit}

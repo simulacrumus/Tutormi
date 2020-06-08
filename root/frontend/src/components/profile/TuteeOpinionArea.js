@@ -6,18 +6,24 @@ import customTheme from "../../styles/materialUiTheme";
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { connect } from "react-redux";
 import { addTutorToFavorites, removeTutorFromFavorites, addRatingToTutor } from "../../store/user/userActions";
+import { updateTutorRating } from "../../store/viewed-tutor/viewedTutorActions";
 import { updateTuteeFavorites, addRating } from "../../util/apiCallFunctions";
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import IconButton from '@material-ui/core/IconButton';
 
 class TuteeOpinionArea extends Component {
 
     render() {
         return (
             <div className="personalRatingContainer summarySmallWidth">
-                <div>
-                    <label >Your Rating:</label>
-                    <Rating value={this.getTuteeRating()} onChange={(event, newValue) => this.handleRate(newValue)} />
-                </div>
                 <ThemeProvider theme={customTheme}>
+                    <div className="ratingContainer">
+                        <label >Your Rating:</label>
+                        <Rating value={this.getTuteeRating().rate} onChange={(event, newValue) => this.handleRate(newValue)} />
+                        <IconButton aria-label="delete" color="primary">
+                            <HighlightOffIcon />
+                        </IconButton>
+                    </div>
                     <Button color="primary" variant="contained" startIcon={<FavoriteIcon />}
                         onClick={() => {
                             if (this.props.tutee.favorites.some((tutor) => tutor._id === this.props.viewedTutor._id)) {
@@ -43,14 +49,10 @@ class TuteeOpinionArea extends Component {
     }
 
     handleRate = (newValue) => {
-        addRating(this.props.viewedTutor._id, newValue)
+        addRating(this.props.viewedTutor._id, newValue, this.getTuteeRating().id)
             .then((response) => {
-                addRatingToTutor({
-                    tutee: { id: this.props.tutee._id, name: this.props.tutee.user.name },
-                    tutor: { id: this.props.viewedTutor._id, name: this.props.viewedTutor.user.name },
-                    rate: newValue,
-                    date: new Date()
-                });
+                addRatingToTutor(response.rating);
+                updateTutorRating(response.average);
             });
     }
 
