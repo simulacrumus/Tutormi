@@ -6,21 +6,22 @@
   height: 100%;
 }
 
-.profilePage div {
+.viewTuteeContainer {
   display: flex;
 }
 
-.tutorProfileContainer, .tutorWeekContainer {
+.tuteeProfileContainer, .tuteeHistoryContainer {
   display: flex;
   height: fit-content;
   margin-top: 5vh;
 }
 
-.tutorWeekContainer {
-  width: 60vw;
+.tuteeHistoryContainer {
+  width: 30vw;
+  margin-right: 8vw;
 }
 
-.tutorProfileContainer {
+.tuteeProfileContainer {
   flex-direction: column;
   width: 30vw;
 }

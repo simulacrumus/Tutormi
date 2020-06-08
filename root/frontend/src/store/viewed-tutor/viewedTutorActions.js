@@ -1,4 +1,5 @@
 import { updateStore, store } from '../configureStore';
+import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
 
 export const VIEWED_TUTOR_SET = "VIEWED_TUTOR_SET";
 export const VIEWED_TUTOR_CLEARED = "VIEWED_TUTOR_CLEARED";
@@ -20,7 +21,7 @@ export function cancelViewedTutorAppointment(appointment) {
 }
 
 export function updateViewedTutorSchedule(appointment) {
-    updateStore(VIEWED_TUTOR_AVAILABILITY_UPDATED, appointment);
+    updateStore(VIEWED_TUTOR_AVAILABILITY_UPDATED, convertTimeSlotToSingleHours(appointment));
 
     updateStore(VIEWED_TUTOR_APPOINTMENT_BOOKED, appointment);
 }

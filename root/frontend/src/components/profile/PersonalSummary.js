@@ -3,20 +3,22 @@ import "./PersonalSummary.css";
 import { SocialIcon } from "react-social-icons";
 import EditModal from "./edit-profile/EditModal";
 import Rating from '@material-ui/lab/Rating';
-import TuteeOpinionArea from "./TuteeOpinionArea";
+import { isViewedTutorSet } from "../../util/authenticationFunctions";
 
 export default class PersonalSummary extends Component {
 
   render() {
+
     let width = this.props.isUser ? "summaryBigWidth" : "summarySmallWidth";
     let height = this.props.isUser ? "summaryBigHeight" : "summarySmallHeight";
     return (
       <div className="summarySection">
+
         <img className={`profileImg ${width} ${height}`} src={require(`../../images/uploads/${this.props.person.profilePic}`)} />
         <div className={`textContainer ${width}`}>
           <dv className="nameContainer">
             <h3>{this.props.person.user.name}</h3>
-            {!this.props.isUser && <Rating value={this.props.person.rating} readOnly />}
+            {!this.props.isUser && isViewedTutorSet() && <Rating value={this.props.person.rating} readOnly />}
           </dv>
           <h6>{this.props.person.user.email}</h6>
           <p>{this.props.person.bio}</p>
@@ -40,7 +42,6 @@ export default class PersonalSummary extends Component {
           <EditModal className="editIcon" />
         </div>}
 
-        {!this.props.isUser && <TuteeOpinionArea />}
       </div>
     );
   }

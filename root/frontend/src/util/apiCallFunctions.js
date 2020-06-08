@@ -1,6 +1,7 @@
 import { store } from "../store/configureStore";
 import { userWithProfileLoggedIn, userWithoutProfileLoggedIn, addToken } from "../store/user/userActions";
 import { setViewedTutor } from "../store/viewed-tutor/viewedTutorActions";
+import { setViewedTutee } from "../store/viewed-tutee/viewedTuteeActions";
 
 export async function saveAppointment(appointment) {
   let response = await fetch("api/appointments", {
@@ -39,6 +40,7 @@ export async function saveTutorAvailableHours(availableHours) {
 }
 
 export async function uploadProfilePicture(imageFile) {
+  console.log(imageFile)
   let formData = new FormData();
   formData.append("image", imageFile);
 
@@ -49,6 +51,7 @@ export async function uploadProfilePicture(imageFile) {
   });
 
   uploadResponse = await uploadResponse.json();
+  console.log(uploadResponse);
   return uploadResponse.profilePic;
 }
 
@@ -111,7 +114,11 @@ export async function updateTuteeFavorites(tutorId, shouldAdd) {
       "x-auth-token": store.getState().user.token,
     },
   });
+
+  console.log(response)
   response = await response.json();
+  console.log(response)
+
   return response;
 }
 
@@ -177,9 +184,19 @@ export async function addRating(tutorId, rating, currentRatingId) {
     })
   });
 
-  console.log(response);
+
   response = await response.json();
-  console.log(response);
+  return response;
+}
+
+export async function deleteRating(ratingId) {
+  let response = await fetch(`api/ratings/${ratingId}`, {
+    method: "DELETE",
+    headers: { "x-auth-token": store.getState().user.token, }
+  });
+
+  response = await response.json();
+  return response;
 }
 
 export async function deleteUser(userType) {
@@ -235,4 +252,37 @@ export async function getAndSetViewedTutor(id) {
 
   let viewedTutor = await response.json();
   setViewedTutor(viewedTutor);
+}
+
+export async function getAndSetViewedTutee(id) {
+  let response = await fetch(`api/tutees/user/${id}`, {
+    method: "GET"
+  });
+
+  let viewedTutee = await response.json();
+  console.log(viewedTutee);
+  setViewedTutee(viewedTutee);
+}
+
+export async function blockUser(id) {
+  console.log(id);
+  let response = await fetch(`api/users/block/${id}`, {
+    method: "PUT",
+    headers: { "x-auth-token": store.getState().user.token }
+  });
+
+  response = await response.json();
+  console.log(response);
+  // setViewedTutee(viewedTutee);
+}
+
+export async function unBlockUser(id) {
+  let response = await fetch(`api/users/block/${id}`, {
+    method: "DELETE",
+    headers: { "x-auth-token": store.getState().user.token }
+  });
+
+  response = await response.json();
+  console.log(response);
+  // setViewedTutee(viewedTutee);
 }

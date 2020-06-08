@@ -34,9 +34,14 @@ class NavigationBar extends Component {
 
         <Navbar.Collapse className="justify-content-end">
 
-          {isLoggedIn() &&
+          {isLoggedIn() && isProfileSetUp() &&
             <Navbar.Text>
-              Signed in as: <a href="/login" onClick={() => logout()}>{this.props.name}</a>
+              Signed in as: <a href="/logout">{this.props.name}</a>
+            </Navbar.Text>}
+
+          {isLoggedIn() && !isProfileSetUp() &&
+            <Navbar.Text>
+              <a href="/logout">Logout</a>
             </Navbar.Text>}
 
           {isLoggedIn() && isProfileSetUp() &&

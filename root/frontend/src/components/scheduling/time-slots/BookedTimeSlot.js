@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { displayHour12Format } from "../../../util/scheduleFunctions";
 import BookedTimeSlotPopover from "./BookedTimeSlotPopover";
+import moment from "moment";
 
 export default class BookedTimeSlot extends Component {
 
@@ -17,7 +18,9 @@ export default class BookedTimeSlot extends Component {
           }
           className="booked"
         >
-          {displayHour12Format(this.props.appointment.time.start.hours()) +
+          {moment().isAfter(moment(this.props.appointment.time.start))
+            ? "Appointment has started"
+            : displayHour12Format(this.props.appointment.time.start.hours()) +
             "-" +
             displayHour12Format(this.props.appointment.time.end.hours())}
           <br />

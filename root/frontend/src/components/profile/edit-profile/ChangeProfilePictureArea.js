@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import Form from 'react-bootstrap/Form';
 import { changeUserImage } from "../../../store/user/userActions";
 import { uploadProfilePicture } from "../../../util/apiCallFunctions";
+import { isProfileSetUp } from "../../../util/authenticationFunctions";
 import { ThemeProvider } from "@material-ui/core/styles";
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
@@ -18,7 +19,8 @@ export default class ChangeProfilePictureArea extends Component {
                 <div className="imageUploadContainer">
                     <div className="imageUploadButtons">
                         <input type="file" id="changeProfilePictureUpload" hidden accept="image/*"
-                            onChange={e => document.getElementById("profilePictureUploadPreview").src = URL.createObjectURL(e.target.files[0])} />
+                            onChange={e => document.getElementById("profilePictureUploadPreview").src = URL.createObjectURL(e.target.files[0])
+                            } />
                         <label htmlFor="changeProfilePictureUpload">
                             <ThemeProvider theme={customTheme}>
                                 <Button color="primary" aria-label="upload profile picture" component="span" variant="contained" startIcon={<PhotoCamera />}>
@@ -34,6 +36,7 @@ export default class ChangeProfilePictureArea extends Component {
                                         .then((imageFile) => changeUserImage(imageFile));
                                 }}>Save</Button>
                         </ThemeProvider>
+
                     </div>
                     <img id="profilePictureUploadPreview" src={require(`../../../images/uploads/${this.props.profilePic}`)} />
 

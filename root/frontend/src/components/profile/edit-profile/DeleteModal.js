@@ -25,8 +25,7 @@ export default class DeleteModal extends Component {
                         if (document.getElementById("deleteConfirmCheckBox").checked)
                             deleteUser(this.props.type) // Delete then log out
                                 .then((response) => {
-                                    window.location.href = "/login";
-                                    logout();
+                                    window.location.href = "/logout";
                                 });
                     }}>DELETE</Button>
                 </ModalFooter>
