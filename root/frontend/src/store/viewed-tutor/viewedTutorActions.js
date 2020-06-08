@@ -1,5 +1,4 @@
-import { store } from '../configureStore';
-import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
+import { updateStore, store } from '../configureStore';
 
 export const VIEWED_TUTOR_SET = "VIEWED_TUTOR_SET";
 export const VIEWED_TUTOR_CLEARED = "VIEWED_TUTOR_CLEARED";
@@ -7,35 +6,20 @@ export const VIEWED_TUTOR_AVAILABILITY_UPDATED = "VIEWED_TUTOR_AVAILABILITY_UPDA
 export const VIEWED_TUTOR_APPOINTMENT_BOOKED = "VIEWED_TUTOR_APPOINTMENT_BOOKED";
 export const VIEWED_TUTOR_APPOINTMENT_CANCELED = "VIEWED_TUTOR_APPOINTMENT_CANCELED";
 
-export async function setViewedTutor(id) {
-    let response = await fetch(`/api/tutors/user/${id}`, {
-        method: "GET"
-    });
-
-    let viewedTutor = await response.json();
-    viewedTutor.profilePic = viewedTutor.profilePic === undefined ? "default-profile-pic.png" : viewedTutor.profilePic; // Give a default profile pic to viewed tutors without one
-    store.dispatch({ type: VIEWED_TUTOR_SET, payload: viewedTutor });
+export async function setViewedTutor(viewedTutor) {
+    updateStore(VIEWED_TUTOR_SET, viewedTutor);
 }
 
 export function clearViewedTutor() {
-    store.dispatch({ type: VIEWED_TUTOR_CLEARED })
+    updateStore(VIEWED_TUTOR_CLEARED);
 }
 
 export function cancelViewedTutorAppointment(appointment) {
-    store.dispatch({
-        type: VIEWED_TUTOR_APPOINTMENT_CANCELED,
-        payload: appointment
-    });
+    updateStore(VIEWED_TUTOR_APPOINTMENT_CANCELED, appointment);
 }
 
 export function updateViewedTutorSchedule(appointment) {
-    store.dispatch({
-        type: VIEWED_TUTOR_AVAILABILITY_UPDATED,
-        payload: convertTimeSlotToSingleHours(appointment)
-    });
+    updateStore(VIEWED_TUTOR_AVAILABILITY_UPDATED, appointment);
 
-    store.dispatch({
-        type: VIEWED_TUTOR_APPOINTMENT_BOOKED,
-        payload: appointment
-    });
+    updateStore(VIEWED_TUTOR_APPOINTMENT_BOOKED, appointment);
 }

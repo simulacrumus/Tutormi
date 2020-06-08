@@ -1,7 +1,6 @@
-import { store } from "../configureStore";
+import { updateStore, store } from "../configureStore";
 import { cancelViewedTutorAppointment } from "../viewed-tutor/viewedTutorActions";
 import { isViewedTutorSet } from "../../util/authenticationFunctions";
-import { logIn } from "../../util/apiCallFunctions";
 
 // General user actions
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
@@ -20,82 +19,52 @@ export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
 
 export function addRatingToTutor(rating) {
-  store.dispatch({
-    type: USER_RATED_TUTOR,
-    payload: { rating: rating }
-  })
+  updateStore(USER_RATED_TUTOR, rating);
 }
 
 export function addTutorToFavorites(tutor) {
-  store.dispatch({
-    type: USER_ADDED_TO_FAVORITES,
-    payload: tutor
-  });
+  updateStore(USER_ADDED_TO_FAVORITES, tutor);
 }
 
 export function removeTutorFromFavorites(tutorId) {
-  store.dispatch({
-    type: USER_REMOVED_FAVORITE,
-    payload: tutorId
-  });
+  updateStore(USER_REMOVED_FAVORITE, tutorId);
 }
 
 export function userWithProfileLoggedIn(user) {
-  store.dispatch({
-    type: USER_LOGGED_IN,
-    payload: { user: user },
-  });
+  updateStore(USER_LOGGED_IN, { user: user });
 }
 
 export function userWithoutProfileLoggedIn(userType) {
-  store.dispatch({
-    type: USER_WITHOUT_PROFILE_LOGGED_IN,
-    payload: { type: userType }
-  });
+  updateStore(USER_WITHOUT_PROFILE_LOGGED_IN, { type: userType });
 }
 
 export function addToken(token) {
-  store.dispatch({
-    type: TOKEN_ACQUIRED,
-    payload: { token: token }
-  });
+  updateStore(TOKEN_ACQUIRED, { token: token });
 }
 
 export function logout() {
-  store.dispatch({ type: USER_LOGGED_OUT });
+  updateStore(USER_LOGGED_OUT);
 }
 
 export function changeUserImage(profilePic) {
-  store.dispatch({ type: USER_IMAGE_UPDATED, payload: profilePic });
+  updateStore(USER_IMAGE_UPDATED, profilePic);
 }
 
 export function cancelAppointment(appointment) {
-  store.dispatch({
-    type: APPOINTMENT_CANCELED,
-    payload: appointment,
-  });
+  updateStore(APPOINTMENT_CANCELED, appointment);
 
   if (isViewedTutorSet() && store.getState().viewedTutor.viewedTutor._id === appointment.tutor.id)
     cancelViewedTutorAppointment(appointment); // Clear the viewed tutor appointment to keep page responsive
 }
 
-export async function updateUser(updateInfo) {
-  await store.dispatch({
-    type: USER_INFO_UPDATED,
-    payload: updateInfo,
-  });
+export function updateUser(updateInfo) {
+  updateStore(USER_INFO_UPDATED, updateInfo);
 }
 
 export function openAvailabilityHour(availabilityDate) {
-  store.dispatch({
-    type: AVAILABILITY_OPENED,
-    payload: availabilityDate,
-  });
+  updateStore(AVAILABILITY_OPENED, availabilityDate);
 }
 
 export function bookAppointment(appointment) {
-  store.dispatch({
-    type: APPOINTMENT_BOOKED,
-    payload: appointment,
-  });
+  updateStore(APPOINTMENT_BOOKED, appointment);
 }

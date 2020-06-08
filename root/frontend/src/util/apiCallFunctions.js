@@ -1,5 +1,6 @@
 import { store } from "../store/configureStore";
 import { userWithProfileLoggedIn, userWithoutProfileLoggedIn, addToken } from "../store/user/userActions";
+import { setViewedTutor } from "../store/viewed-tutor/viewedTutorActions";
 
 export async function saveAppointment(appointment) {
   let response = await fetch("api/appointments", {
@@ -165,17 +166,15 @@ export async function logIn(token, userType) {
 export async function addRating(tutorId, rating) {
   let response = await fetch("api/ratings", {
     method: "POST",
-    headers: { "x-auth-token": store.getState().user.token },
+    headers: {
+      "x-auth-token": store.getState().user.token,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       tutorId: tutorId,
       rate: rating,
     })
   });
-
-  console.log(JSON.stringify({
-    tutorId: tutorId,
-    rate: rating,
-  }))
 
   console.log(response);
   response = await response.json();
@@ -195,7 +194,10 @@ export async function deleteUser(userType) {
 export async function updateEmail(newEmail, password) {
   let response = await fetch("api/users/changeemail", {
     method: "POST",
-    headers: { "x-auth-token": store.getState().user.token },
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": store.getState().user.token,
+    },
     body: JSON.stringify({
       email: newEmail,
       password: password,
@@ -210,7 +212,10 @@ export async function updateEmail(newEmail, password) {
 export async function changePassword(currentPassword, newPassword) {
   let response = await fetch("api/users/changepassword", {
     method: "POST",
-    headers: { "x-auth-token": store.getState().user.token },
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": store.getState().user.token,
+    },
     body: JSON.stringify({
       currentPassword: currentPassword,
       newPassword: newPassword,
@@ -220,4 +225,13 @@ export async function changePassword(currentPassword, newPassword) {
   response = await response.json();
   console.log(response);
   return response;
+}
+
+export async function getAndSetViewedTutor(id) {
+  let response = await fetch(`/api/tutors/user/${id}`, {
+    method: "GET"
+  });
+
+  let viewedTutor = await response.json();
+  setViewedTutor(viewedTutor);
 }

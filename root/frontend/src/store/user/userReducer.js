@@ -59,7 +59,7 @@ export default function userReducer(state = initialState, action) {
         case USER_RATED_TUTOR:
             let copiedRatings = state.user.ratings.slice();
             copiedRatings.push(action.payload.rating);
-            return { ...state, user: { ...state.user, rating: copiedRatings } };
+            return { ...state, user: { ...state.user, ratings: copiedRatings } };
 
         case USER_ADDED_TO_FAVORITES:
             let favoritesList = state.user.favorites.slice();
