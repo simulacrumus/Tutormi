@@ -357,10 +357,12 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
             user: req.user.user.id
         })
 
-        fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
-            if (err) throw err;
-            console.log('Previous profile picture removed');
-        });
+        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.profilePic}`)) {
+            fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
+                if (err) throw err;
+                console.log('Previous profile picture removed');
+            });
+        }
 
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
@@ -394,12 +396,12 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         let tutor = await Tutor.findOne({
             user: req.user.user.id
         })
-
-        fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
-            if (err) throw err;
-            console.log('Previous cover picture removed');
-        });
-
+        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.cover}`)) {
+            fs.unlink(`../frontend/src/images/uploads/${tutor.cover}`, (err) => {
+                if (err) throw err;
+                console.log('Previous cover picture removed');
+            });
+        }
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
