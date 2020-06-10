@@ -357,7 +357,7 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
             user: req.user.user.id
         })
 
-        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.profilePic}`)) {
+        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.profilePic}`) && tutor.profilePic !== 'default-profile-pic.png') {
             fs.unlink(`../frontend/src/images/uploads/${tutor.profilePic}`, (err) => {
                 if (err) throw err;
                 console.log('Previous profile picture removed');
@@ -370,9 +370,7 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
             profilePic: req.file.filename
         });
 
-        tutor = await Tutor.findOne({
-            user: req.user.user.id
-        });
+        tutor.profilePic = req.file.filename
 
         res.json(tutor);
     } catch (err) {
@@ -396,7 +394,7 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         let tutor = await Tutor.findOne({
             user: req.user.user.id
         })
-        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.cover}`)) {
+        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.cover}`) && tutor.cover !== 'default-cover-pic.png') {
             fs.unlink(`../frontend/src/images/uploads/${tutor.cover}`, (err) => {
                 if (err) throw err;
                 console.log('Previous cover picture removed');
@@ -408,9 +406,7 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
             cover: req.file.filename
         });
 
-        tutor = await Tutor.findOne({
-            user: req.user.user.id
-        });
+        tutor.cover = req.file.filename
 
         res.json(tutor);
     } catch (err) {

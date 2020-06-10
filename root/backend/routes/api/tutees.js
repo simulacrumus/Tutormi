@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const multer = require('multer');
 const auth = require("../../middleware/auth");
 const Tutee = require("../../models/tutee.model");
 const Tutor = require("../../models/tutor.model");
@@ -16,7 +17,7 @@ const {
 router.get("/me", auth, async (req, res) => {
   try {
     const tutee = await
-      Tutee.findOne({
+    Tutee.findOne({
         user: req.user.user.id,
       })
       .populate('user', ['name', 'email', 'date'])
@@ -51,8 +52,8 @@ router.get("/me", auth, async (req, res) => {
 router.post(
   "/",
   auth, [
-  check("languages", "Language is required").not().isEmpty(),
-],
+    check("languages", "Language is required").not().isEmpty(),
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -90,13 +91,13 @@ router.post(
       }, query)
 
       const tutee = await Tutee.findOneAndUpdate({
-        user: req.user.user.id
-      }, {
-        $set: tuteeProfileFields
-      }, {
-        new: true,
-        upsert: true
-      })
+          user: req.user.user.id
+        }, {
+          $set: tuteeProfileFields
+        }, {
+          new: true,
+          upsert: true
+        })
         .populate('user', ['name', 'email', 'type'])
         .populate('appointments')
         .populate('ratings');
@@ -129,8 +130,8 @@ router.get("/", async (req, res) => {
 router.get("/user/:id", async (req, res) => {
   try {
     const profile = await Tutee.findOne({
-      _id: req.params.id,
-    })
+        _id: req.params.id,
+      })
       .populate("user", ["name", "email"])
       .populate('appointments')
       .populate('ratings');
@@ -330,5 +331,104 @@ router.delete('/favorites/:id', auth, async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+// Multer function to upload image
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: '../frontend/src/images/uploads/',
+    filename: (req, file, cb) => {
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+  }),
+  limits: {
+    fileSize: 1024 * 1024 * 2 // 2MB
+  },
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb('Images Only! Only files with jpeg, jpg, png and gif extension accepted');
+    }
+  }
+});
+
+// @route    POST api/tutees/profile-pic
+// @desc     Upload or update profile picture of the tutee
+// @access   Private
+router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
+  if (req.file == undefined) {
+    return res.status(400).json({
+      message: 'Please provide an image file with 2MB max size'
+    });
+  }
+
+  try {
+
+    let tutee = await Tutee.findOne({
+      user: req.user.user.id
+    })
+
+    if (fs.existsSync(`../frontend/src/images/uploads/${tutee.profilePic}`) && tutee.profilePic !== 'default-profile-pic.png') {
+      fs.unlink(`../frontend/src/images/uploads/${tutee.profilePic}`, (err) => {
+        if (err) throw err;
+        console.log('Previous profile picture removed');
+      });
+    }
+
+    await Tutee.findOneAndUpdate({
+      user: req.user.user.id
+    }, {
+      profilePic: req.file.filename
+    });
+
+    tutee.profilePic = req.user.user.id
+
+    res.json(tutee);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route    POST api/tutors/cover-pic
+// @desc     Upload or update cover picture of the tutor
+// @access   Private
+router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
+  if (req.file == undefined) {
+    res.status(400).json({
+      message: 'Please provide an image file with 2MB max size'
+    });
+  }
+
+  try {
+
+    let tutee = await Tutee.findOne({
+      user: req.user.user.id
+    })
+    if (fs.existsSync(`../frontend/src/images/uploads/${tutee.cover}`) && tutee.cover !== 'default-cover-pic.png') {
+      fs.unlink(`../frontend/src/images/uploads/${tutee.cover}`, (err) => {
+        if (err) throw err;
+        console.log('Previous cover picture removed');
+      });
+    }
+
+    await Tutee.findOneAndUpdate({
+      user: req.user.user.id
+    }, {
+      cover: req.file.filename
+    });
+
+    tutee.cover = req.file.filename
+
+    res.json(tutee);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 
 module.exports = router;

@@ -433,9 +433,8 @@ router.post('/resendconfirmation', auth, async (req, res) => {
 // @desc     Block user using their id (tutor or tutee id)
 // @access   Private
 router.put('/block/:id', auth, async (req, res) => {
-    const {
-        id
-    } = req.params.id
+
+    const id = req.params.id
 
     if (!id) {
         return res.status(400).json({
@@ -461,13 +460,13 @@ router.put('/block/:id', auth, async (req, res) => {
                 user: req.user.user.id
             }, {
                 $addToSet: {
-                    blockedUsers: tutor._id
+                    blockedTutors: tutor.id
                 }
             })
 
-            tutor.update({
+            await Tutor.findByIdAndUpdate(tutor.id, {
                 $addToSet: {
-                    blockedBy: tutee._id
+                    blockedBy: tutee.id
                 }
             })
 
@@ -487,13 +486,13 @@ router.put('/block/:id', auth, async (req, res) => {
                 user: req.user.user.id
             }, {
                 $addToSet: {
-                    blockedUsers: tutee._id
+                    blockedTutees: tutee.id
                 }
             })
 
-            tutee.update({
+            await Tutee.findOneAndUpdate(tutee.id, {
                 $addToSet: {
-                    blockedBy: tutor._id
+                    blockedBy: tutor.id
                 }
             })
 
@@ -515,9 +514,7 @@ router.put('/block/:id', auth, async (req, res) => {
 // @desc     Unlock user using their id (tutor or tutee id)
 // @access   Private
 router.delete('/block/:id', auth, async (req, res) => {
-    const {
-        id
-    } = req.params.id
+    const id = req.params.id
 
     if (!id) {
         return res.status(400).json({
@@ -536,7 +533,7 @@ router.delete('/block/:id', auth, async (req, res) => {
 
             if (!tutor) {
                 return res.status(400).json({
-                    message: "Tutor not found, you can pnly block tutors"
+                    message: "Tutor not found"
                 })
             }
 
@@ -544,13 +541,13 @@ router.delete('/block/:id', auth, async (req, res) => {
                 user: req.user.user.id
             }, {
                 $pull: {
-                    blockedUsers: tutor._id
+                    blockedTutors: tutor.id
                 }
             })
 
-            tutor.update({
+            await Tutor.findByIdAndUpdate(tutor.id, {
                 $pull: {
-                    blockedBy: tutee._id
+                    blockedBy: tutee.id
                 }
             })
 
@@ -562,7 +559,7 @@ router.delete('/block/:id', auth, async (req, res) => {
 
             if (!tutee) {
                 return res.status(400).json({
-                    message: "Tutee not found, you can only block tutees"
+                    message: "Tutee not found"
                 })
             }
 
@@ -570,13 +567,13 @@ router.delete('/block/:id', auth, async (req, res) => {
                 user: req.user.user.id
             }, {
                 $pull: {
-                    blockedUsers: tutee._id
+                    blockedTutees: tutee.id
                 }
             })
 
-            tutee.update({
+            await Tutee.findByIdAndUpdate(tutee.id, {
                 $pull: {
-                    blockedBy: tutor._id
+                    blockedBy: tutor.id
                 }
             })
 
