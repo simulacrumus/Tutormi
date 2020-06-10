@@ -86,28 +86,31 @@ router.post(
                 rate
             }
 
-            let currentRating;
             let rating;
             if (currentRatingId) {
-                currentRating = await Rating.findByIdAndUpdate(currentRatingId, {
+                rating = await Rating.findByIdAndUpdate(currentRatingId, {
                     rate
-                }).select('tutor.id -_id')
-                rating = currentRating
+                })
+
+                if (!rating) {
+                    res.status(400).json({
+                        message: 'Rating not found'
+                    })
+                }
             } else {
                 newRating = Rating(ratingFields)
-                await newRating.save()
-                rating = newRating
+                rating = await newRating.save()
             }
 
             let numOfRates = Array.from(tutor.ratings).length;
             let totalRate = 0;
             Array.from(tutor.ratings).forEach(rating => totalRate += rating.rate)
 
-            if (!currentRating) {
+            if (!currentRatingId) {
                 numOfRates++;
                 totalRate += rate;
             } else {
-                totalRate += (rate - currentRating.rate)
+                totalRate += (rate - rating.rate)
             }
 
             const ratingValue = isNaN(totalRate / numOfRates) ? rate : (totalRate / numOfRates) < 1 ? 1 : (totalRate / numOfRates)
@@ -131,6 +134,7 @@ router.post(
                 }
             })
 
+            rating.rate = rate
             res.json({
                 rating,
                 average: ratingValue
@@ -148,7 +152,7 @@ router.delete('/:id', auth, async (req, res) => {
 
     if (!req.params.id) {
         return res.status(400).json({
-            message: 'Rating ID cannot be empty'
+            message: 'Rating ID required'
         })
     }
 
@@ -156,7 +160,7 @@ router.delete('/:id', auth, async (req, res) => {
 
         const rating = await Rating.findOneAndDelete({
             _id: req.params.id
-        }).select('tutor.id rate _id')
+        })
 
         if (!rating) {
             return res.status(400).json({
@@ -164,26 +168,17 @@ router.delete('/:id', auth, async (req, res) => {
             })
         }
 
-        await Tutee.findOneAndUpdate({
-            _id: rating.tutee.id
-        }, {
-            $pull: {
-                ratings: rating.id
-            }
-        })
+        const tutor = await Tutor.findById(
+            rating.tutor.id
+        ).populate('ratings')
 
-        const tutor = await Tutor.findOne({
-            _id: rating.tutor.id
-        })
+        // Tutor doesn't return all the ratings, something is wrong 
 
         let numOfRates = Array.from(tutor.ratings).length - 1;
         let totalRate = 0;
-        Array.from(tutor.ratings).forEach(rate => totalRate += rate.rate)
-
+        Array.from(tutor.ratings).forEach(rating => totalRate += rating.rate)
         totalRate -= rating.rate;
         const ratingValue = isNaN(totalRate / numOfRates) ? 1 : (totalRate / numOfRates) < 1 ? 1 : (totalRate / numOfRates)
-
-        console.log(ratingValue);
         await Tutor.findOneAndUpdate({
             _id: tutor.id
         }, {
@@ -192,6 +187,14 @@ router.delete('/:id', auth, async (req, res) => {
             },
             $set: {
                 rating: ratingValue
+            }
+        })
+
+        await Tutee.findOneAndUpdate({
+            _id: rating.tutee.id
+        }, {
+            $pull: {
+                ratings: rating.id
             }
         })
 
