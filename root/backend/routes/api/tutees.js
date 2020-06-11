@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const io = require('../../socket');
 const bcrypt = require("bcryptjs");
 const multer = require('multer');
 const auth = require("../../middleware/auth");
@@ -386,6 +387,11 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
 
     tutee.profilePic = req.user.user.id
 
+    io.getIo().emit('profilePic', {
+      tutee: tutee.id,
+      profilePic: req.file.filename
+    })
+
     res.json(tutee);
   } catch (err) {
     console.error(err.message);
@@ -422,6 +428,11 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
     });
 
     tutee.cover = req.file.filename
+
+    io.getIo().emit('cover', {
+      tutee: tutee.id,
+      cover: req.file.filename
+    })
 
     res.json(tutee);
   } catch (err) {
