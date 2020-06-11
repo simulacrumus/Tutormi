@@ -1,7 +1,11 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
+const http = require('http');
+const socketio = require('socket.io');
 const connectDB = require('./config/db');
 const app = express();
+const server = http.createServer(app);
+const io = require('./socket').init(server)
 
 // Connect to database
 connectDB();
@@ -26,7 +30,10 @@ app.use('/api/auth', authRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/ratings', ratingsRouter);
 
+io.on('connection', socket => {
+    console.log('Socket is on')
+});
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => console.log(`Server is running on PORT ${port}`));
+server.listen(port, () => console.log(`Server is running on PORT ${port}`));

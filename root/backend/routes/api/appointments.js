@@ -183,6 +183,7 @@ router.post('/', [auth, [
         console.log("Message sent: %s", info.messageId);
 
 
+
         res.json(appointment);
 
     } catch (err) {

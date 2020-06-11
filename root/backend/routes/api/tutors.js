@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const io = require('../../socket');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
@@ -273,7 +274,6 @@ router.post('/search', auth, async (req, res) => {
         const tutors = await Tutor.find(query)
             .select('courses languages rating bio location')
             .populate('user', '-_id -password -type -date -__v -email -confirmed -profile');
-
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -290,26 +290,29 @@ router.post('/schedule', auth, async (req, res) => {
         hours
     } = req.body;
 
+    const availibility = hours.map((hour) => new Date(hour)).sort((x, y) => y - x)
     try {
         // update tutor's available hours
-        await Tutor.findOneAndUpdate({
+        const tutor = await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
             $set: {
-                availableHours: hours.map((hour) => new Date(hour)),
-                $sort: -1
+                availableHours: availibility
             }
-        });
-
-        let tutor = await Tutor.findOne({
-            user: req.user.user.id
         }).populate('user', ['name', 'email', 'type']);
 
-        if (!tutor)
+        if (!tutor) {
             return res.status(400).json({
                 message: 'Tutor not found or there is no tutor profile for this user'
-            });
+            })
+        };
 
+        tutor.availableHours = availibility
+
+        io.getIo().emit('availableHours', {
+            tutor: tutor.id,
+            availableHours: availibility
+        })
         res.json(tutor);
     } catch (err) {
         console.error(err.message);
@@ -372,6 +375,10 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
 
         tutor.profilePic = req.file.filename
 
+        io.getIo().emit('profilePic', {
+            tutor: tutor.id,
+            profilePic: req.file.filename
+        })
         res.json(tutor);
     } catch (err) {
         console.error(err.message);
@@ -407,6 +414,11 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         });
 
         tutor.cover = req.file.filename
+
+        io.getIo().emit('cover', {
+            tutor: tutor.id,
+            cover: req.file.filename
+        })
 
         res.json(tutor);
     } catch (err) {
