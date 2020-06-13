@@ -115,10 +115,7 @@ export async function updateTuteeFavorites(tutorId, shouldAdd) {
     },
   });
 
-  console.log(response)
   response = await response.json();
-  console.log(response)
-
   return response;
 }
 
@@ -273,7 +270,6 @@ export async function blockUser(id) {
 
   response = await response.json();
   console.log(response);
-  // setViewedTutee(viewedTutee);
 }
 
 export async function unBlockUser(id) {
@@ -284,5 +280,4 @@ export async function unBlockUser(id) {
 
   response = await response.json();
   console.log(response);
-  // setViewedTutee(viewedTutee);
 }
