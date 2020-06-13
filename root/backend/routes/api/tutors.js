@@ -272,7 +272,7 @@ router.post('/search', auth, async (req, res) => {
         }
 
         const tutors = await Tutor.find(query)
-            .select('courses languages rating bio location')
+            .select('courses languages rating bio location profilePic coverPic')
             .populate('user', '-_id -password -type -date -__v -email -confirmed -profile');
         res.json(tutors);
     } catch (err) {
@@ -315,12 +315,10 @@ router.post('/schedule', auth, async (req, res) => {
         })
         res.json(tutor);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error(err.message)
+        res.status(500).send('Server Error')
     }
 });
-
-
 // Multer function to upload image
 const upload = multer({
     storage: multer.diskStorage({
@@ -401,8 +399,8 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         let tutor = await Tutor.findOne({
             user: req.user.user.id
         })
-        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.cover}`) && tutor.cover !== 'default-cover-pic.png') {
-            fs.unlink(`../frontend/src/images/uploads/${tutor.cover}`, (err) => {
+        if (fs.existsSync(`../frontend/src/images/uploads/${tutor.coverPic}`) && tutor.coverPic !== 'default-cover-pic.png') {
+            fs.unlink(`../frontend/src/images/uploads/${tutor.coverPic}`, (err) => {
                 if (err) throw err;
                 console.log('Previous cover picture removed');
             });
@@ -410,14 +408,14 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         await Tutor.findOneAndUpdate({
             user: req.user.user.id
         }, {
-            cover: req.file.filename
+            coverPic: req.file.filename
         });
 
-        tutor.cover = req.file.filename
+        tutor.coverPic = req.file.filename
 
         io.getIo().emit('cover', {
             tutor: tutor.id,
-            cover: req.file.filename
+            coverPic: req.file.filename
         })
 
         res.json(tutor);

@@ -414,8 +414,8 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
     let tutee = await Tutee.findOne({
       user: req.user.user.id
     })
-    if (fs.existsSync(`../frontend/src/images/uploads/${tutee.cover}`) && tutee.cover !== 'default-cover-pic.png') {
-      fs.unlink(`../frontend/src/images/uploads/${tutee.cover}`, (err) => {
+    if (fs.existsSync(`../frontend/src/images/uploads/${tutee.coverPic}`) && tutee.coverPic !== 'default-cover-pic.png') {
+      fs.unlink(`../frontend/src/images/uploads/${tutee.coverPic}`, (err) => {
         if (err) throw err;
         console.log('Previous cover picture removed');
       });
@@ -424,14 +424,14 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
     await Tutee.findOneAndUpdate({
       user: req.user.user.id
     }, {
-      cover: req.file.filename
+      coverPic: req.file.filename
     });
 
-    tutee.cover = req.file.filename
+    tutee.coverPic = req.file.filename
 
     io.getIo().emit('cover', {
       tutee: tutee.id,
-      cover: req.file.filename
+      coverPic: req.file.filename
     })
 
     res.json(tutee);
