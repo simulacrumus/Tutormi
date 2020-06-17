@@ -22,13 +22,11 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: "2px 4px",
     marginTop: 10,
-    display: "flex",
-    maxWidth: 200,
+    maxWidth: 215,
   },
   input: {
-    flex: 1,
+    flex: 2,
     alignItems: "center",
   },
   buttonColor: {
@@ -39,11 +37,13 @@ const useStyles = makeStyles((theme) => ({
   faqRoot: {
     width: "100%",
     marginBottom: 10,
+    background: "#304FFE",
   },
   heading: {
     fontFamily: "Arial",
     fontSize: theme.typography.pxToRem(14),
     fontWeight: theme.typography.fontWeightRegular,
+    color: "#BBDEFB",
   },
   expansion: {
     display: "flex",
@@ -53,12 +53,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LeftPanelContent = ({
-  token = "",
-  tutorList = [],
-  onAddTutor,
-  clearTutors,
-}) => {
+const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
   const classes = useStyles();
   const [rating, setRating] = useState(1);
   const [nameQuery, setNameQuery] = useState(null);
@@ -100,13 +95,14 @@ const LeftPanelContent = ({
   };
 
   useEffect(() => {
-    if (courseQuery === null && btnClicked === false) {
+    if (courseQuery === null && btnClicked === false && rating === 1) {
       const getTutors = async () => {
         try {
-          tutorList.map((tutor) => clearTutors(tutor));
+          clearTutors();
           const response = await fetch("/api/tutors");
           const data = await response.json();
-          data.map((tutor) => onAddTutor(tutor));
+          console.log(data);
+          onAddTutor(data);
           console.log("FIRST EFFECT!!!!");
         } catch (error) {
           console.log("Error!!", error);
@@ -117,17 +113,11 @@ const LeftPanelContent = ({
   }, [courseQuery, btnClicked]);
 
   useEffect(() => {
-    if (
-      rating !== 1 ||
-      nameQuery !== null ||
-      languageQuery !== null ||
-      courseQuery !== null ||
-      btnClicked !== false
-    ) {
+    if (btnClicked !== false) {
       const filterState = async () => {
         try {
-          tutorList.map((tutor) => clearTutors(tutor));
-          console.log(token);
+          clearTutors();
+          console.log("SECOND FETCH!!");
           const response = await fetch("/api/tutors/search", {
             method: "POST",
             headers: {
@@ -148,7 +138,8 @@ const LeftPanelContent = ({
             }),
           });
           const data = await response.json();
-          data.map((tutor) => onAddTutor(tutor));
+          console.log("RESPONSE!!!!!! ", data);
+          onAddTutor(data);
           setBtnValue(false);
         } catch (error) {
           console.log("Error!!", error);
@@ -156,7 +147,7 @@ const LeftPanelContent = ({
       };
       filterState();
     }
-  }, [nameQuery, rating, languageQuery, courseQuery, btnClicked]);
+  }, [btnClicked]);
 
   return (
     <>
@@ -261,7 +252,7 @@ const LeftPanelContent = ({
       <Button
         size="small"
         variant="outlined"
-        color="secondary"
+        color="primary"
         className={classes.buttonColor}
         onClick={() => setBtnValue(true)}
       >
@@ -273,11 +264,10 @@ const LeftPanelContent = ({
 
 const mapStateToProps = (state) => ({
   token: state.user.token,
-  tutorList: state.tutorSearchList,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   onAddTutor: (tutor) => dispatch(addTutor(tutor)),
-  clearTutors: (tutor) => dispatch(deleteTutor(tutor)),
+  clearTutors: () => dispatch(deleteTutor()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(LeftPanelContent);
