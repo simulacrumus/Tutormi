@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import InputBase from "@material-ui/core/InputBase";
 import { Rating } from "@material-ui/lab";
-import { addTutor, deleteTutor } from "../store/tutorSearchList";
+import { addTutors, deleteTutors } from "../../store/tutorSearchList";
 import Button from "@material-ui/core/Button";
 import "date-fns";
 import DateFnsUtils from "@date-io/date-fns";
@@ -53,7 +53,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
+const LeftPanelContent = ({ token = "", dispatch }) => {
+  //Define all of the necessary variables(hooks) required for keeping track of the user input
   const classes = useStyles();
   const [rating, setRating] = useState(1);
   const [nameQuery, setNameQuery] = useState(null);
@@ -61,8 +62,7 @@ const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
   const [courseQuery, setCourseQuery] = useState(null);
   const [dateQuery, setDateQuery] = useState(
     moment(new Date().toString().replace(/:([0-9])+:([0-9])+/, ":00:00"))
-  );
-  const [initialDate] = useState(moment(dateQuery));
+  ); //the DB expects the time to be in hourly format, so by default replace the current minute & second values with :00:00, e.g. 11:23:01 becomes 11:00:00
   const [startQuery, setStartQuery] = useState(dateQuery);
   const [endQuery, setEndQuery] = useState(dateQuery);
   const [initialStart] = useState(moment(startQuery));
@@ -95,14 +95,22 @@ const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
   };
 
   useEffect(() => {
-    if (courseQuery === null && btnClicked === false && rating === 1) {
+    if (
+      btnClicked === false &&
+      courseQuery === null &&
+      rating === 1 &&
+      nameQuery === null &&
+      languageQuery === null &&
+      moment(startQuery).isSame(initialStart) &&
+      moment(endQuery).isSame(initialEnd)
+    ) {
       const getTutors = async () => {
         try {
-          clearTutors();
+          dispatch(deleteTutors()); //empty the tutorList in the gloabal state
           const response = await fetch("/api/tutors");
           const data = await response.json();
           console.log(data);
-          onAddTutor(data);
+          dispatch(addTutors(data)); //add the object returned by the server to the global state, this object represents the tutorList slice, and contains all exisitng tutors
           console.log("FIRST EFFECT!!!!");
         } catch (error) {
           console.log("Error!!", error);
@@ -110,13 +118,13 @@ const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
       };
       getTutors();
     }
-  }, [courseQuery, btnClicked]);
+  }, [btnClicked]);
 
   useEffect(() => {
     if (btnClicked !== false) {
       const filterState = async () => {
         try {
-          clearTutors();
+          dispatch(deleteTutors()); //empty the tutorList in the gloabal state
           console.log("SECOND FETCH!!");
           const response = await fetch("/api/tutors/search", {
             method: "POST",
@@ -139,8 +147,8 @@ const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
           });
           const data = await response.json();
           console.log("RESPONSE!!!!!! ", data);
-          onAddTutor(data);
-          setBtnValue(false);
+          dispatch(addTutors(data));
+          setBtnValue(false); //reset the search button to false (default), in order to know when the user clicks it again
         } catch (error) {
           console.log("Error!!", error);
         }
@@ -254,7 +262,7 @@ const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
         variant="outlined"
         color="primary"
         className={classes.buttonColor}
-        onClick={() => setBtnValue(true)}
+        onClick={() => setBtnValue(!btnClicked)}
       >
         Search
       </Button>
@@ -263,11 +271,6 @@ const LeftPanelContent = ({ token = "", onAddTutor, clearTutors }) => {
 };
 
 const mapStateToProps = (state) => ({
-  token: state.user.token,
+  token: state.user.token, //access the user token, required in order to execute Post request for user search inputs
 });
-
-const mapDispatchToProps = (dispatch) => ({
-  onAddTutor: (tutor) => dispatch(addTutor(tutor)),
-  clearTutors: () => dispatch(deleteTutor()),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(LeftPanelContent);
+export default connect(mapStateToProps)(LeftPanelContent);
