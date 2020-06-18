@@ -5,7 +5,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core";
-import { getAndSetViewedTutor } from "../util/apiCallFunctions";
+import { getAndSetViewedTutor } from "../../util/apiCallFunctions";
 import Typography from "@material-ui/core/Typography";
 import { Avatar, IconButton, CardMedia } from "@material-ui/core";
 import { Rating } from "@material-ui/lab";
