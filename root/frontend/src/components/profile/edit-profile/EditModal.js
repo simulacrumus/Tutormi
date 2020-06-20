@@ -53,7 +53,8 @@ class EditModal extends Component {
 
               {this.state.tabValue === 0 &&
                 <Form>
-                  <ChangeProfilePictureArea profilePic={this.props.user.profilePic} userType={this.props.user.user.type} />
+                  <ChangeProfilePictureArea profilePic={this.props.user.profilePic} coverPic={this.props.user.coverPic}
+                    userType={this.props.user.user.type} />
 
                   <Form.Group>
                     <Form.Label>Name</Form.Label>

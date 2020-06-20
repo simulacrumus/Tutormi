@@ -9,11 +9,15 @@ export default class TutorView extends Component {
 
   render() {
     return (
-      <div tabIndex="0" className="tutorView" onClick={() => getAndSetViewedTutor(this.props.tutor._id)}>
-        <img src={require("../../images/uploads/default-profile-pic.png")} />
+      <div tabIndex="0" className="tutorView"
+        onClick={() => getAndSetViewedTutor(this.props.tutor._id)}>
+
+        <img src={require(`../../images/uploads/${this.props.tutor.profilePic}`)} />
+
         <h6>
           {this.props.tutor.user.name}
         </h6>
+
         <ThemeProvider theme={customTheme}>
           <Button color="primary" variant="contained" size="small" variant="outlined"
             onClick={() => {
@@ -25,4 +29,5 @@ export default class TutorView extends Component {
       </div>
     );
   }
+
 }
