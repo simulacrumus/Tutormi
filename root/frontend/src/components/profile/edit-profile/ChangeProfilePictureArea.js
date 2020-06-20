@@ -32,7 +32,7 @@ export default class ChangeProfilePictureArea extends Component {
                             <Button color="primary" variant="contained" startIcon={<SaveAltIcon />}
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    uploadProfilePicture(document.getElementById("changeProfilePictureUpload").files[0]) // Send image to the server
+                                    uploadProfilePicture(document.getElementById("changeProfilePictureUpload").files[0], this.props.userType) // Send image to the server
                                         .then((imageFile) => changeUserImage(imageFile));
                                 }}>Save</Button>
                         </ThemeProvider>

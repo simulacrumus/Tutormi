@@ -3,7 +3,6 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import "./NavigationBar.css";
 import { connect } from "react-redux";
-import { logout } from "../../store/user/userActions";
 import { isLoggedIn, isProfileSetUp, isTutee } from "../../util/authenticationFunctions";
 
 class NavigationBar extends Component {

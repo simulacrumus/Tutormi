@@ -14,11 +14,7 @@ import Login from "./components/login/Login";
 import SignUp from "./components/login/SignUp";
 
 import {
-  isLoggedIn,
-  isTutee,
-  isViewedTutorSet,
-  isProfileSetUp,
-  isViewedTuteeSet,
+  isLoggedIn, isTutee, isViewedTutorSet, isProfileSetUp, isViewedTuteeSet, validateToken
 } from "./util/authenticationFunctions";
 
 export default class Router extends Component {
@@ -28,8 +24,33 @@ export default class Router extends Component {
         <Switch>
           <Route path="/" component={HomePage} exact />
           <Route path="/logout" component={LogoutPage} exact />
-          <Route
-            path="/login"
+
+
+          <Route path="/login" render={() => {
+            if (isLoggedIn())
+              return !isProfileSetUp() ? <Redirect to="/createProfile" /> : <Redirect to="/profile" />;
+            else
+              return <Login />;
+          }} />
+
+          <Route path="/signup" exact render={() => {
+            if (isLoggedIn())
+              return !isProfileSetUp() ? <Redirect to="/createProfile" /> : <Redirect to="/profile" />;
+            else
+              return <SignUp />;
+          }} />
+
+          <Route path="/emailConfirmation" component={EmailConfirmationPage} exact />
+
+          <Route path="/createProfile" exact render={() => {
+
+            if (isLoggedIn())
+              return !isProfileSetUp() ? <CreateProfilePage /> : <Redirect to="/profile" />;
+            else
+              return <Redirect to="/login" />;
+          }} />
+
+          <Route path="/profile" exact
             render={() => {
               if (isLoggedIn())
                 return !isProfileSetUp() ? (
@@ -135,9 +156,13 @@ export default class Router extends Component {
             }}
           />
           <Route path="*" render={() => <h1>404 Page Not Found!</h1>} />{" "}
-          {/* Need to make an error component later */}
         </Switch>
       </main>
     );
   }
+  componentDidMount() {
+    if (isLoggedIn()) // On each page refresh if a user is logged in their token will be checked and validated
+      setInterval(validateToken, 1000); // Token is continuously checked over a set time interval
+  }
+
 }

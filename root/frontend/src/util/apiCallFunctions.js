@@ -3,6 +3,19 @@ import { userWithProfileLoggedIn, userWithoutProfileLoggedIn, addToken } from ".
 import { setViewedTutor } from "../store/viewed-tutor/viewedTutorActions";
 import { setViewedTutee } from "../store/viewed-tutee/viewedTuteeActions";
 
+export async function checkTokenExpiry() {
+  let response = await fetch("api/auth/expiry", {
+    method: "GET",
+    headers: {
+      "x-auth-token": store.getState().user.token,
+    }
+  });
+
+  response = await response.json();
+  return response.valid !== undefined;
+  // return response.valid;
+}
+
 export async function saveAppointment(appointment) {
   let response = await fetch("api/appointments", {
     method: "POST",
@@ -39,19 +52,20 @@ export async function saveTutorAvailableHours(availableHours) {
   });
 }
 
-export async function uploadProfilePicture(imageFile) {
-  console.log(imageFile)
+export async function uploadProfilePicture(imageFile, userType) {
+  console.log("called")
   let formData = new FormData();
   formData.append("image", imageFile);
 
-  let uploadResponse = await fetch("/api/tutors/profile-pic", {
+  let apiRoute = userType === "tutor" ? "/api/tutors/profile-pic" : "/api/tutees/profile-pic";
+  console.log(apiRoute);
+  let uploadResponse = await fetch(apiRoute, {
     method: "POST",
     headers: { "x-auth-token": store.getState().user.token },
     body: formData,
   });
 
   uploadResponse = await uploadResponse.json();
-  console.log(uploadResponse);
   return uploadResponse.profilePic;
 }
 
