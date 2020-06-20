@@ -56,8 +56,8 @@ export default class Router extends Component {
                 return !isProfileSetUp() ? (
                   <Redirect to="/createProfile" />
                 ) : (
-                  <Redirect to="/profile" />
-                );
+                    <ProfilePage />
+                  );
               else return <Login />;
             }}
           />
@@ -69,8 +69,8 @@ export default class Router extends Component {
                 return !isProfileSetUp() ? (
                   <Redirect to="/createProfile" />
                 ) : (
-                  <Redirect to="/profile" />
-                );
+                    <Redirect to="/profile" />
+                  );
               else return <SignUp />;
             }}
           />
@@ -87,8 +87,8 @@ export default class Router extends Component {
                 return !isProfileSetUp() ? (
                   <CreateProfilePage />
                 ) : (
-                  <Redirect to="/profile" />
-                );
+                    <Redirect to="/profile" />
+                  );
               else return <Redirect to="/login" />;
             }}
           />
@@ -100,8 +100,8 @@ export default class Router extends Component {
                 return isProfileSetUp() ? (
                   <ProfilePage />
                 ) : (
-                  <Redirect to="/createProfile" />
-                );
+                    <Redirect to="/createProfile" />
+                  );
               else return <Redirect to="/login" />;
             }}
           />
@@ -113,8 +113,8 @@ export default class Router extends Component {
                 return isProfileSetUp() ? (
                   <DashboardPage />
                 ) : (
-                  <Redirect to="/createProfile" />
-                );
+                    <Redirect to="/createProfile" />
+                  );
               else return <Redirect to="/login" />;
             }}
           />
@@ -127,8 +127,8 @@ export default class Router extends Component {
                 return isViewedTuteeSet() ? (
                   <ViewTuteePage />
                 ) : (
-                  <Redirect to="/dashboard" />
-                );
+                    <Redirect to="/dashboard" />
+                  );
               else return <Redirect to="/createProfile" />;
             }}
           />
@@ -141,8 +141,8 @@ export default class Router extends Component {
                 return isViewedTutorSet() ? (
                   <ViewTutorPage />
                 ) : (
-                  <Redirect to="/dashboard" />
-                );
+                    <Redirect to="/dashboard" />
+                  );
               else return <Redirect to="/createProfile" />;
             }}
           />
@@ -162,7 +162,7 @@ export default class Router extends Component {
   }
   componentDidMount() {
     if (isLoggedIn()) // On each page refresh if a user is logged in their token will be checked and validated
-      setInterval(validateToken, 1000); // Token is continuously checked over a set time interval
+      setInterval(validateToken, 60000); // Token is continuously checked over a set time interval
   }
 
 }

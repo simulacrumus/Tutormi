@@ -25,3 +25,8 @@
   padding: 15px;
   margin: 6px;
 }
+
+.favTutorGridContainer {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}

@@ -13,7 +13,6 @@ export async function checkTokenExpiry() {
 
   response = await response.json();
   return response.valid !== undefined;
-  // return response.valid;
 }
 
 export async function saveAppointment(appointment) {
@@ -58,6 +57,23 @@ export async function uploadProfilePicture(imageFile, userType) {
   formData.append("image", imageFile);
 
   let apiRoute = userType === "tutor" ? "/api/tutors/profile-pic" : "/api/tutees/profile-pic";
+  console.log(apiRoute);
+  let uploadResponse = await fetch(apiRoute, {
+    method: "POST",
+    headers: { "x-auth-token": store.getState().user.token },
+    body: formData,
+  });
+
+  uploadResponse = await uploadResponse.json();
+  return uploadResponse.profilePic;
+}
+
+export async function uploadCoverPicture(imageFile, userType) {
+  console.log("called")
+  let formData = new FormData();
+  formData.append("image", imageFile);
+
+  let apiRoute = userType === "tutor" ? "/api/tutors/cover-pic" : "/api/tutees/cover-pic";
   console.log(apiRoute);
   let uploadResponse = await fetch(apiRoute, {
     method: "POST",

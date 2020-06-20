@@ -38,7 +38,9 @@ class DashboardSidePanel extends Component {
         </ThemeProvider>
 
         <div className="sideContainer">
-          {(this.state.tabValue === 0 && isTutee()) && this.displayTutors()}
+          <div className="favTutorGridContainer">
+            {(this.state.tabValue === 0 && isTutee()) && this.displayTutors()}
+          </div>
 
           {(this.state.tabValue === 0 && !isTutee()) && <ScheduleMetrics />}
 
@@ -72,18 +74,11 @@ class DashboardSidePanel extends Component {
             You don't have any tutors in your favorites list yet, try <a href="/search">searching</a> for one.
           </p>
         </div>);
-    } else {
-      // If the tutee has favorites display them
+    } else { // If the tutee has favorites display them
       let tutors = [];
-      let tutorRow = [];
-      for (let index = 0; index < this.props.favoriteTutors.length; index++) {
-        if (index !== 0 && index % 3 === 0) {
-          tutors.push(<div className="tutorRowContainer">{tutorRow}</div>);
-          tutorRow = [];
-        }
-        tutorRow[index] = (<TutorView tutor={this.props.favoriteTutors[index]} />);
-      }
-      tutors.push(<div className="tutorRowContainer">{tutorRow}</div>);
+      for (let tutor of this.props.favoriteTutors)
+        tutors.push(<TutorView tutor={tutor} />);
+
       return tutors;
     }
   }
