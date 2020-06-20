@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const io = require('../../socket');
 const bcrypt = require("bcryptjs");
+const path = require('path');
+const fs = require('fs');
 const multer = require('multer');
 const auth = require("../../middleware/auth");
 const Tutee = require("../../models/tutee.model");
@@ -440,6 +442,5 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-
 
 module.exports = router;

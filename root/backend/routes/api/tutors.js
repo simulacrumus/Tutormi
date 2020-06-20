@@ -195,6 +195,8 @@ router.delete('/', auth, async (req, res) => {
 // @desc     Get all tutors matching search criteria
 // @access   Public
 router.post('/search', auth, async (req, res) => {
+
+    let s = Date.now();
     let {
         start,
         end,
@@ -203,10 +205,8 @@ router.post('/search', auth, async (req, res) => {
         rating,
         name
     } = req.body;
-
     //let end = req.body.end;
     let query = {};
-
     let appointmentHours = new Array();
     if (start) {
         end = end ? end : new Date(start).setHours(new Date(start).getHours() + 1);
@@ -275,6 +275,9 @@ router.post('/search', auth, async (req, res) => {
             .select('courses languages rating bio location profilePic coverPic')
             .populate('user', '-_id -password -type -date -__v -email -confirmed -profile');
         res.json(tutors);
+
+        let e = Date.now();
+        console.log('Query time: ', (e - s))
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -424,5 +427,17 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+router.post('/addcover', async (req, res) => {
+    try {
+        const tutors = await Tutee.updateMany({
+            coverPic: 'default-cover-pic.png'
+        })
+        res.json(tutors)
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+})
 
 module.exports = router;
