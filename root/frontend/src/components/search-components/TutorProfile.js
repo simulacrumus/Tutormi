@@ -5,8 +5,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core";
-import { getAndSetViewedTutor } from "../util/apiCallFunctions";
-import Paper from "@material-ui/core/Paper";
+import { getAndSetViewedTutor } from "../../util/apiCallFunctions";
 import Typography from "@material-ui/core/Typography";
 import { Avatar, IconButton, CardMedia } from "@material-ui/core";
 import { Rating } from "@material-ui/lab";
@@ -49,11 +48,9 @@ const TutorProfile = ({
   description,
   imgSrc,
   rating,
-  courses,
 }) => {
   const classes = useStyles();
   description = trimBio(description);
-  let paperKey = 0;
 
   return (
     <Card className={classes.root} raised>
@@ -71,15 +68,6 @@ const TutorProfile = ({
         <Typography variant="body2" component="p">
           {trimBio(description)}
         </Typography>
-        {/*<Typography className={classes.typography}>Skills</Typography>
-        {courses.map((course) => (
-          <Paper key={++paperKey} elevation={5} className={classes.paper}>
-            <Typography key={id} className={classes.typography}>
-              {course.toUpperCase()}
-            </Typography>
-          </Paper>
-        ))}
-        */}
       </CardContent>
       <CardActions>
         <Button
@@ -96,8 +84,9 @@ const TutorProfile = ({
                 : 0,
           }}
           onClick={() => {
-            getAndSetViewedTutor(id)
-              .then(() => window.location.href = "/viewTutor");
+            getAndSetViewedTutor(id).then(
+              () => (window.location.href = "/viewTutor")
+            );
           }}
         >
           Profile
