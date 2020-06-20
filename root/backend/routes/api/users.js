@@ -362,7 +362,7 @@ router.post('/changeemail', auth, [
             // send mail with defined transport object
             transporter.sendMail({
                 from: '"Tutormi" <info@tutormiproject.com>', // sender address
-                to: `${email}`, // list of receivers
+                to: `${user,email}`, // list of receivers
                 subject: "TUTORMI - CONFIRM EMAIL", // Subject line
                 text: "", // plain text body
                 html: htmloutput, // html body

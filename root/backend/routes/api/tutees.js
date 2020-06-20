@@ -441,5 +441,4 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
   }
 });
 
-
 module.exports = router;
