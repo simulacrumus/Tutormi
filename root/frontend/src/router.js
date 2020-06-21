@@ -11,11 +11,13 @@ import CreateProfilePage from "./pages/create-profile/CreateProfilePage";
 import EmailConfirmationPage from "./pages/create-profile/EmailConfirmationPage";
 import SearchMain from "./components/SearchMain";
 import Login from "./components/login/Login";
-import SignUp from "./components/login/SignUp"
+import SignUp from "./components/login/SignUp";
+import ChangePassword from "./components/login/ChangePassword";
 
 import {
   isLoggedIn, isTutee, isViewedTutorSet, isProfileSetUp, isViewedTuteeSet
 } from "./util/authenticationFunctions";
+
 
 export default class Router extends Component {
 
@@ -42,6 +44,7 @@ export default class Router extends Component {
           }} />
 
           <Route path="/emailConfirmation" component={EmailConfirmationPage} exact />
+          <Route path="/changepassword" component={ChangePassword} exact />
 
           <Route path="/createProfile" exact render={() => {
             if (isLoggedIn())

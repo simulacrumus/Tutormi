@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Form, Modal } from "react-bootstrap";
 
-import MainNavigation from "../navigation/MainNavigation";
+
 import CustomButton from "./CustomButton.js";
 import {
   authenticateAndLoginUser,
@@ -16,12 +16,7 @@ import "./Login.css";
 const validEmailRegex = RegExp(
   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 );
-const validateForm = (errors) => {
-  let valid = true;
-  Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
-  return valid;
-};
-const userType = "";
+
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -30,10 +25,12 @@ class Login extends Component {
       password: "",
       userType: "",
       showModal: false,
+      emailF:"", //email that was entered in the modal
       errors: {
         email: "",
         password: "",
         login: "",
+        emailF: "",
       },
     };
 
@@ -44,7 +41,6 @@ class Login extends Component {
     event.preventDefault();
     const { name, value } = event.target;
     let errors = this.state.errors;
-    // console.log(name, value);
 
     switch (name) {
       case "email":
@@ -59,10 +55,22 @@ class Login extends Component {
           errors.email = "email is to long!";
         }
         break;
+        case "emailF":
+          this.setState({ ...this.state, emailF: event.target.value });
+          errors.emailF = !this.state.emailF ? "email can't be empty!" : "";
+          if (this.state.email) {
+            errors.emailF = validEmailRegex.test(value)
+              ? ""
+              : "email is not valid!";
+          }
+          if (value.length > 30) {
+            errors.emailF = "email is to long!";
+          }
+          break;
       case "password":
         this.setState({ ...this.state, password: event.target.value });
         errors.password =
-          value.length < 4 ? "password can't be shotrer then 4 characters" : "";
+          value.length < 8 ? "password can't be shotrer then 8 characters" : "";
         if (value.length > 30) {
           errors.password = "password can be maximum 30 characters";
         }
@@ -71,10 +79,6 @@ class Login extends Component {
       default:
         break;
     }
-
-    // this.setState({ errors, [name]: value }, () => {
-    //   //console.log(errors);
-    // });
   }
 
   async handleSubmit(event) {
@@ -82,23 +86,28 @@ class Login extends Component {
       "Handle Submit says: this is a user type: " + this.state.userType
     );
     event.preventDefault();
-    if (this.state.type == "") {
+    //if the type wasn't set execute forgort email function
+    if (this.state.emailF !== "") {
       let emailSent = "";
-      if (validateForm(this.state.errors) && this.state.email) {
-        emailSent = await changeForgottenPassword(this.state.email);
+      if (this.state.errors && this.state.emailF) {
+        console.log(emailSent)
+        emailSent = await changeForgottenPassword(this.state.emailF);
       }
+      //if no error message change modal body
       if (!emailSent) {
-        this.setState({ ...this.state, showModal: true });
+      console.log(emailSent)
+      document.getElementById("title").innerHTML = "<p>almost done...</p>";
+      document.getElementById("modal-body").innerHTML = "<p>Check your email to reset your password</p>";
       } else {
         document.getElementById("submittion-error").innerHTML = emailSent;
-        // await this.setState({ ...this.state, errors: { login: login } }, () => {
-        //   console.log(errors);
-        // });
         console.error("HANDLE SUBMIT SAYS: invalid Form");
       }
+    }else{
+      console.error("HANDLE SUBMIT SAYS: invalid Form");
     }
+    //if the type is set and no error ocure execute login function
     if (
-      validateForm(this.state.errors) &&
+      this.state.errors &&
       this.state.email &&
       this.state.password
     ) {
@@ -117,9 +126,6 @@ class Login extends Component {
         else window.location.href = "/createProfile";
       } else {
         document.getElementById("submittion-error").innerHTML = login;
-        // await this.setState({ ...this.state, errors: { login: login } }, () => {
-        //   console.log(errors);
-        // });
         console.error("HANDLE SUBMIT SAYS: invalid Form");
       }
     }
@@ -130,23 +136,7 @@ class Login extends Component {
     const { errors } = this.state;
 
     return (
-      <>
-        <Modal
-          centered="true"
-          show={this.state.showModal}
-          onHide={() => {
-            this.setState({ ...this.state, showModal: false });
-            window.location.href = "/login";
-          }}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Forgot your password? We got you!</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>All done! check your email.</Modal.Body>
-        </Modal>
-        {/* <MainNavigation /> */}
-
-        {/* **************************************************************************************** */}
+      <> {/* **************************************************************************************** */}
 
         <Modal
           centered="true"
@@ -157,19 +147,20 @@ class Login extends Component {
           }}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Forgot your password? We got you!</Modal.Title>
+            <Modal.Title id ="title">Forgot your password? We got you!</Modal.Title>
           </Modal.Header>
-          <Modal.Body>
+      
+          <Modal.Body id = "modal-body">
             <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formBasicEmail">
                 <Form.Control
                   onBlur={this.handleInputChange}
                   onChange={this.handleInputChange}
-                  name="email"
+                  name="emailF"
                   placeholder="Enter your email"
                 />
-                {errors.email.length > 0 && (
-                  <Form.Text className="error">{errors.email}</Form.Text>
+                {errors.emailF.length > 0 && (
+                  <Form.Text className="error">{errors.emailF}</Form.Text>
                 )}
               </Form.Group>
               <Form.Text id="submittion-error" className="error">
@@ -180,8 +171,9 @@ class Login extends Component {
                   name="login"
                   type="submit"
                   onClick={() => {
-                    console.log("random message");
-                    this.setState({ ...this.state, email: this.state.email });
+                    console.log("I am in the Modal");
+                    this.setState({ ...this.state, emailF: this.state.emailF });
+                  
                   }}
                 >
                   reset password
@@ -190,8 +182,6 @@ class Login extends Component {
             </Form>
           </Modal.Body>
         </Modal>
-        {/* <MainNavigation /> */}
-
         {/* ************************************************************************************ */}
         <div className="parentLoginFormBoxContainer">
           <div className="loginFormBoxContainer">
@@ -240,7 +230,7 @@ class Login extends Component {
                 name="login"
                 type="submit"
                 onClick={() => {
-                  console.log("random message");
+                  console.log("you clicked the button tutor");
                   this.setState({ ...this.state, userType: "tutor" });
                 }}
               >
@@ -280,14 +270,12 @@ class Login extends Component {
             <CustomButton
               name="buttonSignUp"
               onClick={() => {
-                //setCount(count + 1);
-                //  this.props.flip()
+             
                 window.location.href = "/signup";
               }}
             >
               sign up
             </CustomButton>
-            {/* <p>Join {count} users that already signed up</p> */}
           </div>
         </div>
       </>

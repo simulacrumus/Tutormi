@@ -73,7 +73,7 @@ export async function updateUserInformation(updateInfo, userType) {
 }
 
 export async function changeForgottenPassword(email) {
-  let authResponse = await fetch("/api/forgetpswd", {
+  let authResponse = await fetch("/api/users/forgetpswd", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -234,6 +234,23 @@ export async function changePassword(currentPassword, newPassword) {
     body: JSON.stringify({
       currentPassword: currentPassword,
       newPassword: newPassword,
+    })
+  });
+
+  response = await response.json();
+  console.log(response);
+  return response;
+}
+
+export async function resetPassword(newPassword) {
+  let response = await fetch("api/users/password", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": store.getState().user.token,
+    },
+    body: JSON.stringify({
+      password: newPassword,
     })
   });
 
