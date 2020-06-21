@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const config = require('config');
+const io = require('../../socket');
 const transporter = require('./../../config/email');
 const auth = require('../../middleware/auth');
 const {
@@ -159,6 +160,8 @@ router.post('/', [auth, [
             }
         })
 
+        const tutor3 = await Tutor.findById(tutorid)
+
         const htmloutput = `<p>You have a new appointment</p>
         <h3>Appointment Details:</h3>
         <ul>
@@ -182,7 +185,9 @@ router.post('/', [auth, [
 
         console.log("Message sent: %s", info.messageId);
 
-
+        io.getIo().emit(`availableHours-${tutor.id}`, {
+            availableHours: tutor3.availableHours
+        })
 
         res.json(appointment);
 
@@ -358,6 +363,12 @@ router.delete('/:id', auth, async (req, res) => {
                 });
             }
         });
+
+        const tutor1 = await Tutor.findById(tutor.id);
+
+        io.getIo().emit(`availableHours-${tutor.id}`, {
+            availableHours: tutor1.availableHours
+        })
 
         //return message
         res.json({
