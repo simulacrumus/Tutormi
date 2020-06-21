@@ -196,7 +196,6 @@ router.delete('/', auth, async (req, res) => {
 // @access   Public
 router.post('/search', auth, async (req, res) => {
 
-    let s = Date.now();
     let {
         start,
         end,
@@ -205,7 +204,7 @@ router.post('/search', auth, async (req, res) => {
         rating,
         name
     } = req.body;
-    //let end = req.body.end;
+
     let query = {};
     let appointmentHours = new Array();
     if (start) {
@@ -264,20 +263,26 @@ router.post('/search', auth, async (req, res) => {
         }
 
         query.blockedUsers = {
-            $nin: [req.user.user.id]
+            $not: {
+                $elemMatch: {
+                    $nin: [req.user.user.id]
+                }
+            }
         }
 
         query.blockedBy = {
-            $nin: [req.user.user.id]
+            $not: {
+                $elemMatch: {
+                    $nin: [req.user.user.id]
+                }
+            }
         }
 
         const tutors = await Tutor.find(query)
             .select('courses languages rating bio location profilePic coverPic')
             .populate('user', '-_id -password -type -date -__v -email -confirmed -profile');
-        res.json(tutors);
 
-        let e = Date.now();
-        console.log('Query time: ', (e - s))
+        res.json(tutors);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -312,10 +317,10 @@ router.post('/schedule', auth, async (req, res) => {
 
         tutor.availableHours = availibility
 
-        io.getIo().emit('availableHours', {
-            tutor: tutor.id,
+        io.getIo().emit(`availableHours-${tutor.id}`, {
             availableHours: availibility
         })
+
         res.json(tutor);
     } catch (err) {
         console.error(err.message)
@@ -430,7 +435,7 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
 
 router.post('/addcover', async (req, res) => {
     try {
-        const tutors = await Tutee.updateMany({
+        const tutors = await Tutor.updateMany({
             coverPic: 'default-cover-pic.png'
         })
         res.json(tutors)
