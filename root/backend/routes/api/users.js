@@ -190,7 +190,7 @@ router.post('/forgetpswd', [
 
         // create html 
         const htmloutput = `<h3>Hi, ${user.name}!</h3>
-        <p>Click <a href="<<FRONTEND LINK>>/${token}" target="_blank" >here</a> to reset your password!</p>`
+        <p>Click <a href="http://localhost:3000/changepassword?token=${token}">here</a> to reset your password!</p>`
 
         // send mail with defined transport object
         transporter.sendMail({
