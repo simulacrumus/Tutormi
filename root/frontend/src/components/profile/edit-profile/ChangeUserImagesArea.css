@@ -1,0 +1,17 @@
+.imageUploadContainer {
+    display: flex;
+    align-content: flex-end;
+    justify-content: space-around;
+}
+
+.imageUploadButtons {
+    display: flex;
+    flex-direction: column;
+    align-self: start;
+    margin-right: 10px;
+}
+
+.imageUploadButtonsContainer {
+    display: flex;
+    align-self: start;
+}

@@ -158,9 +158,8 @@ router.delete('/:id', auth, async (req, res) => {
 
     try {
 
-        const rating = await Rating.findOneAndDelete({
-            _id: req.params.id
-        })
+        const rating = await Rating.findById(req.params.id
+        )
 
         if (!rating) {
             return res.status(400).json({
@@ -174,8 +173,9 @@ router.delete('/:id', auth, async (req, res) => {
 
         // Tutor doesn't return all the ratings, something is wrong 
 
+
         let numOfRates = Array.from(tutor.ratings).length - 1;
-        let totalRate = Array.from(tutor.ratings).reduce((x, y) => x.rate + y.rate, 0)
+        let totalRate = Array.from(tutor.ratings).reduce((x, y) => x + y.rate, 0)
         totalRate -= rating.rate;
         const ratingValue = isNaN(totalRate / numOfRates) ? 1 : (totalRate / numOfRates) < 1 ? 1 : (totalRate / numOfRates)
         await Tutor.findOneAndUpdate({
@@ -197,6 +197,7 @@ router.delete('/:id', auth, async (req, res) => {
             }
         })
 
+        await Rating.findByIdAndDelete(rating.id);
         res.json({
             rating,
             average: ratingValue

@@ -10,14 +10,14 @@ export default class PersonalSummary extends Component {
 
   render() {
 
-    let width = this.props.isUser ? "summaryBigWidth" : "summarySmallWidth";
-    let height = this.props.isUser ? "summaryBigHeight" : "summarySmallHeight";
+    const width = this.props.isUser ? "summaryBigWidth" : "summarySmallWidth";
+    const height = this.props.isUser ? "summaryBigHeight" : "summarySmallHeight";
     return (
       <div className="summarySection">
 
         <ProfileImagesArea profilePic={this.props.person.profilePic}
           coverPic={this.props.person.coverPic}
-          width={width} height={height} />
+          width={"25vw"} height={"30vh"} />
 
         <div className={`textContainer ${width}`}>
           <dv className="nameContainer">
