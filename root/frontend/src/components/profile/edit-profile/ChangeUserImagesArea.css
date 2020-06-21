@@ -12,6 +12,14 @@
 }
 
 .imageUploadButtonsContainer {
-    display: flex;
+    display: grid;
     align-self: start;
+    grid-template-columns: auto auto;
+}
+
+.saveImagesButtonContainer {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    display: flex;
+    justify-content: center;
 }

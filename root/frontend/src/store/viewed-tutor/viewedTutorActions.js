@@ -7,9 +7,15 @@ export const VIEWED_TUTOR_AVAILABILITY_UPDATED = "VIEWED_TUTOR_AVAILABILITY_UPDA
 export const VIEWED_TUTOR_APPOINTMENT_BOOKED = "VIEWED_TUTOR_APPOINTMENT_BOOKED";
 export const VIEWED_TUTOR_APPOINTMENT_CANCELED = "VIEWED_TUTOR_APPOINTMENT_CANCELED";
 export const VIEWED_TUTOR_RATED = "VIEWED_TUTOR_RATED";
+export const VIEWED_TUTOR_AVAILABILITY_UPDATED_REMOTELY = "VIEWED_TUTOR_AVAILABILITY_UPDATED_REMOTELY";
+
 
 export async function setViewedTutor(viewedTutor) {
     updateStore(VIEWED_TUTOR_SET, viewedTutor);
+}
+
+export async function updateViewedTutorAvailability(availability) {
+    updateStore(VIEWED_TUTOR_AVAILABILITY_UPDATED_REMOTELY, availability);
 }
 
 export function clearViewedTutor() {
