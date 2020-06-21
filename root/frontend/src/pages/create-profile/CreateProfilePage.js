@@ -7,15 +7,14 @@ import ListUpdateArea from '../../components/profile/edit-profile/ListUpdateArea
 import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../styles/materialUiTheme";
 import EditSocialArea from "../../components/profile/edit-profile/EditSocialArea";
-import ChangeProfilePictureArea from "../../components/profile/edit-profile/ChangeProfilePictureArea";
-import { updateUserInformation } from "../../util/apiCallFunctions";
+import ChangeUserImagesArea from "../../components/profile/edit-profile/ChangeUserImagesArea";
+import { updateUserInformation, uploadProfilePicture, uploadCoverPicture } from "../../util/apiCallFunctions";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import { userWithProfileLoggedIn } from "../../store/user/userActions";
-import { uploadProfilePicture } from "../../util/apiCallFunctions";
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
 
 class CreateProfilePage extends Component {
@@ -23,7 +22,12 @@ class CreateProfilePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            profilePic: null,
+            profilePic: "default-profile-pic.png",
+            coverPic: "default-cover-pic.png",
+            profilePicFile: null,
+            coverPicFile: null,
+            updatedProfilePic: false,
+            updatedCoverPic: false,
             bio: "",
             courses: [],
             languages: [],
@@ -41,10 +45,11 @@ class CreateProfilePage extends Component {
         }
         this.updateSocialAccount = this.updateSocialAccount.bind(this);
         this.setProfilePic = this.setProfilePic.bind(this);
+        this.setCoverPic = this.setCoverPic.bind(this);
     }
 
     render() {
-        console.log(this.state.profilePic)
+        console.log(this.state.updatedProfilePic, this.state.updatedProfilePic)
         return (
             <>
                 <div className="pageContainer">
@@ -84,40 +89,12 @@ class CreateProfilePage extends Component {
 
                             {this.state.activeStep === 1 &&
                                 <>
-                                    <div className="imageUpdateAreaContainer">
-                                        <Form.Label>Profile Picture</Form.Label>
+                                    <ChangeUserImagesArea profilePic={this.state.profilePic} coverPic={this.state.coverPic}
+                                        userType={this.props.type} setProfilePic={this.setProfilePic} setCoverPic={this.setCoverPic}
+                                        updatedProfilePic={this.state.updatedProfilePic} updatedCoverPic={this.state.updatedCoverPic} />
 
-                                        <div className="imageUploadContainer">
-                                            <div className="imageUploadButtons">
-                                                <input type="file" id="changeProfilePictureUpload" hidden accept="image/*"
-                                                    onChange={e => {
-                                                        this.setProfilePic(e.target.files[0]);
-                                                        document.getElementById("profilePictureUploadPreview").src = URL.createObjectURL(e.target.files[0])
-                                                    }
-                                                    } />
-                                                <label htmlFor="changeProfilePictureUpload">
-                                                    <ThemeProvider theme={customTheme}>
-                                                        <Button color="primary" aria-label="upload profile picture" component="span" variant="contained" startIcon={<PhotoCamera />}>
-                                                            Upload</Button>
-                                                    </ThemeProvider>
 
-                                                </label>
-                                                {/* <ThemeProvider theme={customTheme}>
-                                                    <Button color="primary" variant="contained" startIcon={<SaveAltIcon />}
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            uploadProfilePicture(document.getElementById("changeProfilePictureUpload").files[0]) // Send image to the server
-                                                                .then((imageFile) => changeUserImage(imageFile));
-                                                        }}>Save</Button>
-                                                </ThemeProvider> */}
 
-                                            </div>
-                                            <img id="profilePictureUploadPreview" src={require(`../../images/uploads/default-profile-pic.png`)} />
-
-                                            <div /> {/* Added a DOM element to center the image*/}
-                                        </div>
-                                    </div>
-                                    {/* <ChangeProfilePictureArea profilePic={"default-profile-pic.png"} setProfilePic={this.setProfilePic} /> */}
                                     <Form.Group >
                                         <Form.Label>Bio</Form.Label>
                                         <Form.Control as="textarea" rows="3" value={this.state.bio} placeholder="Give a brief description about yourself"
@@ -150,12 +127,16 @@ class CreateProfilePage extends Component {
         );
     }
 
-    setProfilePic(pic) {
-        this.setState({ ...this.state, profilePic: pic });
+    setProfilePic(pic, file) {
+        this.setState({ ...this.state, profilePic: pic, updatedProfilePic: true, profilePicFile: file });
+    }
+
+    setCoverPic(pic, file) {
+        this.setState({ ...this.state, coverPic: pic, updatedCoverPic: true, coverPicFile: file });
     }
 
     async createProfile(e) {
-        // e.preventDefault();
+        e.preventDefault();
         this.setState({ ...this.state, isSaving: true })
         let editInformation = {
             bio: this.state.bio,
@@ -166,32 +147,19 @@ class CreateProfilePage extends Component {
         };
         let updateResponse = await updateUserInformation(editInformation, this.props.type);  // Update the server with the new user information
         if (updateResponse.errors === undefined) { // No errors occurred when updating
-            await uploadProfilePicture(this.state.profilePic); // Send image to the server
-            let user = await logIn(this.props.token, this.props.type);
-            await userWithProfileLoggedIn(user); // Update global state
-            window.location.href = "/profile";
+            await uploadProfilePicture(this.state.profilePicFile, this.props.type); // Send image to the server
+            await uploadCoverPicture(this.state.coverPicFile, this.props.type);
+
+            const user = await logIn(this.props.token, this.props.type);
+
+
+            userWithProfileLoggedIn(user); // Update global state
+            // window.location.href = "/profile";
+
         } else {
             this.setState({ ...this.state, isSaving: false, errors: updateResponse.errors[0].msg }); // Notify users of errors 
             setTimeout(() => this.setState({ ...this.state, isSaving: false, errors: null }), 2000); // Stop showing error after 2 seconds
         }
-
-        // updateUserInformation(editInformation, this.props.type)  // Update the server with the new user information
-        //     .then((updateResponse) => {
-        //         if (updateResponse.errors === undefined) { // No errors occurred when updating
-        //             uploadProfilePicture(this.state.profilePic) // Send image to the server
-        //                 .then((imageFile) => {
-        //                     logIn(this.props.token, this.props.type)
-        //                         .then((user) => {
-        //                             userWithProfileLoggedIn(user); // Update global state
-        //                             window.location.href = "/profile";
-        //                         })
-        //                 });
-        //             ;
-        //         } else {
-        //             this.setState({ ...this.state, isSaving: false, errors: updateResponse.errors[0].msg }); // Notify users of errors 
-        //             setTimeout(() => this.setState({ ...this.state, isSaving: false, errors: null }), 2000); // Stop showing error after 2 seconds
-        //         }
-        //     });
     }
 
     stepForward = () => {

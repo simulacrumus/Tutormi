@@ -52,7 +52,6 @@ export async function saveTutorAvailableHours(availableHours) {
 }
 
 export async function uploadProfilePicture(imageFile, userType) {
-  console.log("called")
   let formData = new FormData();
   formData.append("image", imageFile);
 
@@ -69,12 +68,10 @@ export async function uploadProfilePicture(imageFile, userType) {
 }
 
 export async function uploadCoverPicture(imageFile, userType) {
-  console.log("called")
   let formData = new FormData();
   formData.append("image", imageFile);
 
   let apiRoute = userType === "tutor" ? "/api/tutors/cover-pic" : "/api/tutees/cover-pic";
-  console.log(apiRoute);
   let uploadResponse = await fetch(apiRoute, {
     method: "POST",
     headers: { "x-auth-token": store.getState().user.token },
@@ -82,7 +79,7 @@ export async function uploadCoverPicture(imageFile, userType) {
   });
 
   uploadResponse = await uploadResponse.json();
-  return uploadResponse.profilePic;
+  return uploadResponse.coverPic;
 }
 
 export async function updateUserInformation(updateInfo, userType) {
@@ -97,8 +94,6 @@ export async function updateUserInformation(updateInfo, userType) {
   });
 
   updateResponse = await updateResponse.json();
-  console.log(updateResponse);
-
   return updateResponse;
 }
 
@@ -192,8 +187,7 @@ export async function logIn(token, userType) {
 
   let user = await userResponse.json();
   user.user.type = userType; // Set user type 
-  // For now we do this check. When tutor DB is updated remove!
-  user.profilePic = user.profilePic === undefined ? "default-profile-pic.png" : user.profilePic;
+  console.log(user)
   return user;
 }
 
@@ -223,6 +217,7 @@ export async function deleteRating(ratingId) {
   });
 
   response = await response.json();
+  console.log(response)
   return response;
 }
 
