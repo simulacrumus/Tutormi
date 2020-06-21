@@ -14,22 +14,29 @@ export default class AppointmentView extends Component {
                 ${moment(this.props.appointment.time.start).format("DD MMM")} - ${appointmentLengthInHours(this.props.appointment)} hour(s)`}</h5>
 
                 {isTutee()
-                    ? <>Tutor: <a href="/viewTutor" onClick={() => {
-                        getAndSetViewedTutor(this.props.appointment.tutor.id)
-                            .then((response) => window.location.href = "/viewTutor");
-                    }}>{this.props.appointment.tutor.name}</a>
-                        <br /></>
-                    : <>Tutee: <a href="/viewTutee" onClick={() => {
-                        getAndSetViewedTutee(this.props.appointment.tutee.id)
-                            .then((response) => window.location.href = "/viewTutee");
-                    }}>{this.props.appointment.tutee.name}</a>
-                        <br /></>}
+                    ? <>Tutor: <a href="/viewTutor" onClick={(e) => this.viewTutor(e)}>
+                        {this.props.appointment.tutor.name}</a><br /></>
+
+                    : <>Tutee: <a href="/viewTutee" onClick={(e) => this.viewTutee(e)}>
+                        {this.props.appointment.tutee.name}</a><br /></>}
 
                 {`Subject:  ${this.props.appointment.subject}`}
                 <br />
                 {`Notes:  ${this.props.appointment.note}`}
             </div>
         );
+    }
+
+    async viewTutor(e) {
+        e.preventDefault();
+        await getAndSetViewedTutor(this.props.appointment.tutor.id);
+        window.location.href = "/viewTutor";
+    }
+
+    async viewTutee(e) {
+        e.preventDefault();
+        await getAndSetViewedTutee(this.props.appointment.tutee.id);
+        window.location.href = "/viewTutee";
     }
 
 }

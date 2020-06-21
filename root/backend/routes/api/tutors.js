@@ -22,8 +22,8 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-                user: req.user.user.id
-            })
+            user: req.user.user.id
+        })
             .populate('user', ['name', 'email', 'date', 'type'])
             .populate('appointments')
             .populate('ratings')
@@ -93,13 +93,13 @@ router.post(
 
             // Using upsert option (creates new doc if no match is found):
             const tutor = await Tutor.findOneAndUpdate({
-                    user: req.user.user.id
-                }, {
-                    $set: tutorProfileFields
-                }, {
-                    new: true,
-                    upsert: true
-                })
+                user: req.user.user.id
+            }, {
+                $set: tutorProfileFields
+            }, {
+                new: true,
+                upsert: true
+            })
                 .populate('user', ['name', 'email', 'type'])
                 .populate('appointments')
                 .populate('ratings');
@@ -141,8 +141,8 @@ router.get('/user/:id', async ({
 }, res) => {
     try {
         const tutor = await Tutor.findOne({
-                _id: id
-            })
+            _id: id
+        })
             .populate('user', ['name', 'email', 'type'])
             .populate('appointments')
             .populate('ratings');
@@ -317,10 +317,7 @@ router.post('/schedule', auth, async (req, res) => {
 
         tutor.availableHours = availibility
 
-        io.getIo().emit(`availableHours-${tutor.id}`, {
-            availableHours: availibility
-        })
-
+        io.getIo().emit(`availableHours-${tutor.id}`, availibility)
         res.json(tutor);
     } catch (err) {
         console.error(err.message)

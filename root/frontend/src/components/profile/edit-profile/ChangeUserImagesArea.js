@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import Form from 'react-bootstrap/Form';
-import { changeUserImage, changeUserCoverImage } from "../../../store/user/userActions";
+import { changeUserImage, changeUserCoverImage, changeProfileAndCoverImage } from "../../../store/user/userActions";
 import { uploadProfilePicture, uploadCoverPicture } from "../../../util/apiCallFunctions";
 import { isProfileSetUp } from "../../../util/authenticationFunctions";
 import { ThemeProvider } from "@material-ui/core/styles";
@@ -16,8 +16,10 @@ export default class ChangeUserImagesArea extends Component {
     state = {
         profilePic: this.props.profilePic,
         coverPic: this.props.coverPic,
-        updatedProfilePic: this.props.updatedProfilePic,
-        updatedCoverPic: this.props.updatedCoverPic
+        uploadedProfilePic: false,
+        uploadedCoverPic: false,
+        profilePicFile: null,
+        coverPicFile: null
     }
 
     render() {
@@ -26,76 +28,49 @@ export default class ChangeUserImagesArea extends Component {
             <div className="imageUpdateAreaContainer">
                 <Form.Label>Profile Images</Form.Label>
 
+
                 <div className="imageUploadContainer">
 
+
                     <div className="imageUploadButtonsContainer">
+
                         <div className="imageUploadButtons">
                             <h6>Profile Picture</h6>
                             <input type="file" id="changeProfilePictureUpload" hidden accept="image/*"
-                                onChange={e => {
-                                    let setState = this.setState.bind(this);
-                                    let setProfilePic = this.props.setProfilePic;
-                                    let reader = new FileReader();
-                                    reader.onload = function (event) {
-                                        if (setProfilePic)
-                                            setProfilePic(event.target.result, document.getElementById("changeProfilePictureUpload").files[0]);
-                                        setState({ ...this.state, profilePic: event.target.result, updatedProfilePic: true });
-
-                                    }
-                                    reader.readAsDataURL(e.target.files[0]);
-                                }} />
+                                onChange={e => this.updatePicturePreview(e, true)} />
                             <label htmlFor="changeProfilePictureUpload">
                                 <ThemeProvider theme={customTheme}>
                                     <Button color="primary" aria-label="upload profile picture" component="span" variant="contained" startIcon={<PhotoCamera />}>
                                         Upload</Button>
                                 </ThemeProvider>
-
                             </label>
-                            <ThemeProvider theme={customTheme}>
-                                <Button color="primary" variant="contained" startIcon={<SaveAltIcon />}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        uploadProfilePicture(document.getElementById("changeProfilePictureUpload").files[0], this.props.userType) // Send image to the server
-                                            .then((imageFile) => changeUserImage(imageFile));
-                                    }}>Save</Button>
-                            </ThemeProvider>
                         </div>
 
                         <div className="imageUploadButtons">
                             <h6>Cover Picture</h6>
                             <input type="file" id="changeCoverPictureUpload" hidden accept="image/*"
-                                onChange={e => {
-                                    let setState = this.setState.bind(this);
-                                    let setCoverPic = this.props.setCoverPic;
-                                    let reader = new FileReader();
-                                    reader.onload = function (event) {
-                                        if (setCoverPic)
-                                            setCoverPic(event.target.result, document.getElementById("changeCoverPictureUpload").files[0]);
-                                        setState({ ...this.state, coverPic: event.target.result, updatedCoverPic: true });
-                                    }
-                                    reader.readAsDataURL(e.target.files[0]);
-                                }} />
+                                onChange={e => this.updatePicturePreview(e, false)} />
                             <label htmlFor="changeCoverPictureUpload">
                                 <ThemeProvider theme={customTheme}>
                                     <Button color="primary" aria-label="upload profile picture" component="span" variant="contained" startIcon={<PhotoCamera />}>
                                         Upload</Button>
                                 </ThemeProvider>
                             </label>
+                        </div>
 
+                        <div className="saveImagesButtonContainer">
                             <ThemeProvider theme={customTheme}>
                                 <Button color="primary" variant="contained" startIcon={<SaveAltIcon />}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        uploadCoverPicture(document.getElementById("changeCoverPictureUpload").files[0], this.props.userType) // Send image to the server
-                                            .then((imageFile) => changeUserCoverImage(imageFile));
-                                    }}>Save</Button>
+                                    onClick={(e) => this.uploadImages(e)}>Save</Button>
                             </ThemeProvider>
                         </div>
+
+
                     </div>
 
                     <div className="imagePreviewContainer">
                         <ProfileImageArea profilePic={this.state.profilePic} coverPic={this.state.coverPic}
-                            updatedProfilePic={this.state.updatedProfilePic} updatedCoverPic={this.state.updatedCoverPic}
+                            uploadedProfilePic={this.state.uploadedProfilePic} uploadedCoverPic={this.state.uploadedCoverPic}
                             width={"17vw"} height={"20vh"} />
                     </div>
 
@@ -104,6 +79,39 @@ export default class ChangeUserImagesArea extends Component {
             </div>
         );
 
+    }
+
+    async uploadImages(e) {
+        e.preventDefault();
+        let profileImage, coverImage = null;
+
+        if (this.state.uploadedProfilePic) // Upload a new profile pic if the user has chosen one
+            profileImage = await uploadProfilePicture(this.state.profilePicFile, this.props.type); // Send image to the server
+
+        if (this.state.uploadedCoverPic) // Upload a new cover pic if the user has chosen one
+            coverImage = await uploadCoverPicture(this.state.coverPicFile, this.props.type);
+
+        if (profileImage && coverImage)
+            changeProfileAndCoverImage(profileImage, coverImage)
+        else if (profileImage)
+            changeUserImage(profileImage);
+        else if (coverImage)
+            changeUserCoverImage(coverImage);
+    }
+
+    updatePicturePreview(e, isProfilePic) {
+        const setState = this.setState.bind(this); // Need a reference to the function inside onload
+        const reader = new FileReader();
+        reader.onload = (onLoadEvent) => {
+            setState({
+                ...this.state,
+                [isProfilePic ? "profilePic" : "coverPic"]: onLoadEvent.target.result, // New picture is set for preview
+                [isProfilePic ? "uploadedProfilePic" : "uploadedCoverPic"]: true,
+                [isProfilePic ? "profilePicFile" : "coverPicFile"]:
+                    document.getElementById(isProfilePic ? "changeProfilePictureUpload" : "changeCoverPictureUpload").files[0]
+            });
+        }
+        reader.readAsDataURL(e.target.files[0]);
     }
 
 }

@@ -48,14 +48,14 @@ export function removeSlotConflict(tutorAvailableHours, tuteeAppointments) {
 // Since in local storage dates are converted to strings we need to convert all the strings back to dates while maintaining the other data
 export function convertDateStringsToDates(dateStrings) {
   let dates = [];
-  for (let i = 0; typeof dateStrings !== "undefined" && i < dateStrings.length; i++) {
-    dates[i] = {
-      ...dateStrings[i],
+  for (let dateString of dateStrings) {
+    dates.push({
+      ...dateString,
       time: {
-        start: moment(dateStrings[i].time.start),
-        end: moment(dateStrings[i].time.end),
-      },
-    };
+        start: moment(dateString.time.start),
+        end: moment(dateString.time.end),
+      }
+    })
   }
   return dates;
 }
