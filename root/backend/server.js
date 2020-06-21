@@ -11,6 +11,7 @@ const io = require('./socket').init(server)
 connectDB();
 
 app.use(express.static('../frontend/public'));
+app.use(express.static('../frontend/src/images/uploads'));
 
 const tutorsRouter = require('./routes/api/tutors');
 const tuteesRouter = require('./routes/api/tutees');

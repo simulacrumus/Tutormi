@@ -10,6 +10,8 @@ import {
     combineSingleSlots, displayHour12Format, fallsOnSameDay
 } from "../../util/scheduleFunctions.js";
 import { isTutee, isViewedTutorSet } from "../../util/authenticationFunctions";
+import { updateViewedTutorAvailability } from "../../store/viewed-tutor/viewedTutorActions";
+import socketIOClient from "socket.io-client";
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -33,6 +35,19 @@ class WeeklyScheduleTable extends Component {
         );
     }
 
+    componentDidMount() {
+        const socket = socketIOClient("http://localhost:5000");
+
+        if (isTutee() && isViewedTutorSet()) {
+            socket.on(`availableHours-${this.props.viewedTutor._id}`, availableHours => {
+                updateViewedTutorAvailability(availableHours);
+            });
+
+        } else if (!isTutee) {
+
+        }
+    }
+
     makeDayHeaderCells() {
         let headerCells = [];
         for (let day = 0; day < DAYS_OF_WEEK.length; day++)
@@ -50,8 +65,6 @@ class WeeklyScheduleTable extends Component {
             availableHours = this.props.user.availableHours;
         else if (isViewedTutorSet()) // If the tutee user is viewing a tutor show the viewed tutors available hours
             availableHours = this.props.viewedTutor.availableHours;
-
-        // userAvailableHours = convertDateStringsToDates(userAvailableHours); // Don't know if I need this anymore
 
         availableHours = convertSingleHoursToTimeSlots(availableHours);
         removeSlotConflict(availableHours, appointments); // This will remove any tutor open hours that cant be booked because of pre-existing conflicts

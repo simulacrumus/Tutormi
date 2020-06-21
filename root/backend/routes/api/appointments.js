@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const config = require('config');
+const io = require('../../socket');
 const transporter = require('./../../config/email');
 const auth = require('../../middleware/auth');
 const {
@@ -159,6 +160,9 @@ router.post('/', [auth, [
             }
         })
 
+        const tutor3 = await Tutor.findById(tutorid).populate('appointments')
+        const tutee2 = await Tutee.findById(tuteeid).populate('appointments')
+
         const htmloutput = `<p>You have a new appointment</p>
         <h3>Appointment Details:</h3>
         <ul>
@@ -182,7 +186,9 @@ router.post('/', [auth, [
 
         console.log("Message sent: %s", info.messageId);
 
-
+        io.getIo().emit(`availableHours-${tutor.id}`, tutor3.availableHours)
+        io.getIo().emit(`appointments-${tutor.id}`, tutor3.appointments)
+        io.getIo().emit(`appointments-${tutee.id}`, tutee2.appointments)
 
         res.json(appointment);
 
@@ -358,6 +364,14 @@ router.delete('/:id', auth, async (req, res) => {
                 });
             }
         });
+
+        const tutor1 = await Tutor.findById(tutor.id).populate('appointments');
+        const tutee1 = await Tutee.findById(tutee.id).populate('appointments')
+
+        //socket.io
+        io.getIo().emit(`availableHours-${tutor.id}`, tutor1.availableHours)
+        io.getIo().emit(`appointments-${tutor.id}`, tutor1.appointments)
+        io.getIo().emit(`appointments-${tutee.id}`, tutee1.appointments)
 
         //return message
         res.json({

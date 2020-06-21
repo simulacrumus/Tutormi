@@ -3,9 +3,9 @@ import {
     USER_LOGGED_IN, USER_INFO_UPDATED, AVAILABILITY_OPENED, TOKEN_ACQUIRED, USER_RATED_TUTOR,
     AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT,
     USER_IMAGE_UPDATED, USER_ADDED_TO_FAVORITES, USER_REMOVED_FAVORITE, USER_WITHOUT_PROFILE_LOGGED_IN,
-    USER_REMOVED_RATING,
+    USER_REMOVED_RATING, USER_COVER_UPDATED,
     USER_BLOCKED_SOMEONE,
-    USER_UNBLOCKED_SOMEONE
+    USER_UNBLOCKED_SOMEONE, USER_UPDATED_PROFILE_AND_COVER
 } from './userActions';
 import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
 
@@ -120,8 +120,20 @@ export default function userReducer(state = initialState, action) {
                 }
             }
 
+        case USER_UPDATED_PROFILE_AND_COVER:
+            return {
+                ...state, user: {
+                    ...state.user,
+                    profilePic: action.payload.profilePic,
+                    coverPic: action.payload.coverPic
+                }
+            }
+
         case USER_IMAGE_UPDATED:
             return { ...state, user: { ...state.user, profilePic: action.payload } }
+
+        case USER_COVER_UPDATED:
+            return { ...state, user: { ...state.user, coverPic: action.payload } }
 
         case USER_LOGGED_OUT:
             return initialState;

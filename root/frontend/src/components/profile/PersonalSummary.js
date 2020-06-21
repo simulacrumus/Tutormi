@@ -4,17 +4,21 @@ import { SocialIcon } from "react-social-icons";
 import EditModal from "./edit-profile/EditModal";
 import Rating from '@material-ui/lab/Rating';
 import { isViewedTutorSet } from "../../util/authenticationFunctions";
+import ProfileImagesArea from "./ProfileImagesArea";
 
 export default class PersonalSummary extends Component {
 
   render() {
 
-    let width = this.props.isUser ? "summaryBigWidth" : "summarySmallWidth";
-    let height = this.props.isUser ? "summaryBigHeight" : "summarySmallHeight";
+    const width = this.props.isUser ? "summaryBigWidth" : "summarySmallWidth";
+    const height = this.props.isUser ? "summaryBigHeight" : "summarySmallHeight";
     return (
       <div className="summarySection">
 
-        <img className={`profileImg ${width} ${height}`} src={require(`../../images/uploads/${this.props.person.profilePic}`)} />
+        <ProfileImagesArea profilePic={this.props.person.profilePic}
+          coverPic={this.props.person.coverPic}
+          width={"25vw"} height={"30vh"} />
+
         <div className={`textContainer ${width}`}>
           <dv className="nameContainer">
             <h3>{this.props.person.user.name}</h3>

@@ -8,7 +8,9 @@ export const USER_LOGGED_IN = "USER_LOGGED_IN";
 export const USER_WITHOUT_PROFILE_LOGGED_IN = "USER_WITHOUT_PROFILE_LOGGED_IN";
 export const TOKEN_ACQUIRED = "TOKEN_ACQUIRED";
 export const USER_INFO_UPDATED = "USER_INFO_UPDATED";
+export const USER_UPDATED_PROFILE_AND_COVER = "USER_UPDATED_PROFILE_AND_COVER";
 export const USER_IMAGE_UPDATED = "USER_IMAGE_UPDATED";
+export const USER_COVER_UPDATED = "USER_COVER_UPDATED";
 export const USER_LOGGED_OUT = "USER_LOGGED_OUT";
 export const USER_ADDED_TO_FAVORITES = "USER_ADDED_TO_FAVORITES";
 export const USER_REMOVED_FAVORITE = "USER_REMOVED_FAVORITE";
@@ -64,8 +66,16 @@ export function logout() {
   clearViewedTutor();
 }
 
+export function changeProfileAndCoverImage(profilePic, coverPic) {
+  updateStore(USER_UPDATED_PROFILE_AND_COVER, { profilePic, coverPic });
+}
+
 export function changeUserImage(profilePic) {
   updateStore(USER_IMAGE_UPDATED, profilePic);
+}
+
+export function changeUserCoverImage(coverPic) {
+  updateStore(USER_COVER_UPDATED, coverPic);
 }
 
 export function cancelAppointment(appointment) {

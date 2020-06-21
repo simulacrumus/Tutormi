@@ -20,12 +20,7 @@
 }
 
 .summarySmallHeight {
-  height: 20vh;
-}
-
-.profileImg {
-  object-fit: cover;
-  margin-bottom: 30px;
+  height: 30vh;
 }
 
 .textContainer {

@@ -1,5 +1,5 @@
 import {
-  VIEWED_TUTOR_SET, VIEWED_TUTOR_CLEARED, VIEWED_TUTOR_RATED,
+  VIEWED_TUTOR_SET, VIEWED_TUTOR_CLEARED, VIEWED_TUTOR_RATED, VIEWED_TUTOR_AVAILABILITY_UPDATED_REMOTELY,
   VIEWED_TUTOR_AVAILABILITY_UPDATED, VIEWED_TUTOR_APPOINTMENT_BOOKED, VIEWED_TUTOR_APPOINTMENT_CANCELED
 } from "./viewedTutorActions";
 import moment from 'moment';
@@ -16,6 +16,9 @@ export default function viewedTutorReducer(state = { viewedTutor: null }, action
 
     case VIEWED_TUTOR_RATED:
       return { ...state, viewedTutor: { ...state.viewedTutor, rating: action.payload } }
+
+    case VIEWED_TUTOR_AVAILABILITY_UPDATED_REMOTELY:
+      return { ...state, viewedTutor: { ...state.viewedTutor, availableHours: action.payload } }
 
     case VIEWED_TUTOR_AVAILABILITY_UPDATED:
       let copiedAvailableHours = state.viewedTutor.availableHours.slice();

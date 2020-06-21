@@ -29,11 +29,6 @@
   color: #9277c9;
 }
 
-.imageUploadContainer {
-  display: flex;
-  align-items: center;
-}
-
 #profilePictureUploadPreview {
   object-fit: cover;
   border-radius: 50%;
@@ -55,11 +50,6 @@
 .editFormErrorMessage {
   color: red;
   text-align: center;
-}
-
-.imageUploadButtons {
-  display: flex;
-  flex-direction: column;
 }
 
 .deleteConfirm {

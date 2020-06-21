@@ -14,7 +14,7 @@ import AppBar from '@material-ui/core/AppBar';
 import { ThemeProvider } from "@material-ui/core/styles";
 import customTheme from "../../../styles/materialUiTheme";
 import EditSocialArea from "./EditSocialArea";
-import ChangeProfilePictureArea from "./ChangeProfilePictureArea";
+import ChangeUserImagesArea from "./ChangeUserImagesArea";
 import { updateUserInformation, deleteUser } from "../../../util/apiCallFunctions";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
@@ -53,7 +53,8 @@ class EditModal extends Component {
 
               {this.state.tabValue === 0 &&
                 <Form>
-                  <ChangeProfilePictureArea profilePic={this.props.user.profilePic} />
+                  <ChangeUserImagesArea profilePic={this.props.user.profilePic} coverPic={this.props.user.coverPic}
+                    userType={this.props.user.user.type} />
 
                   <Form.Group>
                     <Form.Label>Name</Form.Label>

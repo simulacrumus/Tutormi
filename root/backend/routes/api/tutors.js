@@ -22,8 +22,8 @@ const Appointment = require('../../models/appointment.model');
 router.get('/me', auth, async (req, res) => {
     try {
         const tutor = await Tutor.findOne({
-                user: req.user.user.id
-            })
+            user: req.user.user.id
+        })
             .populate('user', ['name', 'email', 'date', 'type'])
             .populate('appointments')
             .populate('ratings')
@@ -93,13 +93,13 @@ router.post(
 
             // Using upsert option (creates new doc if no match is found):
             const tutor = await Tutor.findOneAndUpdate({
-                    user: req.user.user.id
-                }, {
-                    $set: tutorProfileFields
-                }, {
-                    new: true,
-                    upsert: true
-                })
+                user: req.user.user.id
+            }, {
+                $set: tutorProfileFields
+            }, {
+                new: true,
+                upsert: true
+            })
                 .populate('user', ['name', 'email', 'type'])
                 .populate('appointments')
                 .populate('ratings');
@@ -141,8 +141,8 @@ router.get('/user/:id', async ({
 }, res) => {
     try {
         const tutor = await Tutor.findOne({
-                _id: id
-            })
+            _id: id
+        })
             .populate('user', ['name', 'email', 'type'])
             .populate('appointments')
             .populate('ratings');
@@ -195,6 +195,7 @@ router.delete('/', auth, async (req, res) => {
 // @desc     Get all tutors matching search criteria
 // @access   Public
 router.post('/search', auth, async (req, res) => {
+
     let {
         start,
         end,
@@ -204,9 +205,7 @@ router.post('/search', auth, async (req, res) => {
         name
     } = req.body;
 
-    //let end = req.body.end;
     let query = {};
-
     let appointmentHours = new Array();
     if (start) {
         end = end ? end : new Date(start).setHours(new Date(start).getHours() + 1);
@@ -264,16 +263,25 @@ router.post('/search', auth, async (req, res) => {
         }
 
         query.blockedUsers = {
-            $nin: [req.user.user.id]
+            $not: {
+                $elemMatch: {
+                    $nin: [req.user.user.id]
+                }
+            }
         }
 
         query.blockedBy = {
-            $nin: [req.user.user.id]
+            $not: {
+                $elemMatch: {
+                    $nin: [req.user.user.id]
+                }
+            }
         }
 
         const tutors = await Tutor.find(query)
             .select('courses languages rating bio location profilePic coverPic')
             .populate('user', '-_id -password -type -date -__v -email -confirmed -profile');
+
         res.json(tutors);
     } catch (err) {
         console.error(err.message);
@@ -309,10 +317,7 @@ router.post('/schedule', auth, async (req, res) => {
 
         tutor.availableHours = availibility
 
-        io.getIo().emit('availableHours', {
-            tutor: tutor.id,
-            availableHours: availibility
-        })
+        io.getIo().emit(`availableHours-${tutor.id}`, availibility)
         res.json(tutor);
     } catch (err) {
         console.error(err.message)
@@ -424,5 +429,17 @@ router.post('/cover-pic', auth, upload.single('image'), async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+router.post('/addcover', async (req, res) => {
+    try {
+        const tutors = await Tutor.updateMany({
+            coverPic: 'default-cover-pic.png'
+        })
+        res.json(tutors)
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+})
 
 module.exports = router;
