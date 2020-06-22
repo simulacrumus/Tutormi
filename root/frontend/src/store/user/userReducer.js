@@ -4,8 +4,8 @@ import {
     AVAILABILITY_CANCELED, APPOINTMENT_BOOKED, APPOINTMENT_CANCELED, USER_LOGGED_OUT,
     USER_IMAGE_UPDATED, USER_ADDED_TO_FAVORITES, USER_REMOVED_FAVORITE, USER_WITHOUT_PROFILE_LOGGED_IN,
     USER_REMOVED_RATING, USER_COVER_UPDATED,
-    USER_BLOCKED_SOMEONE,
-    USER_UNBLOCKED_SOMEONE, USER_UPDATED_PROFILE_AND_COVER
+    USER_BLOCKED_SOMEONE, AVAILABILITY_UPDATED,
+    USER_UNBLOCKED_SOMEONE, USER_UPDATED_PROFILE_AND_COVER, APPOINTMENTS_UPDATED
 } from './userActions';
 import { convertTimeSlotToSingleHours } from "../../util/scheduleFunctions";
 
@@ -60,6 +60,12 @@ export default function userReducer(state = initialState, action) {
                     social: action.payload.social
                 }
             };
+
+        case AVAILABILITY_UPDATED:
+            return { ...state, user: { ...state.user, availableHours: action.payload } };
+
+        case APPOINTMENTS_UPDATED:
+            return { ...state, user: { ...state.user, appointments: action.payload } };
 
         case USER_BLOCKED_SOMEONE:
             let blockedListName = state.user.user.type === "tutor" ? "blockedTutees" : "blockedTutors";
