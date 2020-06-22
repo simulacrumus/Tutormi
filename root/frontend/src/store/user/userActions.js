@@ -23,6 +23,16 @@ export const AVAILABILITY_OPENED = "AVAILABILITY_OPENED";
 export const AVAILABILITY_CANCELED = "AVAILABILITY_CANCELED";
 export const APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED";
 export const APPOINTMENT_CANCELED = "APPOINTMENT_CANCELED";
+export const AVAILABILITY_UPDATED = "AVAILABILITY_UPDATED";
+export const APPOINTMENTS_UPDATED = "APPOINTMENTS_UPDATED";
+
+export function updateAvailability(availability) {
+  updateStore(AVAILABILITY_UPDATED, availability);
+}
+
+export function updateAppointments(appointments) {
+  updateStore(APPOINTMENTS_UPDATED, appointments);
+}
 
 export function addRatingToTutor(rating) {
   updateStore(USER_RATED_TUTOR, rating);

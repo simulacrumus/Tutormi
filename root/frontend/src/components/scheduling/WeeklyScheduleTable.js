@@ -11,6 +11,7 @@ import {
 } from "../../util/scheduleFunctions.js";
 import { isTutee, isViewedTutorSet } from "../../util/authenticationFunctions";
 import { updateViewedTutorAvailability } from "../../store/viewed-tutor/viewedTutorActions";
+import { updateAvailability, updateAppointments } from "../../store/user/userActions";
 import socketIOClient from "socket.io-client";
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -35,17 +36,25 @@ class WeeklyScheduleTable extends Component {
         );
     }
 
+    // Listen for availability and appointment changes
     componentDidMount() {
         const socket = socketIOClient("http://localhost:5000");
 
-        if (isTutee() && isViewedTutorSet()) {
+        if (isTutee() && isViewedTutorSet()) { // Checking for changes in the viewed tutor's availability
             socket.on(`availableHours-${this.props.viewedTutor._id}`, availableHours => {
                 updateViewedTutorAvailability(availableHours);
             });
 
-        } else if (!isTutee) {
-
+        } else if (!isTutee()) { // Checking for changes in the user's availability (if the user is a tutor)
+            socket.on(`availableHours-${this.props.user._id}`, availableHours => {
+                updateAvailability(availableHours);
+            });
         }
+
+        // Checking for changes in the user's appointments (for tutees and tutors)
+        socket.on(`appointments-${this.props.user._id}`, appointments => {
+            updateAppointments(appointments)
+        });
     }
 
     makeDayHeaderCells() {
