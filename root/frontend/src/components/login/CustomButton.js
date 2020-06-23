@@ -1,5 +1,5 @@
 import React from "react";
-import classes from "./CustomButton.css";
+import "./CustomButton.css";
 
 const CustomButton = (props) => (
   // reusable button component, class name

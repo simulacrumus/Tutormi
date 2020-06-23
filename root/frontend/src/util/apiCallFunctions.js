@@ -1,5 +1,9 @@
 import { store } from "../store/configureStore";
-import { userWithProfileLoggedIn, userWithoutProfileLoggedIn, addToken } from "../store/user/userActions";
+import {
+  userWithProfileLoggedIn,
+  userWithoutProfileLoggedIn,
+  addToken,
+} from "../store/user/userActions";
 import { setViewedTutor } from "../store/viewed-tutor/viewedTutorActions";
 import { setViewedTutee } from "../store/viewed-tutee/viewedTuteeActions";
 
@@ -8,11 +12,29 @@ export async function checkTokenExpiry() {
     method: "GET",
     headers: {
       "x-auth-token": store.getState().user.token,
-    }
+    },
   });
-
+  console.log("this is the response: " + response);
   response = await response.json();
+  console.log(
+    "result of the apiCallFunction is: " + response.valid !== undefined
+  );
   return response.valid !== undefined;
+}
+
+export async function checkURLtokenExpiry(token) {
+  let response = await fetch("api/auth/expiry", {
+    method: "GET",
+    headers: {
+      "x-auth-token": token,
+    },
+  });
+  
+  response = await response.json();
+  console.log("this is the response: " + response);
+  console.log(
+    "result of the checkURLtokenExpiry is: " + (JSON.stringify(response)));
+  return JSON.stringify(response);
 }
 
 export async function saveAppointment(appointment) {
@@ -55,7 +77,10 @@ export async function uploadProfilePicture(imageFile, userType) {
   let formData = new FormData();
   formData.append("image", imageFile);
 
-  let apiRoute = userType === "tutor" ? "/api/tutors/profile-pic" : "/api/tutees/profile-pic";
+  let apiRoute =
+    userType === "tutor"
+      ? "/api/tutors/profile-pic"
+      : "/api/tutees/profile-pic";
   console.log(apiRoute);
   let uploadResponse = await fetch(apiRoute, {
     method: "POST",
@@ -71,7 +96,8 @@ export async function uploadCoverPicture(imageFile, userType) {
   let formData = new FormData();
   formData.append("image", imageFile);
 
-  let apiRoute = userType === "tutor" ? "/api/tutors/cover-pic" : "/api/tutees/cover-pic";
+  let apiRoute =
+    userType === "tutor" ? "/api/tutors/cover-pic" : "/api/tutees/cover-pic";
   let uploadResponse = await fetch(apiRoute, {
     method: "POST",
     headers: { "x-auth-token": store.getState().user.token },
@@ -104,7 +130,7 @@ export async function changeForgottenPassword(email) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email: email
+      email: email,
     }),
   });
 
@@ -134,7 +160,7 @@ export async function createAccount(name, email, password, type) {
 
 export async function updateTuteeFavorites(tutorId, shouldAdd) {
   let response = await fetch(`api/tutees/favorites/${tutorId}`, {
-    method: (shouldAdd ? "PUT" : "DELETE"),
+    method: shouldAdd ? "PUT" : "DELETE",
     headers: {
       "x-auth-token": store.getState().user.token,
     },
@@ -153,14 +179,15 @@ export async function authenticateAndLoginUser(email, password, userType) {
     body: JSON.stringify({
       email: email,
       password: password,
-      type: userType
+      type: userType,
     }),
   });
 
   const status = authResponse.status;
   const responseToken = await authResponse.json();
 
-  if (status === 200) { // Valid token is acquired
+  if (status === 200) {
+    // Valid token is acquired
     addToken(responseToken.token);
 
     if (responseToken.hasProfile) {
@@ -174,7 +201,6 @@ export async function authenticateAndLoginUser(email, password, userType) {
   } else {
     return responseToken.errors[0].message;
   }
-
 }
 
 export async function logIn(token, userType) {
@@ -186,8 +212,8 @@ export async function logIn(token, userType) {
   });
 
   let user = await userResponse.json();
-  user.user.type = userType; // Set user type 
-  console.log(user)
+  user.user.type = userType; // Set user type
+  console.log(user);
   return user;
 }
 
@@ -201,10 +227,9 @@ export async function addRating(tutorId, rating, currentRatingId) {
     body: JSON.stringify({
       tutorId: tutorId,
       rate: rating,
-      currentRatingId: currentRatingId
-    })
+      currentRatingId: currentRatingId,
+    }),
   });
-
 
   response = await response.json();
   return response;
@@ -213,11 +238,11 @@ export async function addRating(tutorId, rating, currentRatingId) {
 export async function deleteRating(ratingId) {
   let response = await fetch(`api/ratings/${ratingId}`, {
     method: "DELETE",
-    headers: { "x-auth-token": store.getState().user.token, }
+    headers: { "x-auth-token": store.getState().user.token },
   });
 
   response = await response.json();
-  console.log(response)
+  console.log(response);
   return response;
 }
 
@@ -225,7 +250,7 @@ export async function deleteUser(userType) {
   let apiRoute = userType === "tutor" ? "/api/tutors" : "/api/tutees";
   let response = await fetch(apiRoute, {
     method: "DELETE",
-    headers: { "x-auth-token": store.getState().user.token }
+    headers: { "x-auth-token": store.getState().user.token },
   });
 
   response = await response.json();
@@ -241,7 +266,7 @@ export async function updateEmail(newEmail, password) {
     body: JSON.stringify({
       email: newEmail,
       password: password,
-    })
+    }),
   });
 
   response = await response.json();
@@ -259,12 +284,33 @@ export async function changePassword(currentPassword, newPassword) {
     body: JSON.stringify({
       currentPassword: currentPassword,
       newPassword: newPassword,
-    })
+    }),
   });
 
   response = await response.json();
   console.log(response);
   return response;
+}
+//function to reset forgotten password
+export async function resetForgottenPassword(password, token) {
+  let response = await fetch("api/users/password", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": token,
+    },
+    body: JSON.stringify({
+      password: password,
+    }),
+  });
+
+  response = await response.json();
+  console.log(
+    "resetForgottenPassword says that this is the response: " + response
+  );
+  console.log("resetForgottenPassword says: this is the token: " + token);
+  console.log("resetForgottenPassword says: this is the password:" + password);
+  return JSON.stringify(response);
 }
 
 export async function resetPassword(newPassword) {
@@ -276,17 +322,17 @@ export async function resetPassword(newPassword) {
     },
     body: JSON.stringify({
       password: newPassword,
-    })
+    }),
   });
 
   response = await response.json();
-  console.log(response);
+  console.log("resetPassword says: " + response);
   return response;
 }
 
 export async function getAndSetViewedTutor(id) {
   let response = await fetch(`/api/tutors/user/${id}`, {
-    method: "GET"
+    method: "GET",
   });
 
   let viewedTutor = await response.json();
@@ -295,7 +341,7 @@ export async function getAndSetViewedTutor(id) {
 
 export async function getAndSetViewedTutee(id) {
   let response = await fetch(`api/tutees/user/${id}`, {
-    method: "GET"
+    method: "GET",
   });
 
   let viewedTutee = await response.json();
@@ -307,7 +353,7 @@ export async function blockUser(id) {
   console.log(id);
   let response = await fetch(`api/users/block/${id}`, {
     method: "PUT",
-    headers: { "x-auth-token": store.getState().user.token }
+    headers: { "x-auth-token": store.getState().user.token },
   });
 
   response = await response.json();
@@ -317,7 +363,7 @@ export async function blockUser(id) {
 export async function unBlockUser(id) {
   let response = await fetch(`api/users/block/${id}`, {
     method: "DELETE",
-    headers: { "x-auth-token": store.getState().user.token }
+    headers: { "x-auth-token": store.getState().user.token },
   });
 
   response = await response.json();
