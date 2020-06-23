@@ -3,7 +3,6 @@ import { Form, Modal } from "react-bootstrap";
 
 import { createAccount } from "../../util/apiCallFunctions";
 import CustomButton from "./CustomButton.js";
-import MainNavigation from "../navigation/MainNavigation";
 
 import "./Login.css";
 
@@ -15,7 +14,6 @@ const validateForm = (errors) => {
   Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
   return valid;
 };
-const userType = "";
 class SingUp extends Component {
   constructor(props) {
     super(props);
@@ -67,7 +65,7 @@ class SingUp extends Component {
         break;
       case "password2":
         errors.password2 =
-          this.state.password == this.state.password2
+          this.state.password === this.state.password2
             ? ""
             : "passwords do not match!";
         break;
@@ -76,16 +74,13 @@ class SingUp extends Component {
     }
 
     this.setState({ errors, [name]: value }, () => {
-      //console.log(errors);
+
     });
   }
 
   async handleSubmit(event) {
     event.preventDefault();
-    let errors = this.state.errors;
-    console.log(
-      "Handle Submit says: this is a user type: " + this.state.userType
-    );
+    
     if (
       validateForm(this.state.errors) &&
       this.state.email &&

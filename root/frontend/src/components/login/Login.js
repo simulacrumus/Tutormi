@@ -25,12 +25,12 @@ class Login extends Component {
       password: "",
       userType: "",
       showModal: false,
-      emailF:"", //email that was entered in the modal
+      forgottenEmail:"", //email that was entered in the modal
       errors: {
         email: "",
         password: "",
         login: "",
-        emailF: "",
+        forgottenEmail: "",
       },
     };
 
@@ -55,16 +55,16 @@ class Login extends Component {
           errors.email = "email is to long!";
         }
         break;
-        case "emailF":
-          this.setState({ ...this.state, emailF: event.target.value });
-          errors.emailF = !this.state.emailF ? "email can't be empty!" : "";
-          if (this.state.email) {
-            errors.emailF = validEmailRegex.test(value)
+        case "forgottenEmail":
+          this.setState({ ...this.state, forgottenEmail: event.target.value });
+          errors.forgottenEmail = !this.state.forgottenEmail ? "email can't be empty!" : "";
+          if (this.state.forgottenEmail) {
+            errors.forgottenEmail = validEmailRegex.test(value)
               ? ""
               : "email is not valid!";
           }
           if (value.length > 30) {
-            errors.emailF = "email is to long!";
+            errors.forgottenEmail = "email is to long!";
           }
           break;
       case "password":
@@ -75,7 +75,6 @@ class Login extends Component {
           errors.password = "password can be maximum 30 characters";
         }
         break;
-
       default:
         break;
     }
@@ -87,11 +86,11 @@ class Login extends Component {
     );
     event.preventDefault();
     //if the type wasn't set execute forgort email function
-    if (this.state.emailF !== "") {
+    if (this.state.forgottenEmail !== "") {
       let emailSent = "";
-      if (this.state.errors && this.state.emailF) {
+      if (this.state.errors && this.state.forgottenEmail) {
         console.log(emailSent)
-        emailSent = await changeForgottenPassword(this.state.emailF);
+        emailSent = await changeForgottenPassword(this.state.forgottenEmail);
       }
       //if no error message change modal body
       if (!emailSent) {
@@ -105,19 +104,19 @@ class Login extends Component {
     }else{
       console.error("HANDLE SUBMIT SAYS: invalid Form");
     }
-    //if the type is set and no error ocure execute login function
+    //if the type is set and no error ocured execute login function
     if (
       this.state.errors &&
       this.state.email &&
       this.state.password
     ) {
-      console.info("HANDLE SUBMIT SAYS: Valid Form");
+      //console.info("HANDLE SUBMIT SAYS: Valid Form");
       let login = await authenticateAndLoginUser(
         this.state.email,
         this.state.password,
         this.state.userType
       );
-      console.log("value of LOGIN returned is: ", login);
+      //console.log("value of LOGIN returned is: ", login);
       if (!login) {
         if (isProfileSetUp())
           // User who has created their account previously should be sent to profile
@@ -130,14 +129,12 @@ class Login extends Component {
       }
     }
   }
-  // *************************************************************************************************************8
+
   render() {
-    // console.log("xxxxxxxxxxxxxxxxxxxxxx", this.state); //to check the most up to date state
+    // console.log("most up to date state is: ", this.state); //to check the most up to date state
     const { errors } = this.state;
-
     return (
-      <> {/* **************************************************************************************** */}
-
+      <>
         <Modal
           centered="true"
           show={this.state.showModal}
@@ -146,22 +143,19 @@ class Login extends Component {
             window.location.href = "/login";
           }}
         >
-          <Modal.Header closeButton>
+                    <Modal.Header closeButton>
             <Modal.Title id ="title">Forgot your password? We got you!</Modal.Title>
-          </Modal.Header>
-      
+          </Modal.Header>      
           <Modal.Body id = "modal-body">
             <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formBasicEmail">
                 <Form.Control
                   onBlur={this.handleInputChange}
                   onChange={this.handleInputChange}
-                  name="emailF"
+                  name="forgottenEmail"
                   placeholder="Enter your email"
                 />
-                {errors.emailF.length > 0 && (
-                  <Form.Text className="error">{errors.emailF}</Form.Text>
-                )}
+                {errors.forgottenEmail.length > 0 && (<Form.Text className="error">{errors.forgottenEmail}</Form.Text>)}
               </Form.Group>
               <Form.Text id="submittion-error" className="error">
                 {errors.login}
@@ -172,21 +166,16 @@ class Login extends Component {
                   type="submit"
                   onClick={() => {
                     console.log("I am in the Modal");
-                    this.setState({ ...this.state, emailF: this.state.emailF });
-                  
+                    this.setState({ ...this.state, forgottenEmail: this.state.forgottenEmail });                
                   }}
-                >
-                  reset password
-                </CustomButton>
+                >reset password</CustomButton>
               </div>
             </Form>
           </Modal.Body>
         </Modal>
-        {/* ************************************************************************************ */}
         <div className="parentLoginFormBoxContainer">
           <div className="loginFormBoxContainer">
             <h3 className="welcomeSign">Sign In</h3>
-
             <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formBasicEmail">
                 <Form.Label>Email address</Form.Label>
@@ -221,11 +210,9 @@ class Login extends Component {
                   label="Remember me"
                 />
               </Form.Group>
-
               <Form.Text id="submittion-error" className="error">
                 {errors.login}
               </Form.Text>
-
               <CustomButton
                 name="login"
                 type="submit"
@@ -233,49 +220,39 @@ class Login extends Component {
                   console.log("you clicked the button tutor");
                   this.setState({ ...this.state, userType: "tutor" });
                 }}
-              >
-                Login as a tutor
-              </CustomButton>
+              >Login as a tutor</CustomButton>
               <CustomButton
                 type="submit"
                 name="login"
                 onClick={() => {
                   this.setState({ ...this.state, userType: "tutee" });
                 }}
-              >
-                Login as a tutee
-              </CustomButton>
+              >Login as a tutee</CustomButton>
             </Form>
+             {/* forgot password, click on the link shows a modal */}
             <Form.Text
               style={{ alignSelf: "flex-end" }}
               className="forgot-password"
-            >
-              Forgot{" "}
-              <a
+            >Forgot{" "}<a
                 href="/login"
                 id="myButton"
                 onClick={(e) => {
                   e.preventDefault();
                   this.setState({ ...this.state, showModal: true });
                 }}
-              >
-                password?
-              </a>
+              >password?</a>
             </Form.Text>
             <br />
+            {/* Sign up for TutorMi redirection to sign up page */}
             <Form.Text style={{ fontSize: "15px" }}>
               Not a member yet?
             </Form.Text>
-
             <CustomButton
               name="buttonSignUp"
               onClick={() => {
-             
-                window.location.href = "/signup";
+                   window.location.href = "/signup";
               }}
-            >
-              sign up
-            </CustomButton>
+            > sign up </CustomButton>
           </div>
         </div>
       </>
