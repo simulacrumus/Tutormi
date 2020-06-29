@@ -33,7 +33,7 @@
   color: #f2f2f2;
   /* width: 110px; */
   border: 0.6px solid #e1e1e1;
-  background-color: #a385e0;
+  background-color: #8060eb;
 }
 
 .weeklySchedule td {
@@ -50,7 +50,7 @@
 .weekControlSection {
   display: flex;
   flex-direction: column;
-  background-color: #e6dff5;
+  background-color: #E4DDFB;
   margin-bottom: 3px;
   font-weight: normal;
   padding: 10px;
