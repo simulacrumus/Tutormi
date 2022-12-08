@@ -22,10 +22,10 @@
   "homepage": "https://github.com/simulacrumus/Tutormi#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.1",
     "concurrently": "^5.2.0",
     "config": "^3.3.1",
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "express-fileupload": "^1.1.7-alpha.3",
     "express-handlebars": "^4.0.4",
     "express-validator": "^6.4.1",
